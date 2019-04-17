@@ -1,0 +1,11 @@
+configobj
+GeoAlchemy2
+Shapely
+SQLAlchemy
+sqlahelper
+alembic
+click
+netCDF4
+xarray >= 10.6
+dask
+toolz
