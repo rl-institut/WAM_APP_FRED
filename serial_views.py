@@ -16,7 +16,7 @@ def serializer():
 
     for record in session.query(oep_modles.classes['Location']).limit(100):
         # ToDo: why type error: TypeError: bytes or integer address expected instead of str instance
-        geometry = loads(record.point.wkb)
+        geometry = loads(str(record.point), True)
         feature = Feature(id=record.id, geometry=geometry)
         features.append(feature)
 
