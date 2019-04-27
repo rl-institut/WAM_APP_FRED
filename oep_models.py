@@ -1,13 +1,7 @@
 # Add all open_FRED table models form source DB: OEP
-
-# from sqlalchemy import create_engine, MetaData, Table, Column, MetaData, ARRAY, BigInteger, Boolean, \
-#                         Column, Float, ForeignKey, Integer, JSON, String, Table
-# from sqlalchemy.ext.declarative import declarative_base
-# from sqlalchemy.orm import sessionmaker
 import WAM_APP_FRED.app_settings
 from geoalchemy2 import WKTElement as WKT, types as geotypes
 from sqlalchemy import (
-    create_engine,
     BigInteger as BI,
     Column as C,
     DateTime as DT,
@@ -25,9 +19,6 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import mapper, relationship, sessionmaker
-from sqlalchemy.orm.exc import MultipleResultsFound as MRF
-from sqlalchemy.inspection import inspect
-from sqlalchemy.schema import AddConstraint, CheckConstraint, CreateSchema
 
 import sqlahelper as sah
 
