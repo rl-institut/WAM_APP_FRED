@@ -1,4 +1,5 @@
 # serialize data for all models
+from django.http import HttpResponse
 
 import WAM_APP_FRED.oep_models as oep_modles
 # from WAM_APP_FRED.db_sqla import *
@@ -31,8 +32,15 @@ def serializer():
 
     return dumps(FeatureCollection(features))
 
+class GeoView():
 
-# print(serializer())
-# print('WAIT')
+    def geojson_view(self):
+        """
+
+        :return:
+        """
+        geojsondata = serializer()
+        # return render(geojsondata, GeoView.template_name, context={'geo_json':geojsondata})
+        return HttpResponse(geojsondata, content_type="application/json")
 
 
