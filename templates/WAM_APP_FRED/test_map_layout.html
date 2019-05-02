@@ -246,6 +246,34 @@
 
     <script src="{% static 'WAM_APP_FRED/foundation/js/app.js' %}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+            var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}"
+
+            function map_init_basic (map, options) {
+              var popup = L.popup()
+
+              L.marker([53.4554, 9.6211]).addTo(map); // example marker to quickly show if map loads
+
+              // LV BranchTee
+                $.ajax({
+                    url: locations_dataurl,
+                    dataType: 'json',
+                    async: true,
+                    success: function(loca){
+                        var layer = new L.geoJSON(loca, {
+                            pointToLayer: function (feature, latlng) {
+                                return L.marker(latlng);
+                            }
+                        })
+                        map.addLayer(layer)
+                        layer.bringToBack();
+                        }
+                });
+
+            };
+
+    </script>
 
   </body>
 </html>
