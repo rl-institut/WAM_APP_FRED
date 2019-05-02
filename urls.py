@@ -7,8 +7,6 @@ urlpatterns = [
     # path('', views.fred_map, name='index')
     path('', views.webgui_test, name='index'),
 
-    # 1 - Line
-    # path('Lines.data/', serial_views.LinesData.as_view(), name='Lines.data'),
-
+    # just point geometrys as geojson featureCollection
     path('Locations.data/', GeoView.geojson_view, name='Locations.data')
 ]
