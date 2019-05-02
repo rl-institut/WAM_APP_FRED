@@ -9,7 +9,7 @@ from wam import settings
 # from . import oep_models
 
 
-wam_config = settings.config['DATABASES']['OEP_LOCAL_SQLA']
+wam_config = settings.config['DATABASES']['OEP']
 
 ############################################SQLAlchemy ENGINE#####+#####################################################
 # db connection string for sqlalchemy-engine
