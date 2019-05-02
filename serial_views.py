@@ -12,7 +12,6 @@ import sqlahelper as sah
 def serializer():
     """
     returns the queryed table id, geom as GEOJSON featureCollection
-
     :return: dict - geojson featureCollection
     """
 
@@ -33,11 +32,13 @@ def serializer():
     return dumps(FeatureCollection(features))
 
 class GeoView():
+    """
+    geo view object
+    """
 
     def geojson_view(self):
         """
-
-        :return:
+        :return: Geojson as http response for url
         """
         geojsondata = serializer()
         # return render(geojsondata, GeoView.template_name, context={'geo_json':geojsondata})
