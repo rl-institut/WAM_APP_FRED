@@ -133,5 +133,5 @@ def mapped_classes(metadata):
     return classes
 
 
-# contains open_FRED related tables as sqla classes
+# contains open_FRED related tables as sqla class
 classes = mapped_classes(metadata)
