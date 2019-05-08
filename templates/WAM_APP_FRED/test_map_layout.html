@@ -248,6 +248,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript">
 
+            // define a var which holds a GEOJSON from a URL provided by django
             var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}"
 
             function map_init_basic (map, options) {
@@ -255,7 +256,7 @@
 
               L.marker([53.4554, 9.6211]).addTo(map); // example marker to quickly show if map loads
 
-              // LV BranchTee
+              // create a ajax call for LV BranchTee
                 $.ajax({
                     url: locations_dataurl,
                     dataType: 'json',
