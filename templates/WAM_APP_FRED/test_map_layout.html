@@ -261,13 +261,17 @@
                     url: locations_dataurl,
                     dataType: 'json',
                     async: true,
+                    // if the data-source can be accessed, create a GEOJSON layer
                     success: function(loca){
                         var layer = new L.geoJSON(loca, {
+                            // create the markers for every geometry (POINT) in GEOJSON(featureCollection)
                             pointToLayer: function (feature, latlng) {
                                 return L.marker(latlng);
                             }
                         })
+                        // add the geojson layer to map
                         map.addLayer(layer)
+                        // might not be usable, should bring th elements to back
                         layer.bringToBack();
                         }
                 });
