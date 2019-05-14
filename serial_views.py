@@ -3,7 +3,7 @@ from django.http import HttpResponse
 
 import WAM_APP_FRED.oep_models as oep_modles
 # from WAM_APP_FRED.db_sqla import *
-from shapely.wkb import loads
+from shapely.wkb import loads as loadswkb
 from geojson import Feature, FeatureCollection, dumps
 from geoalchemy2 import functions
 import sqlahelper as sah
@@ -34,7 +34,10 @@ import sqlahelper as sah
 
 def serializer():
     """
-    returns the query result containing id, geom from table as GEOJSON featureCollection
+    returns a query result containing a full record from OEP table model_draft.openfred_series
+    as GEOJSON featureCollection. All related tables are joined and the values are included as
+    property within the GEOJSON.
+
     :return: dict - geojson featureCollection
     """
 
@@ -51,10 +54,24 @@ def serializer():
                                 oep_modles.classes['Variable']).join(oep_modles.classes['Timespan'])\
                                                                .join(oep_modles.classes['Location'])\
                                                                .join(oep_modles.classes['Variable']).limit(100):
-        geometry = loads(str(record.Series.location.point), True)
 
-        # propertys = record.id  # dict
-        feature = Feature(id=record.Series.location_id, geometry=geometry)
+        # Collection all Columns to be included from tables timespan and values
+        # ToDo: maybe serialize the following on another session
+        # record.Series.timespan.segments not included "list to long"
+        # record.Series.values not included "list to long"
+        timespan_collection = {"Start": record.Series.timespan.start, "Stop": record.Series.timespan.stop,
+                               "Resolution": record.Series.timespan.resolution}
+
+        netcdf = record.Series.variable.netcdf_attributes
+        variables_collection = {"Name": record.Series.variable.name}
+        variables_collection["NetCDF"] = netcdf
+
+        geometry = loadswkb(str(record.Series.location.point), True)
+
+        propertys = {"SeriesID": record.Series.id, "values": record.Series.values, "height": record.Series.height}
+        propertys.update(timespan_collection)
+        propertys.update(variables_collection)
+        feature = Feature(id=record.Series.location_id, geometry=geometry, properties=propertys)
 
         features.append(feature)
 
@@ -76,6 +93,3 @@ class GeoView():
 
     def geo_filter(self):
         pass
-
-
-serializer()
