@@ -7,7 +7,7 @@ from shapely.wkb import loads as loadswkb
 from geojson import Feature, FeatureCollection, dumps
 from geoalchemy2 import functions
 import sqlahelper as sah
-
+from datetime import datetime
 
 # def serializer():
 #     """
@@ -59,8 +59,10 @@ def serializer():
         # ToDo: maybe serialize the following on another session
         # record.Series.timespan.segments not included "list to long"
         # record.Series.values not included "list to long"
-        timespan_collection = {"Start": record.Series.timespan.start, "Stop": record.Series.timespan.stop,
-                               "Resolution": record.Series.timespan.resolution}
+        # ToDo: How to handel the DateTimeObj so it is Json Serializeable
+        # timespan_collection = {"Start": record.Series.timespan.start.strftime('%b %d %Y %I:%M%p'),
+        #                        "Stop": record.Series.timespan.stop.strftime('%b %d %Y %I:%M%p'),
+        #                        "Resolution": record.Series.timespan.resolution}
 
         netcdf = record.Series.variable.netcdf_attributes
         variables_collection = {"Name": record.Series.variable.name}
@@ -69,7 +71,7 @@ def serializer():
         geometry = loadswkb(str(record.Series.location.point), True)
 
         propertys = {"SeriesID": record.Series.id, "values": record.Series.values, "height": record.Series.height}
-        propertys.update(timespan_collection)
+        # propertys.update(timespan_collection)
         propertys.update(variables_collection)
         feature = Feature(id=record.Series.location_id, geometry=geometry, properties=propertys)
 
