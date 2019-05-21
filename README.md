@@ -47,6 +47,14 @@ To handel the two different connections you will need to have 2 section with bas
 the same OEP connection credentials but a different Engine provided. Example can be found
 [here](https://wam.readthedocs.io/en/latest/getting_started.html#configuration-file).
 
+Django
+````
+ENGINE = django.contrib.gis.db.backends.postgis
+````
+SQLAlchemy
+````
+ENGINE = postgresql+psycopg2
+````
 * Include this in your views.py
 ````
 from django.shortcuts import render
@@ -66,6 +74,13 @@ urlpatterns = [
     path('', views.fred_map, name='index')
 ] 
 ````
+* To run the local django server just open up a console that can access the manage.py 
+provided by django (in dir WAM) and use the following command line input. If this fails 
+you can try to debug this with the exception, or create a issue. 
+
+````
+python manage.py runserver
+```` 
 
 LICENSE
 -------
