@@ -1,4 +1,4 @@
-@charset "UTF-8";
+ @charset "UTF-8";
 .l-bg-color {
   background-color: #002E4F; }
 
@@ -1277,10 +1277,10 @@ footer {
 .off-canvas-wrapper .off-canvas .tabs-content__wrapper {
   min-height: calc(100vh - 2.5rem);
   background-color: #EBF2FA;
-  width: 100%; }
+  /*width: 100%;*/ }
   @media print, screen and (min-width: 40em) {
     .off-canvas-wrapper .off-canvas .tabs-content__wrapper {
-      width: 30rem; } }
+      /*width: 30rem;*/ } }
 
 .off-canvas-wrapper .off-canvas .tabs-content {
   background-color: #EBF2FA;
