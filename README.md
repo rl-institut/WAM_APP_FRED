@@ -43,37 +43,21 @@ You should have created the environment variable while setting up the WAM.
 valid OEP connection. The OEP is a external database. Because it is not known by django
 we need to use a independent method to access the data.
 !You will need to have access to the OEP! 
-To handel the two different connections you will need to have 2 section with basically 
-the same OEP connection credentials but a different Engine provided. Example can be found
-[here](https://wam.readthedocs.io/en/latest/getting_started.html#configuration-file).
+To handel the two different databases (OEP, django internal) you will need to have 2 sections. 
+Example can be found [here](https://wam.readthedocs.io/en/latest/getting_started.html#configuration-file). 
 
-Django
+What are the differences between a Django engine:value and a SQLAlchemy engine:value?
+
 ````
+In Django Config section:
 ENGINE = django.contrib.gis.db.backends.postgis
 ````
-SQLAlchemy
+
 ````
+In SQLAlchemy Config section:
 ENGINE = postgresql+psycopg2
 ````
-* Include this in your views.py
-````
-from django.shortcuts import render
 
-def fred_map(request):
-    return render(request, 'WAM_APP_FRED/fred_map.html')
-
-````
-
-* Include this in your urls.py
-````
-from django.urls import path
-from . import views
-app_name = 'WAM_APP_FRED'
-
-urlpatterns = [
-    path('', views.fred_map, name='index')
-] 
-````
 * To run the local django server just open up a console that can access the manage.py 
 provided by django (in dir WAM) and use the following command line input. If this fails 
 you can try to debug this with the exception, or create a issue. 
