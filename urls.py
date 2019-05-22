@@ -8,5 +8,5 @@ urlpatterns = [
     path('', views.webgui_test, name='index'),
 
     # just point geometrys as geojson featureCollection
-    path('Locations.data/', Serializer.geometry_view, name='Locations.data')
+    path('Locations.data/', Serializer.wseries_geometry_view, name='Locations.data')
 ]
