@@ -20,5 +20,10 @@ Here is a template for new release sections
 
 ### Added
 - CHANGELOG.md
+- requirements.txt
 
 ### Changed
+-
+
+### Removed
+- wam_environment.yml
