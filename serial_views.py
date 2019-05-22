@@ -35,9 +35,8 @@ from datetime import datetime
 
 class Serializer():
     """
-    returns a query result containing a full record from OEP table model_draft.openfred_series
-    as GEOJSON featureCollection. All related tables are joined and the values are included as
-    property within the GEOJSON.
+    returns a query result containing a full record from OEP table as GEOJSON featureCollection.
+    All related tables are joined and the values are included as property within the GEOJSON.
 
     :return: dict - geojson featureCollection
     """
@@ -47,7 +46,15 @@ class Serializer():
     session = Session()
     ##############################################
 
-    def geometry_view(serlf):
+    def wseries_geometry_view(self):
+        """
+        returns a query result containing a full record from OEP table as GEOJSON featureCollection.
+        Just the geometry is included.
+        All related tables are joined and the values are included as property within the GEOJSON.
+
+        :return:
+        """
+
         features = []
 
         for record in Serializer.session.query(oep_modles.classes['Series'],
@@ -62,7 +69,16 @@ class Serializer():
 
 
 
-    def property_view(self):
+    def wseries_property_view(self):
+        """
+        returns a query result containing a full record from OEP table as GEOJSON featureCollection.
+        No geometry is included.
+        All related tables are joined and the values are included as property within the GEOJSON.
+
+
+        :return:
+        """
+
         features = []
 
         for record in Serializer.session.query(oep_modles.classes['Series'],
@@ -92,10 +108,11 @@ class Serializer():
 
         return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
 
-        # def get_single_weatherpoint(self, request):
+        # def wseries_get_single_point(self, request):
         #     """
         #     Return the data for the closest weather-point for a given position
         #     as GeoJSON.
+        #     The given position is provided as HTTP POST/GET method.
         #
         #     request: is the current mouse position passed from client
         #     :return:
@@ -111,4 +128,26 @@ class Serializer():
         #
         #
         #             return HttpResponse(geojsondata, content_type="application/json")
+
+    def pp_list_geometry_view(self):
+        """
+        This function will return a geojson with all power-plants
+        :return:
+        """
+        pass
+
+    def kw_list_property_view(self):
+        """
+        This function will return a geojson with all property´s for each power-plant
+        :return:
+        """
+        pass
+
+    def district_feedin_series(self):
+        """
+        This function will return a json/geojson with pre calculated data for a single or multiple district.
+        The data will include a feedin time series for each district.
+        :return:
+        """
+        pass
 
