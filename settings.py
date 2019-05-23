@@ -1,4 +1,4 @@
-#app setting e.g. add default  map size
+# app setting e.g. add default  map size
 
 LEAFLET_CONFIG = {
     # conf here

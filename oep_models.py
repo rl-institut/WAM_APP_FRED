@@ -1,6 +1,6 @@
 # Add all open_FRED table models form source DB: OEP
-import WAM_APP_FRED.app_settings
-from geoalchemy2 import WKTElement as WKT, types as geotypes
+
+
 from sqlalchemy import (
     BigInteger as BI,
     Column as C,
@@ -12,29 +12,30 @@ from sqlalchemy import (
     JSON,
     MetaData,
     String as Str,
-    Table,
     Text,
     UniqueConstraint as UC,)
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import mapper, relationship, sessionmaker
-
+from sqlalchemy.orm import relationship
 import sqlahelper as sah
+from geoalchemy2 import types as geotypes
 
+# import WAM_APP_FRED.app_settings
 # from geoalchemy2.types import Geometry
 # from WAM_APP_FRED.cli.openFRED import mapped_classes, db_session
 
 
-############################################SQLAlchemy setup####äääääääääääääää#########################################
+# ##########################################SQLAlchemy setup########################################
 SCHEMA = 'model_draft'
 engine = sah.get_engine('oep_engine')
 metadata = MetaData(schema=SCHEMA, bind=engine, reflect=True)
 
-############################################TABLE DEFINITION############################################################
+# ##########################################TABLE DEFINITION########################################
 
 # included function from github: https://github.com/open-fred/cli/blob/master/openFRED.py
-# copied function to aviode dependencies
+# copied function to avoid dependencies
+
+
 def mapped_classes(metadata):
     """ Returns classes mapped to the openFRED database via SQLAlchemy.
 
@@ -80,6 +81,7 @@ def mapped_classes(metadata):
         },
     )
     # TODO: Handle units.
+
     class Variable(Base):
         __table_args__ = ({"keep_existing": True},)
         __tablename__ = "openfred_variables"
