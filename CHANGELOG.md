@@ -21,6 +21,7 @@ Here is a template for new release sections
 ### Added
 - CHANGELOG.md
 - geojson serializer of the data from the oep server
+- requirements.txt
 
 ### Changed
 -
@@ -28,3 +29,4 @@ Here is a template for new release sections
 ### Removed
 - db_sqla.py file
 - wam_environment.yml file
+
