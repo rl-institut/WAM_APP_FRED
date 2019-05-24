@@ -118,6 +118,12 @@
                               </div>
                             </fieldset>
                           </form>
+                          <div>
+                            <form method="POST" action="/search">
+                            {% csrf_token %}
+                              <input type="text" name="textfield">
+                            </form>
+                          </div>
                           <div class="panel__text panel__text--highlighted">
                             <p id="scenarioPanelText">
                                 <span style="font-weight:700">Status Quo</span><span style="display:inline-block">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</span>
@@ -253,29 +259,56 @@
             var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}"
 
             function map_init_basic (map, options) {
-              var popup = L.popup()
+              var popup = L.popup();
+
+
+              // Move zoom control
+              map.removeControl(map.zoomControl);
+              L.control.zoom({
+                position: 'topright'
+              }).addTo(map);
 
               L.marker([53.4554, 9.6211]).addTo(map); // example marker to quickly show if map loads
 
+              // CIRCLE MARKER --> maybe outsource this section //////////////////////////////////////
+              // create an object with a list of options to style the circle marker
+              // see http://leafletjs.com/reference-1.3.0.html#path for additional options
+              let myLayerStyle = {
+                color: 'Orange',
+                radius: 5
+              };
+
+              // add all of the GeoJSON data to the empty layer we created
+              function createCircles (feature, latlng) {
+                return L.circleMarker(latlng, myLayerStyle)
+              }
+
+              // create an options object that specifies which function will called on each feature
+              let myLayerOptions = {
+                pointToLayer: createCircles
+              };
+              ///////////////////////////////////////////////////////////////////////////////////////
+
+
               // create a ajax call for locations_dataurl
-                $.ajax({
+              $.ajax({
                     url: locations_dataurl,
                     dataType: 'json',
                     async: true,
                     // if the data-source can be accessed, create a GEOJSON layer
                     success: function(loca){
-                        var layer = new L.geoJSON(loca, {
-                            // create the markers for every geometry (POINT) in GEOJSON(featureCollection)
-                            pointToLayer: function (feature, latlng) {
-                                return L.marker(latlng);
-                            }
-                        })
-                        // add the geojson layer to map
-                        map.addLayer(layer)
-                        // might not be usable, should bring th elements to back
-                        layer.bringToBack();
-                        }
-                });
+
+                      // create the GeoJSON layer from the myLayerData object
+                      L.geoJSON(loca, myLayerOptions).addTo(map)
+
+                    }
+              });
+
+              // return current location of the mouse-courser
+              // access the original DOM even translate to L.LatLag instance
+              maker.on('click', function (ev) {
+                var latlng = map.mouseEventToLatLng(ev.originalEvent)
+              });
 
             };
 
