@@ -4,3 +4,6 @@ from django.shortcuts import render
 
 def fred_map(request):
     return render(request, 'WAM_APP_FRED/fred_map.html')
+
+def webgui_test(request):
+    return render(request, 'WAM_APP_FRED/test_map_layout.html')
