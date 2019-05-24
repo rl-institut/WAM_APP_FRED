@@ -1,5 +1,5 @@
 # Add all open_FRED table models form source DB: OEP
-
+# pylint: disable=redefined-outer-name
 
 from sqlalchemy import (
     BigInteger as BI,

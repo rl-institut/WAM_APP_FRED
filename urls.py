@@ -1,6 +1,7 @@
 from django.urls import path
-from . import views
 from WAM_APP_FRED.serial_views import Serializer
+from . import views
+
 app_name = 'WAM_APP_FRED'
 
 urlpatterns = [

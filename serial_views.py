@@ -1,12 +1,11 @@
 # serialize data for all models
 from django.http import HttpResponse
-
-
-import WAM_APP_FRED.oep_models as oep_modles
-# from WAM_APP_FRED.db_sqla import *
 from shapely.wkb import loads as loadswkb
 from geojson import Feature, FeatureCollection, dumps
 import sqlahelper as sah
+import WAM_APP_FRED.oep_models as oep_modles
+# from WAM_APP_FRED.db_sqla import *
+
 
 # def serializer():
 #     """
@@ -39,7 +38,7 @@ class Serializer():
 
     :return: dict - geojson featureCollection
     """
-
+    # pylint: disable=unnecessary-pass, no-self-use
     # ToDO: after testing done change to input pram
     Session = sah.get_session()
     session = Session()
@@ -47,8 +46,8 @@ class Serializer():
 
     def wseries_geometry_view(self):
         """
-        returns a query result containing a full record from OEP table as GEOJSON featureCollection.
-        Just the geometry is included.
+        returns a query result containing a full record from OEP table as GEOJSON
+        featureCollection. Just the geometry is included.
         All related tables are joined and the values are included as property within the GEOJSON.
 
         :return:
@@ -68,8 +67,8 @@ class Serializer():
 
     def wseries_property_view(self):
         """
-        returns a query result containing a full record from OEP table as GEOJSON featureCollection.
-        No geometry is included.
+        returns a query result containing a full record from OEP table as GEOJSON
+        featureCollection. No geometry is included.
         All related tables are joined and the values are included as property within the GEOJSON.
 
 
@@ -78,9 +77,11 @@ class Serializer():
 
         features = []
 
-        for record in Serializer.session.query(oep_modles.classes['Series'],
-                                               oep_modles.classes['Timespan'],
-                                               oep_modles.classes['Variable']).join(oep_modles.classes['Timespan']) \
+        for record in Serializer.session.query(
+                oep_modles.classes['Series'],
+                oep_modles.classes['Timespan'],
+                oep_modles.classes['Variable']
+        ).join(oep_modles.classes['Timespan']) \
                 .join(oep_modles.classes['Variable']).limit(1000):
 
             # Collection all Columns to be included from tables timespan and values
@@ -88,15 +89,21 @@ class Serializer():
             # record.Series.timespan.segments not included "list to long"
             # record.Series.values not included "list to long"
             # ToDo: How to handel the DateTimeObj so it is Json Serializeable
-            # timespan_collection = {"Start": record.Series.timespan.start.strftime('%b %d %Y %I:%M%p'),
-            #                        "Stop": record.Series.timespan.stop.strftime('%b %d %Y %I:%M%p'),
-            #                        "Resolution": record.Series.timespan.resolution}
+            # timespan_collection = {
+            #     "Start": record.Series.timespan.start.strftime('%b %d %Y %I:%M%p'),
+            #     "Stop": record.Series.timespan.stop.strftime('%b %d %Y %I:%M%p'),
+            #     "Resolution": record.Series.timespan.resolution
+            # }
 
             netcdf = record.Series.variable.netcdf_attributes
             variables_collection = {"Name": record.Series.variable.name}
             variables_collection["NetCDF"] = netcdf
 
-            propertys = {"SeriesID": record.Series.id, "values": record.Series.values, "height": record.Series.height}
+            propertys = {
+                "SeriesID": record.Series.id,
+                "values": record.Series.values,
+                "height": record.Series.height
+            }
             # propertys.update(timespan_collection)
             propertys.update(variables_collection)
             feature = Feature(id=record.Series.id, properties=propertys)
@@ -116,12 +123,13 @@ class Serializer():
         #     if request.method is 'POST':
         #         position = request.POST.get('latlng')
         #
-        #         for record in Serializer.session.query(oep_modles.classes['Series'],
-        #                                                oep_modles.classes['Timespan'],
-        #                                                oep_modles.classes['Variable'])\
-        #                                                 .join(oep_modles.classes['Timespan']) \
-        #                                                 .join(oep_modles.classes['Variable']).limit(1000):
-        #
+            # for record in Serializer.session.query(
+            #         oep_modles.classes['Series'],
+            #         oep_modles.classes['Timespan'],
+            #         oep_modles.classes['Variable']) \
+            #         .join(oep_modles.classes['Timespan']) \
+            #         .join(oep_modles.classes['Variable']).limit(1000):
+
         #
         #             return HttpResponse(geojsondata, content_type="application/json")
 
@@ -141,7 +149,8 @@ class Serializer():
 
     def district_feedin_series(self):
         """
-        This function will return a json/geojson with pre calculated data for a single or multiple district.
+        This function will return a json/geojson with pre calculated data for a single or multiple
+        district.
         The data will include a feedin time series for each district.
         :return:
         """

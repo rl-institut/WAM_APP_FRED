@@ -3,7 +3,8 @@
 import sqlahelper
 from sqlalchemy import create_engine
 
-from wam import settings
+
+from wam import settings  # pylint: disable=import-error
 
 
 wam_config = settings.config['DATABASES']['OEP']
