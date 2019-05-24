@@ -1,7 +1,7 @@
 django-geojson
 django-leaflet
 geojson
-sqalchemy
+sqlalchemy
 sqlahelper
 geoalchemy2
 shapely
