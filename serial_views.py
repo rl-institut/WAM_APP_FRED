@@ -12,7 +12,8 @@ from datetime import datetime
 
 # def serializer():
 #     """
-#     returns the queryed table id, geom as GEOJSON featureCollection
+#     Easy example:
+#     returns the queried table id, geom as GEOJSON featureCollection
 #     serializer for table without relations
 #     :return: dict - geojson featureCollection
 #     """
@@ -84,7 +85,7 @@ class Serializer():
         for record in Serializer.session.query(oep_modles.classes['Series'],
                                     oep_modles.classes['Timespan'],
                                     oep_modles.classes['Variable']).join(oep_modles.classes['Timespan'])\
-                                                                   .join(oep_modles.classes['Variable']).limit(1000):
+                                                                   .join(oep_modles.classes['Variable']).limit(500):
 
             # Collection all Columns to be included from tables timespan and values
             # ToDo: maybe serialize the following on another session
@@ -108,26 +109,30 @@ class Serializer():
 
         return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
 
-        # def wseries_get_single_point(self, request):
-        #     """
-        #     Return the data for the closest weather-point for a given position
-        #     as GeoJSON.
-        #     The given position is provided as HTTP POST/GET method.
-        #
-        #     request: is the current mouse position passed from client
-        #     :return:
-        #     """
-        #     if request.method is 'POST':
-        #         position = request.POST.get('latlng')
-        #
-        #         for record in Serializer.session.query(oep_modles.classes['Series'],
-        #                                                oep_modles.classes['Timespan'],
-        #                                                oep_modles.classes['Variable'])\
-        #                                                 .join(oep_modles.classes['Timespan']) \
-        #                                                 .join(oep_modles.classes['Variable']).limit(1000):
-        #
-        #
-        #             return HttpResponse(geojsondata, content_type="application/json")
+    def wseries_get_single_point(self, request):
+        """
+        Return the data for the closest weather-point for a given position
+        as GeoJSON.
+        The given position is provided as HTTP POST/GET method.
+
+        request: is the current mouse position (@click) from client
+
+        :return: GeoJSON feature as HTTP response
+        """
+        if request.method is 'POST':
+            position = request.POST.get('latlng')
+
+            for record in Serializer.session.query(oep_modles.classes['Series'],
+                                                       oep_modles.classes['Timespan'],
+                                                       oep_modles.classes['Variable'])\
+                                                        .join(oep_modles.classes['Timespan']) \
+                                                        .join(oep_modles.classes['Variable']).limit(1000):
+
+                geom = ""
+                propertys = ""
+                feature = Feature(id= "", geometry=geom, property=propertys)
+
+                return HttpResponse(feature, content_type="application/json")
 
     def pp_list_geometry_view(self):
         """
