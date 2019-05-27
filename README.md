@@ -1,75 +1,84 @@
 # WAM_APP_FRED
 
-This is a Django App witch based on the WAM Projekt.
-----------------------
-* **WAM: https://github.com/rl-institut/WAM**
+WAM_APP_FRED is a Django App which is part of the [WAM project](https://github.com/rl-institut/WAM).
 
 
-Usage
-----------------------
+## Overview
+
 This App is based on Django. In Django we have one project with n applications. 
 The base structure is provided within the project which is called WAM. A application
 like WAM_APP_FRED extends the base structure of WAM and benefit from the provided 
 structure/functionality.
 
+## First steps
 
-Installation 
-======================
+### Prerequisite
 
+- clone WAM core project
+```
+git clone https://github.com/rl-institut/WAM.git
+```
+- complete the [setup of WAM](https://wam.readthedocs.io/en/latest/getting_started.html) core project
 
-####WAM
-To run this application locally you need to complete the WAM setup first:  
-* **WAM setup: https://wam.readthedocs.io/en/latest/getting_started.html**
+### Installation 
 
-
-####WAM_APP_FRED
-The following steps have to be completed before running the local django server:
-
-* clone this  repository into the WAM directory:
+1. Clone the WAM_FRED_APP repository into the main directory of the WAM core project:
     ````
-    -WAM <- folder you cloned the wam project
-        -wam <- wam folder
-        -wam_app <- wam_app folder
+    - <WAM core>
+        |
+         - <WAM_APP_FRED>
+        |
+         - ...
     ````
 
-* you need to add the app name to your environment variable "WAM_APPS = App1,App2,...."
-You should have created the environment variable while setting up the WAM.
+2. Make sure you have added WAM_APP_FRED to the list of applications in the environment variable `WAM_APPS` 
+which was created during the [setup of WAM](https://wam.readthedocs.io/en/latest/getting_started.html) core project.
+You can check the value of `WAM_APPS` with the command
+```
+echo $WAM_APPS
+```
+which return value should contain at least `ẀAM_APP_FRED`.
 
-* in your config file which you created while setting up the WAM, you need to provide a
-valid OEP connection. The OEP is a external database that is not managed by django. 
-Because it is not known by django we need to use a independent method to access the data.
-!You will need to have access to the OEP! 
-To handel the two different databases (OEP, django internal) you will need to have 2 
-sections in your config file. 
-Example can be found [here](https://wam.readthedocs.io/en/latest/getting_started.html#configuration-file). 
+3. The database used in this project is the [OEP](https://github.com/OpenEnergyPlatform) database which is a external database
+ that is not managed by django. For this reason we use SQLAlchemy to manage the access to the data.
+ This is set in the .config/config.cfg file of the WAM core project as follow :
+ 
+ ```
+ [DATABASES]
+	[[DEFAULT]]
+	    ENGINE = django.contrib.gis.db.backends.postgis
+        USER = <username>
+        PASSWORD = <password>
+        HOST = oe2.iks.cs.ovgu.de
+        PORT = 5432
+        NAME = oedb
+    [[OEP_LOCAL]]
+        ENGINE = django.contrib.gis.db.backends.postgis
+        NAME = oedb
+        USER = <username>
+        PASSWORD = <password>
+        HOST = localhost
+        PORT = 54321
+    [[OEP]]
+        ENGINE = postgresql+psycopg2
+        USER = <username>
+        PASSWORD = <password>
+        HOST = oe2.iks.cs.ovgu.de
+        PORT = 5432
+        NAME = oedb
+```
+ 
+Enter your OEP credentials instead of <username> and <password>.
 
-fyi:
-The OEP is accessed using SQLAlchemy. SQLA is using its own engine so there is a difference
-how the engine value is named compared to the django engine. 
-What are the differences between a Django engine:value and a SQLAlchemy engine:value?
 
-````
-In Django Config section:
-ENGINE = django.contrib.gis.db.backends.postgis
-````
+4. Run the local django server from the main directory of the WAM core project 
 
-````
-In SQLAlchemy Config section:
-ENGINE = postgresql+psycopg2
-````
-
-* To run the local django server just open up a console that can access the manage.py 
-in the directory WAM and use the following command line input. If this fails 
-you can try to debug it with the exception, or create a issue. 
-
-````
+```
 python manage.py runserver
-```` 
+````
 
-* If you are using linux it might be necessary to add "leaflet" to the installed_app list.
-The list can be found here: 
-````
-path: WAM/wam/settings.py - INSTALLED_APPS[]
-````
-LICENSE
--------
+## Usage
+
+### Explore wind turbines informations and timeseries
+ 
+### Explore weather data
