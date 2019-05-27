@@ -256,7 +256,10 @@
     <script type="text/javascript">
 
             // define a var which holds a GEOJSON from a URL provided by django
-            var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}"
+            var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}";
+            var mouse_click_location = "{% url 'WAM_APP_FRED:MouseClick'|add:'.data' %}";
+
+
 
             function map_init_basic (map, options) {
               var popup = L.popup();
@@ -306,10 +309,13 @@
 
               // return current location of the mouse-courser
               // access the original DOM even translate to L.LatLag instance
-              maker.on('click', function (ev) {
-                var latlng = map.mouseEventToLatLng(ev.originalEvent)
+              // Rest-full return the value to the server with POST with jQuery
+              map.on('click', function (ev) {
+                var latlng = map.mouseEventToLatLng(ev.originalEvent);
+                $.post(mouse_click_location, latlng.lat + "," + latlng.lang, function(response) {
+                  if(response === 'ok'){alert('Transaction good');}
+                });
               });
-
             };
 
     </script>
