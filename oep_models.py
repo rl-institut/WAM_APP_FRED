@@ -34,7 +34,7 @@ metadata = MetaData(schema=SCHEMA, bind=engine, reflect=True)
 ############################################TABLE DEFINITION############################################################
 
 # included function from github: https://github.com/open-fred/cli/blob/master/openFRED.py
-# copied function to aviode dependencies
+# copied function to avoid dependencies
 def mapped_classes(metadata):
     """ Returns classes mapped to the openFRED database via SQLAlchemy.
 
