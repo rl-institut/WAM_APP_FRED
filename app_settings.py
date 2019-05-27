@@ -1,7 +1,7 @@
 # create sqlalchemy con
 
-import sqlahelper
 from sqlalchemy import create_engine
+import sqlahelper
 
 
 from wam import settings  # pylint: disable=import-error

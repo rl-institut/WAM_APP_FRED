@@ -111,28 +111,6 @@ class Serializer():
 
         return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
 
-        # def wseries_get_single_point(self, request):
-        #     """
-        #     Return the data for the closest weather-point for a given position
-        #     as GeoJSON.
-        #     The given position is provided as HTTP POST/GET method.
-        #
-        #     request: is the current mouse position passed from client
-        #     :return:
-        #     """
-        #     if request.method is 'POST':
-        #         position = request.POST.get('latlng')
-        #
-            # for record in Serializer.session.query(
-            #         oep_modles.classes['Series'],
-            #         oep_modles.classes['Timespan'],
-            #         oep_modles.classes['Variable']) \
-            #         .join(oep_modles.classes['Timespan']) \
-            #         .join(oep_modles.classes['Variable']).limit(1000):
-
-        #
-        #             return HttpResponse(geojsondata, content_type="application/json")
-
     def pp_list_geometry_view(self):
         """
         This function will return a geojson with all power-plants
