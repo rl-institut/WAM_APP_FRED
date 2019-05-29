@@ -2,7 +2,7 @@
 from django.http import HttpResponse
 
 
-import WAM_APP_FRED.oep_models as oep_modles
+import WAM_APP_FRED.oep_models as oep_models
 # from WAM_APP_FRED.db_sqla import *
 from shapely.wkb import loads as loadswkb
 from geojson import Feature, FeatureCollection, dumps
@@ -25,7 +25,7 @@ from datetime import datetime
 #
 #     features = []
 #
-#     for record in session.query(oep_modles.classes['Location']).limit(100):
+#     for record in session.query(oep_models.classes['Location']).limit(100):
 #         geometry = loads(str(record.point), True)
 #         propertys = record.id
 #         feature = Feature(id=record.id, geometry=geometry)
@@ -42,7 +42,7 @@ class Serializer():
     :return: dict - geojson featureCollection
     """
 
-    #ToDO: after testing done change to input pram
+    # TODO: after testing done change to input param
     Session = sah.get_session()
     session = Session()
     ##############################################
@@ -58,9 +58,10 @@ class Serializer():
 
         features = []
 
-        for record in Serializer.session.query(oep_modles.classes['Series'],
-                                               oep_modles.classes['Location'])\
-                                                .join(oep_modles.classes['Location']).limit(100000):
+        for record in Serializer.session.query(
+                oep_models.classes['Series'],
+                oep_models.classes['Location']
+        ).join(oep_models.classes['Location']).limit(10):
 
             geometry = loadswkb(str(record.Series.location.point), True)
             feature = Feature(id=record.Series.id, geometry=geometry)
@@ -82,10 +83,11 @@ class Serializer():
 
         features = []
 
-        for record in Serializer.session.query(oep_modles.classes['Series'],
-                                    oep_modles.classes['Timespan'],
-                                    oep_modles.classes['Variable']).join(oep_modles.classes['Timespan'])\
-                                                                   .join(oep_modles.classes['Variable']).limit(500):
+        for record in Serializer.session.query(
+                oep_models.classes['Series'],
+                oep_models.classes['Timespan'],
+                oep_models.classes['Variable']
+        ).join(oep_models.classes['Timespan']).join(oep_models.classes['Variable']).limit(5):
 
             # Collection all Columns to be included from tables timespan and values
             # ToDo: maybe serialize the following on another session
@@ -101,7 +103,11 @@ class Serializer():
             variables_collection["NetCDF"] = netcdf
 
 
-            propertys = {"SeriesID": record.Series.id, "values": record.Series.values, "height": record.Series.height}
+            propertys = {
+                "SeriesID": record.Series.id,
+                "values": record.Series.values,
+                "height": record.Series.height
+            }
             # propertys.update(timespan_collection)
             propertys.update(variables_collection)
             feature = Feature(id=record.Series.id, properties=propertys)
@@ -121,18 +127,19 @@ class Serializer():
         """
         if request.method is 'POST':
             position = request.POST.get('latlng')
+            print(position)
+            # for record in Serializer.session.query(
+            #         oep_models.classes['Series'],
+            #         oep_models.classes['Timespan'],
+            #         oep_models.classes['Variable']
+            # ).join(oep_models.classes['Timespan']).join(oep_models.classes['Variable']).limit(1000):
+            #
+            #     geom = ""
+            #     propertys = ""
+            #     feature = Feature(id= "", geometry=geom, property=propertys)
 
-            for record in Serializer.session.query(oep_modles.classes['Series'],
-                                                       oep_modles.classes['Timespan'],
-                                                       oep_modles.classes['Variable'])\
-                                                        .join(oep_modles.classes['Timespan']) \
-                                                        .join(oep_modles.classes['Variable']).limit(1000):
-
-                geom = ""
-                propertys = ""
-                feature = Feature(id= "", geometry=geom, property=propertys)
-
-                return HttpResponse(feature, content_type="application/json")
+        return HttpResponse('Success')
+        # return HttpResponse(feature, content_type="application/json")
 
     def pp_list_geometry_view(self):
         """
