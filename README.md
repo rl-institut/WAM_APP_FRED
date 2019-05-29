@@ -5,20 +5,18 @@ WAM_APP_FRED is a Django App which is part of the [WAM project](https://github.c
 
 ## Overview
 
-This App is based on Django. In Django we have one project with n applications. 
-The base structure is provided within the project which is called WAM. A application
-like WAM_APP_FRED extends the base structure of WAM and benefit from the provided 
-structure/functionality.
+The aim of this app is to display the content of the Open Energy Database of the
+[Open Energy Platform (OEP)]((https://openenergy-platform.org/)) in an interactive way.
 
 ## First steps
 
 ### Prerequisite
 
-- clone WAM core project
+- First, clone WAM core project
 ```
 git clone https://github.com/rl-institut/WAM.git
 ```
-- complete the [setup of WAM](https://wam.readthedocs.io/en/latest/getting_started.html) core project
+- Then, complete the [setup of WAM](https://wam.readthedocs.io/en/latest/getting_started.html) core project
 
 ### Installation 
 
@@ -39,8 +37,8 @@ echo $WAM_APPS
 ```
 which return value should contain at least `ẀAM_APP_FRED`.
 
-3. The database used in this project is the [OEP](https://github.com/OpenEnergyPlatform) database which is a external database
- that is not managed by django. For this reason we use SQLAlchemy to manage the access to the data.
+3. The database used in this project is the [OEDB](https://github.com/OpenEnergyPlatform/oeplatform) database which is a external database
+ that is not managed by django. For this reason we use SQLAlchemy to access the data.
  This is set in the .config/config.cfg file of the WAM core project as follow :
  
  ```
@@ -68,7 +66,7 @@ which return value should contain at least `ẀAM_APP_FRED`.
         NAME = oedb
 ```
  
-Enter your OEP credentials instead of <username> and <password>.
+Enter your [OEP]((https://openenergy-platform.org/)) credentials instead of <username> and <password>.
 
 
 4. Run the local django server from the main directory of the WAM core project 
@@ -79,6 +77,17 @@ python manage.py runserver
 
 ## Usage
 
+Choose which type of data you would like to explore
+
+### Explore weather data
+
+The weather data from OEDB are available at a spatial resolution of 6 x 6 km with a time step of 15min.
+
+First choose which weather data you would like to enquiry in the menu on the left.
+
+Then, click on the map and a popup with the closest weather data point information will appear on the map.
+
+
 ### Explore wind turbines informations and timeseries
  
-### Explore weather data
+TDB
