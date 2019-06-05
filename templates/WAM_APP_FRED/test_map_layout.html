@@ -310,12 +310,21 @@
               // return current location of the mouse-courser
               // access the original DOM even translate to L.LatLag instance
               // Rest-full return the value to the server with POST with jQuery
-              map.on('click', function (ev) {
-                var latlng = map.mouseEventToLatLng(ev.originalEvent);
-                $.post(mouse_click_location, latlng.lat + "," + latlng.lang, function(response) {
-                  if(response === 'ok'){alert('Transaction good');}
-                });
-              });
+              map.on('click', onMapClick);
+
+              function onMapClick(ev) {
+                  var latlng = map.mouseEventToLatLng(ev.originalEvent);
+                  $.ajax({
+                      type: 'POST',
+                      url: mouse_click_location,
+                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                      data: {'lat': latlng.lat, 'long': latlng.lng},
+                      //success: function(data){alert("youhou" + data);}
+                  });
+	};
+
+
+
             };
 
     </script>
