@@ -1,11 +1,13 @@
 # serialize data for all models
 from django.http import HttpResponse
 
+from .app_settings import LOCAL_TESTING
 
-import WAM_APP_FRED.oep_models as oep_models
+if not LOCAL_TESTING:
+    import WAM_APP_FRED.oep_models as oep_models
 # from WAM_APP_FRED.db_sqla import *
 from shapely.wkb import loads as loadswkb
-from geojson import Feature, FeatureCollection, dumps
+from geojson import Point, Feature, FeatureCollection, dumps
 from geoalchemy2 import functions
 import sqlahelper as sah
 from datetime import datetime
@@ -42,9 +44,10 @@ class Serializer():
     :return: dict - geojson featureCollection
     """
 
-    # TODO: after testing done change to input param
-    Session = sah.get_session()
-    session = Session()
+    if LOCAL_TESTING is False:
+        # TODO: after testing done change to input param
+        Session = sah.get_session()
+        session = Session()
     ##############################################
 
     def wseries_geometry_view(self):
