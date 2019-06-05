@@ -271,7 +271,7 @@
                 position: 'topright'
               }).addTo(map);
 
-              L.marker([53.4554, 9.6211]).addTo(map); // example marker to quickly show if map loads
+              //L.marker([53.4554, 9.6211]).addTo(map); // example marker to quickly show if map loads
 
               // CIRCLE MARKER --> maybe outsource this section //////////////////////////////////////
               // create an object with a list of options to style the circle marker
@@ -300,9 +300,8 @@
                     async: true,
                     // if the data-source can be accessed, create a GEOJSON layer
                     success: function(loca){
-
                       // create the GeoJSON layer from the myLayerData object
-                      L.geoJSON(loca, myLayerOptions).addTo(map)
+                      L.geoJSON(loca).addTo(map)
 
                     }
               });
@@ -321,7 +320,16 @@
                       data: {'lat': latlng.lat, 'long': latlng.lng},
                       //success: function(data){alert("youhou" + data);}
                   });
-	};
+	          };
+
+
+	        var dataurl = '{% url 'WAM_APP_FRED:data' %}';
+            // Download GeoJSON via Ajax
+            $.getJSON(dataurl, function (data) {
+                // Add GeoJSON layer
+                 L.geoJSON(data, myLayerOptions).addTo(map);
+
+            });
 
 
 

@@ -7,7 +7,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        positions = [Point(53.46, 9.65), Point(53.48, 9.53)]
+        positions = [Point(9.65, 53.46), Point(9.53, 53.48)]
 
         for i, pos in enumerate(positions):
 
