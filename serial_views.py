@@ -3,10 +3,13 @@ from django.http import HttpResponse
 
 from .app_settings import LOCAL_TESTING
 
+
+
 if not LOCAL_TESTING:
     import WAM_APP_FRED.oep_models as oep_models
 # from WAM_APP_FRED.db_sqla import *
 from shapely.wkb import loads as loadswkb
+import geojson
 from geojson import Point, Feature, FeatureCollection, dumps
 from geoalchemy2 import functions
 import sqlahelper as sah
@@ -61,6 +64,10 @@ class Serializer():
 
         features = []
 
+        with open('static/landkreis.geojson') as f:
+            gj = geojson.load(f)
+
+        print(len(gj['features']))
         # for record in Serializer.session.query(
         #         oep_models.classes['Series'],
         #         oep_models.classes['Location']
@@ -72,7 +79,7 @@ class Serializer():
         features.append(feature)
 
         # return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
-        return HttpResponse(dumps(feature), content_type="application/json")
+        return HttpResponse(dumps(gj['features']), content_type="application/json")
 
 
 

@@ -327,7 +327,8 @@
             // Download GeoJSON via Ajax
             $.getJSON(dataurl, function (data) {
                 // Add GeoJSON layer
-                 L.geoJSON(data, myLayerOptions).addTo(map);
+                 var ft = L.geoJSON(data, myLayerOptions).addTo(map);
+                 console.log(ft)
 
             });
 

@@ -26,7 +26,8 @@ LEAFLET_CONFIG = {
     # Germany center (center = long/2 and lat/2)
     'DEFAULT_CENTER': (53.4554, 9.6211),
     'DEFAULT_ZOOM': 16,
-    'MAX_ZOOM': 50,
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 1000,
     'RESET_VIEW': False,
     'NO_GLOBALS': False,
 }
