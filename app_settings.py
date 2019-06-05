@@ -9,7 +9,7 @@ from wam import settings
 # from . import oep_models
 
 # add the package leaflet to the wam core project installed apps
-settings.INSTALLED_APPS.append('leaflet')
+# settings.INSTALLED_APPS.append('leaflet')
 LOCAL_TESTING = True
 ############################################SQLAlchemy ENGINE#####+#####################################################
 wam_config = settings.config['DATABASES']['OEP']
