@@ -1,7 +1,20 @@
 # WAM_APP_FRED
 
-WAM_APP_FRED is a Django App which is part of the [WAM project](https://github.com/rl-institut/WAM).
+The WAM_APP_FRED is developed as an open-source web-application which visualize data that was collected or created 
+within the project open_FRED. All data sources which are used within this web-application are open-source. The goal is 
+to create an easy assessable and platform-independent web-application that can be used via the 
+internet (using a web-browser). The main functionality the web-application provides is to visualize data on a map 
+or additionally as graph. The app provide options for the user to interact with the visualized data. The web-application 
+also provides functionality to get the data in a non proprietary format (like .csv). By that an user is able to explore 
+the data in order to get a better understanding about the data. 
+To make the purpose of what is visualized on the map or as graph more oblivious the source data is divided into 
+three main topics. These three topics are: Weather-Data, powerplant asset register and feedin-time-series. Each of these 
+topics basically have there own source data. The data is provided within the open-energy-platform. Further explanation 
+is given in the section source data. 
 
+To achieve these requirements we use proven open-source technologies. We use django as Web-Framework. The base structure 
+for this app is the Web Applications&Maps (WAM) project. 
+WAM_APP_FRED is a Django App which is part of the [WAM project](https://github.com/rl-institut/WAM).
 
 ## Overview
 
