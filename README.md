@@ -104,3 +104,9 @@ Then, click on the map and a popup with the closest weather data point informati
 ### Explore wind turbines informations and timeseries
  
 TDB
+
+### Explore feedin time series data
+
+The feedin time series data needs to be uploaded to the OEDB. Once this is finished it will be possible to present 
+the data as graph within the WAM_APP_FRED. 
+
