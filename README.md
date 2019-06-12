@@ -110,12 +110,14 @@ TDB
 The feedin time series data needs to be uploaded to the OEDB. Once this is finished it will be possible to present 
 the data as graph within the WAM_APP_FRED. 
 
-####Introducing the Open-Energy-Database
+## How to get Data
+
+### Introducing the Open-Energy-Database
 
 The database which is used as main data-source for all of the topics is the open-energy-database (OEDB). 
 The OEDB is a postgreSQL database that was developed within the open_eGo project. 
 
-###Introducing the Open-Energy-Platform
+### Introducing the Open-Energy-Platform
 
 The OEDB is managed within the openenergy-platform (OEP). The OEP is the presentation layer for the OEDB. The OEP 
 provides the Open-Energy Dialect (OED) which is a RestFULL API. Using the OED one can query the OEDB. The OEP provides 
