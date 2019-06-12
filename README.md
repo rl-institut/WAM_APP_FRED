@@ -110,7 +110,12 @@ TDB
 The feedin time series data needs to be uploaded to the OEDB. Once this is finished it will be possible to present 
 the data as graph within the WAM_APP_FRED. 
 
-## How to get Data
+### Get data as .CSV file
+
+The displayed data can be downloaded as csf file. Therefore click on the button located in the control-panel
+on the left. For example, the CSV contains all the data for a single weather point selected on the map. 
+
+## Source database
 
 ### Introducing the Open-Energy-Database
 
@@ -135,7 +140,7 @@ and TOKEN. One can get these credentials by signing-up to the OEP.
 
 TBD
 
-### Source data 
+## Source data 
 
 The following will give an overview over the data-sources used within the WAM_APP_FRED and provides where to find 
 and how to access them. The WAM_APP_FRED defines three main topics . Each of these topics has its own source data.
