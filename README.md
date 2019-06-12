@@ -148,14 +148,14 @@ and how to access them. The WAM_APP_FRED defines three main topics . Each of the
 | Topic 1.         |          |
 | ------------- | -------- |
 | Topic_name | weather-data (open_FRED)|
-| Description |   ??? |
+| Description | available in OEDB |
 | Schema.Tablename |  <ul><li>model_draft.openfred_series</li></ul>|
 | Relation (As FK)| <ul><li>model_draft.openfred_flags</li><li>model_draft.openfred_locations</li><li>model_draft.openfred_timespan</li><li>model_draft.openfred_variables</li></ul> |
 
 | Topic 2| |
 | --- | --- |
 | Topic_name | power-plant facility register (open_eGo) |
-| Description | conventional energy:conv; renewable energy:res; mview´s are created for 3 scenarios |
+| Description | available in OEDB, conventional energy:conv; renewable energy:res; mview´s are created for 3 scenarios |
 | Schema.Tablename | <ul><li>supply.ego_dp_res_powerplant</li></ul> |
 
 
