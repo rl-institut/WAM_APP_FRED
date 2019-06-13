@@ -2,7 +2,7 @@
 
 The WAM_APP_FRED is developed as an open-source web-application which visualize data that was collected or created 
 within the project open_FRED. All data sources which are used within this web-application are open-source. The goal is 
-to create an easy assessable and platform-independent web-application that can be used via the 
+to create an easily accessible and platform-independent web-application that can be used via the 
 internet (using a web-browser). The main functionality the web-application provides is to visualize data on a map 
 or additionally as graph. The app provide options for the user to interact with the visualized data. The web-application 
 also provides functionality to get the data in a non proprietary format (like .csv). By that an user is able to explore 
