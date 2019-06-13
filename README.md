@@ -4,8 +4,8 @@ The WAM_APP_FRED is developed as an open-source web-application to visualize dat
 within the project open_FRED. All data sources which are used within this web-application are open-source. The goal is 
 to create an easily accessible and platform-independent web-application that can be used via the 
 internet (using a web-browser). The main functionality the web-application provides is to visualize data on a map 
-or additionally as graph. The app provide options for the user to interact with the visualized data. The web-application 
-also provides functionality to get the data in a non proprietary format (like .csv).
+or additionally as graph. The app provides options for the user to interact with the visualized data. 
+The web-application also provides functionality to get the data in a non proprietary format (like .csv).
 The source data is divided into 3 main categories :
 : Weather-Data, powerplant asset register and feedin-time-series. Each of these 
 categories basically have there own source data. The data is provided within the open-energy-platform. Further explanation 
@@ -119,18 +119,18 @@ The file contains all the weather data for a single point selected on the map.
 ### Introducing the Open-Energy-Database
 
 The database which is used as main data-source for all of the categories is the open-energy-database (OEDB). 
-The OEDB is a postgreSQL database that was developed within the [open_eGo project](https://reiner-lemoine-institut.de/open_ego-open-electricity-grid-optimization/). 
+The OEDB is a PostgreSQL database that was developed within the [open_eGo project](https://reiner-lemoine-institut.de/open_ego-open-electricity-grid-optimization/). 
 
 ### Introducing the Open-Energy-Platform
 
 The OEDB is managed within the openenergy-platform (OEP). The OEP is the presentation layer for the OEDB. The OEP 
-provides the Open-Energy Dialect (OED) which is a RestFUL API. Using the OED one can query the OEDB. The OEP provides 
+provides the Open-Energy Dialect (OED) which is a RESTful API. Using the OED one can query the OEDB. The OEP provides 
 the open-energy-dialect (OED) which is the main RestFul-API to query the OEDB. The data must be provided as a 
 non-proprietary format like json or GEOJSON. 
 
  - OED on [GitHub](https://github.com/OpenEnergyPlatform/oedialect). 
 
-In order to use the OED, one have to provide user credential. The credentials are represented by USER-NAME 
+In order to use the OED, one has to provide user credential. The credentials are represented by USER-NAME
 and TOKEN. One can get these credentials by signing-up to the OEP. 
 
 - OEP can be found [here](https://openenergy-platform.org/)
@@ -165,5 +165,5 @@ and how to access them.
 | Schema.Tablename | soon |
 | Relation (As FK) | soon |
 
-??? = Not known at the moment
+??? = Not known at the moment, 
 soon = Will be provided soon
