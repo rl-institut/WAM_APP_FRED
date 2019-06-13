@@ -119,7 +119,7 @@ on the left. For example, the CSV contains all the data for a single weather poi
 ### Introducing the Open-Energy-Database
 
 The database which is used as main data-source for all of the topics is the open-energy-database (OEDB). 
-The OEDB is a postgreSQL database that was developed within the open_eGo project. 
+The OEDB is a postgreSQL database that was developed within the [open_eGo project](https://reiner-lemoine-institut.de/open_ego-open-electricity-grid-optimization/). 
 
 ### Introducing the Open-Energy-Platform
 
