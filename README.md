@@ -11,8 +11,8 @@ The source data is divided into 3 main categories :
 categories basically have there own source data. The data is provided within the open-energy-platform. Further explanation 
 is given in the section source data. 
 
-To achieve these requirements we use proven open-source technologies. We use django as Web-Framework. The base structure 
-for this app is the Web Applications&Maps (WAM) project. 
+To achieve these requirements we use proven open-source technologies. We use  as Web-Framework. The base structure 
+for this app is the Web Applications&Maps (WAM) project. Django
 WAM_APP_FRED is a Django App which is part of the [WAM project](https://github.com/rl-institut/WAM).
 
 ## Overview
@@ -50,7 +50,7 @@ echo $WAM_APPS
 which return value should contain at least `ẀAM_APP_FRED`.
 
 3. The database used in this project is the [OEDB](https://github.com/OpenEnergyPlatform/oeplatform) database which is a external database
- that is not managed by django. For this reason we use SQLAlchemy to access the data.
+ that is not managed by Django. For this reason we use SQLAlchemy to access the data.
  This is set in the .config/config.cfg file of the WAM core project as follow :
  
  ```
@@ -81,7 +81,7 @@ which return value should contain at least `ẀAM_APP_FRED`.
 Enter your [OEP]((https://openenergy-platform.org/)) credentials instead of <username> and <password>.
 
 
-4. Run the local django server from the main directory of the WAM core project 
+4. Run the local Django server from the main directory of the WAM core project 
 
 ```
 python manage.py runserver
