@@ -49,9 +49,9 @@ echo $WAM_APPS
 ```
 which return value should contain at least `ẀAM_APP_FRED`.
 
-3. The database used in this project is the [OEDB](https://github.com/OpenEnergyPlatform/oeplatform) database which is a external database
- that is not managed by Django. For this reason we use SQLAlchemy to access the data.
- This is set in the .config/config.cfg file of the WAM core project as follow :
+3. The database used in this project is the [OEDB](https://github.com/OpenEnergyPlatform/oeplatform) database which is 
+a external database that is not managed by Django. For this reason we use SQLAlchemy to access the data.
+This is set in the .config/config.cfg file of the WAM core project as follow :
  
  ```
  [DATABASES]
