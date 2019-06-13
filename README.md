@@ -111,8 +111,8 @@ the data as graph within the WAM_APP_FRED.
 
 ### Get data as .CSV file
 
-The displayed data can be downloaded as csf file. Therefore click on the button located in the control-panel
-on the left. For example, the CSV contains all the data for a single weather point selected on the map. 
+The displayed data can be downloaded as csv file.
+The file contains all the weather data for a single point selected on the map. 
 
 ## Source database
 
