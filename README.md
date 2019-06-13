@@ -130,7 +130,7 @@ GEOJSON.
 
  - OED on [GitHub](https://github.com/OpenEnergyPlatform/oedialect). 
 
-In order to use the  OED one have to provide user credential. The credentials are represented by USER-NAME 
+In order to use the OED, one have to provide user credential. The credentials are represented by USER-NAME 
 and TOKEN. One can get these credentials by signing-up to the OEP. 
 
 - OEP can be found [here](https://openenergy-platform.org/)
