@@ -1,14 +1,13 @@
 # WAM_APP_FRED
 
-The WAM_APP_FRED is developed as an open-source web-application which visualize data that was collected or created 
+The WAM_APP_FRED is developed as an open-source web-application to visualize data that was collected or created 
 within the project open_FRED. All data sources which are used within this web-application are open-source. The goal is 
-to create an easy assessable and platform-independent web-application that can be used via the 
+to create an easily accessible and platform-independent web-application that can be used via the 
 internet (using a web-browser). The main functionality the web-application provides is to visualize data on a map 
 or additionally as graph. The app provide options for the user to interact with the visualized data. The web-application 
-also provides functionality to get the data in a non proprietary format (like .csv). By that an user is able to explore 
-the data in order to get a better understanding about the data. 
-To make the purpose of what is visualized on the map or as graph more oblivious the source data is divided into 
-three main topics. These three topics are: Weather-Data, powerplant asset register and feedin-time-series. Each of these 
+also provides functionality to get the data in a non proprietary format (like .csv).
+The source data is divided into 3 main categories :
+: Weather-Data, powerplant asset register and feedin-time-series. Each of these 
 topics basically have there own source data. The data is provided within the open-energy-platform. Further explanation 
 is given in the section source data. 
 
@@ -120,7 +119,7 @@ on the left. For example, the CSV contains all the data for a single weather poi
 ### Introducing the Open-Energy-Database
 
 The database which is used as main data-source for all of the topics is the open-energy-database (OEDB). 
-The OEDB is a postgreSQL database that was developed within the open_eGo project. 
+The OEDB is a postgreSQL database that was developed within the [open_eGo project](https://reiner-lemoine-institut.de/open_ego-open-electricity-grid-optimization/). 
 
 ### Introducing the Open-Energy-Platform
 
@@ -131,7 +130,7 @@ GEOJSON.
 
  - OED on [GitHub](https://github.com/OpenEnergyPlatform/oedialect). 
 
-In order to use the  OED one have to provide user credential. The credentials are represented by USER-NAME 
+In order to use the OED, one have to provide user credential. The credentials are represented by USER-NAME 
 and TOKEN. One can get these credentials by signing-up to the OEP. 
 
 - OEP can be found [here](https://openenergy-platform.org/)
@@ -142,8 +141,8 @@ TBD
 
 ## Source data 
 
-The following will give an overview over the data-sources used within the WAM_APP_FRED and provides where to find 
-and how to access them. The WAM_APP_FRED defines three main topics . Each of these topics has its own source data.
+The following is an overview of the data sources used within the WAM_APP_FRED and provides where to find 
+and how to access them.
 
 | Topic 1.         |          |
 | ------------- | -------- |
