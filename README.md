@@ -124,8 +124,8 @@ The OEDB is a postgreSQL database that was developed within the [open_eGo projec
 ### Introducing the Open-Energy-Platform
 
 The OEDB is managed within the openenergy-platform (OEP). The OEP is the presentation layer for the OEDB. The OEP 
-provides the Open-Energy Dialect (OED) which is a RestFULL API. Using the OED one can query the OEDB. The OEP provides 
-the open-energy-dialect (OED) which is the main RestFull-API to query the OEDB. The data should be provided as JSON or 
+provides the Open-Energy Dialect (OED) which is a RestFUL API. Using the OED one can query the OEDB. The OEP provides 
+the open-energy-dialect (OED) which is the main RestFul-API to query the OEDB. The data should be provided as JSON or 
 GEOJSON. 
 
  - OED on [GitHub](https://github.com/OpenEnergyPlatform/oedialect). 
