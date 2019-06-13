@@ -7,7 +7,7 @@ internet (using a web-browser). The main functionality the web-application provi
 or additionally as graph. The app provide options for the user to interact with the visualized data. The web-application 
 also provides functionality to get the data in a non proprietary format (like .csv).
 The source data is divided into 3 main categories :
-three main topics. These three topics are: Weather-Data, powerplant asset register and feedin-time-series. Each of these 
+: Weather-Data, powerplant asset register and feedin-time-series. Each of these 
 topics basically have there own source data. The data is provided within the open-energy-platform. Further explanation 
 is given in the section source data. 
 
