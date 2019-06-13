@@ -8,7 +8,7 @@ or additionally as graph. The app provide options for the user to interact with 
 also provides functionality to get the data in a non proprietary format (like .csv).
 The source data is divided into 3 main categories :
 : Weather-Data, powerplant asset register and feedin-time-series. Each of these 
-topics basically have there own source data. The data is provided within the open-energy-platform. Further explanation 
+categories basically have there own source data. The data is provided within the open-energy-platform. Further explanation 
 is given in the section source data. 
 
 To achieve these requirements we use proven open-source technologies. We use django as Web-Framework. The base structure 
@@ -118,7 +118,7 @@ on the left. For example, the CSV contains all the data for a single weather poi
 
 ### Introducing the Open-Energy-Database
 
-The database which is used as main data-source for all of the topics is the open-energy-database (OEDB). 
+The database which is used as main data-source for all of the categories is the open-energy-database (OEDB). 
 The OEDB is a postgreSQL database that was developed within the [open_eGo project](https://reiner-lemoine-institut.de/open_ego-open-electricity-grid-optimization/). 
 
 ### Introducing the Open-Energy-Platform
@@ -144,23 +144,23 @@ TBD
 The following is an overview of the data sources used within the WAM_APP_FRED and provides where to find 
 and how to access them.
 
-| Topic 1.         |          |
+| Category 1.         |          |
 | ------------- | -------- |
-| Topic_name | weather-data (open_FRED)|
+| Category_name | weather-data (open_FRED)|
 | Description | available in OEDB |
 | Schema.Tablename |  <ul><li>model_draft.openfred_series</li></ul>|
 | Relation (As FK)| <ul><li>model_draft.openfred_flags</li><li>model_draft.openfred_locations</li><li>model_draft.openfred_timespan</li><li>model_draft.openfred_variables</li></ul> |
 
-| Topic 2| |
+| Category 2| |
 | --- | --- |
-| Topic_name | power-plant facility register (open_eGo) |
+| Category_name | power-plant facility register (open_eGo) |
 | Description | available in OEDB, conventional energy:conv; renewable energy:res; mview´s are created for 3 scenarios |
 | Schema.Tablename | <ul><li>supply.ego_dp_res_powerplant</li></ul> |
 
 
-| Topic 3 | |
+| Category 3 | |
 | --- | ---- |
-| Topic_name | feedin-time-series () |
+| Category_name | feedin-time-series () |
 | Description | Currently available as python based pandas data-frames; OEDB upload will be in progress soon |
 | Schema.Tablename | soon |
 | Relation (As FK) | soon |
