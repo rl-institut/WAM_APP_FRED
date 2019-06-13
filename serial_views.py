@@ -35,7 +35,6 @@ class Serializer():
     """
     returns a query result containing a full record from OEP table as GEOJSON featureCollection.
     All related tables are joined and the values are included as property within the GEOJSON.
-
     :return: dict - geojson featureCollection
     """
     # pylint: disable=unnecessary-pass, no-self-use
@@ -49,7 +48,6 @@ class Serializer():
         returns a query result containing a full record from OEP table as GEOJSON
         featureCollection. Just the geometry is included.
         All related tables are joined and the values are included as property within the GEOJSON.
-
         :return:
         """
 
@@ -58,7 +56,6 @@ class Serializer():
         for record in Serializer.session.query(oep_modles.classes['Series'],
                                                oep_modles.classes['Location']) \
                 .join(oep_modles.classes['Location']).limit(100000):
-
             geometry = loadswkb(str(record.Series.location.point), True)
             feature = Feature(id=record.Series.id, geometry=geometry)
             features.append(feature)
@@ -70,8 +67,6 @@ class Serializer():
         returns a query result containing a full record from OEP table as GEOJSON
         featureCollection. No geometry is included.
         All related tables are joined and the values are included as property within the GEOJSON.
-
-
         :return:
         """
 
@@ -83,7 +78,6 @@ class Serializer():
                 oep_modles.classes['Variable']
         ).join(oep_modles.classes['Timespan']) \
                 .join(oep_modles.classes['Variable']).limit(1000):
-
             # Collection all Columns to be included from tables timespan and values
             # ToDo: maybe serialize the following on another session
             # record.Series.timespan.segments not included "list to long"

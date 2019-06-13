@@ -38,7 +38,6 @@ metadata = MetaData(schema=SCHEMA, bind=engine, reflect=True)
 
 def mapped_classes(metadata):
     """ Returns classes mapped to the openFRED database via SQLAlchemy.
-
     The classes are dynamically created and stored in a dictionary keyed by
     class names. The dictionary also contains the special entry `__Base__`,
     which an SQLAlchemy `declarative_base` instance used as the base class from
