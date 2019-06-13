@@ -11,7 +11,7 @@ The source data is divided into 3 main categories :
 categories basically have there own source data. The data is provided within the open-energy-platform. Further explanation 
 is given in the section source data. 
 
-To achieve these requirements we use proven open-source technologies. We use  as Web-Framework. The base structure 
+To achieve these requirements we use proven and open-source technologies. We use Django as Web-Framework. The base structure 
 for this app is the Web Applications&Maps (WAM) project. Django
 WAM_APP_FRED is a Django App which is part of the [WAM project](https://github.com/rl-institut/WAM).
 
