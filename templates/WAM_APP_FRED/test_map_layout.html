@@ -68,27 +68,21 @@
                   <div class="cell small-3 offcanvas-tabs__wrapper medium-cell-block-y">
                     <ul class="vertical tabs" data-tabs id="offcanvas-tabs">
                       <li class="tabs-title is-active">
-                        <a href="#panel-scenario" aria-selected="true">
-                          <img src="{% static 'WAM_APP_FRED/img/icons_custom/Enavi_Layers_w.svg' %}">
-                          <h2 class="tabs-title__head">Szenario</h2>
-                        </a>
-                      </li>
-                      <li class="tabs-title">
                         <a href="#panel-energy-system">
                           <img src="{% static 'WAM_APP_FRED/img/icons_custom/Enavi_Energy_w.svg' %}">
-                          <h2 class="tabs-title__head">Energiesystem</h2>
+                          <h2 class="tabs-title__head">Weather Data</h2>
                         </a>
                       </li>
                       <li class="tabs-title">
-                        <a href="#panel3v">
+                        <a href="#panel-scenario">
                           <img src="{% static 'WAM_APP_FRED/img/icons_custom/Enavi_Results_w.svg' %}">
-                          <h2 class="tabs-title__head">Flächen</h2>
+                          <h2 class="tabs-title__head">Power Plant Register</h2>
                         </a>
                       </li>
                       <li class="tabs-title">
                         <a href="#panel4v">
                           <img src="{% static 'WAM_APP_FRED/img/icons_custom/Windrad.svg' %}">
-                          <h2 class="tabs-title__head">Ergebnisse</h2>
+                          <h2 class="tabs-title__head">Feedin-Time Series</h2>
                         </a>
                       </li>
                     </ul>
@@ -98,7 +92,7 @@
                       <div class="tabs-content" data-tabs-content="offcanvas-tabs">
     
                         <!-- First panel content -->
-                        <div class="tabs-panel is-active" id="panel-scenario">
+                        <div class="tabs-panel" id="panel-scenario">
                           <form>
                             <fieldset>
                               <legend>Szenario auswählen 
@@ -118,40 +112,53 @@
                               </div>
                             </fieldset>
                           </form>
-                          <div>
-                            <form method="POST" action="/search">
-                            {% csrf_token %}
-                              <input type="text" name="textfield">
-                            </form>
-                          </div>
+
                           <div class="panel__text panel__text--highlighted">
                             <p id="scenarioPanelText">
-                                <span style="font-weight:700">Status Quo</span><span style="display:inline-block">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</span>
+                                <span style="font-weight:700">Status Quo</span><span style="display:inline-block"></span>
                             </p>
                           </div>
                         </div>
           
                         <!-- Second panel content -->
-                        <div class="tabs-panel" id="panel-energy-system">
+                        <div class="tabs-panel is-active" id="panel-energy-system">
+
+
+
                           <ul class="accordion" data-accordion>
                             <li class="accordion-item accordion-item--no-border is-active" data-accordion-item>
-                              <a href="#" class="accordion-title accordion-title--100">Stromerzeugung</a>
+                              <a href="#" class="accordion-title accordion-title--100">Time Span</a>
                               <div class="accordion-content" data-tab-content >
-                                <p>Panel 1. Lorem ipsum dolor</p>
+                                <div class="tabs-panel is-active" id="panel-energy-system">
+                                  <form id="TimeSpan">
+
+                                    <label for="Start">Start</label>
+                                    <input id="Start">
+                                    <label for="Stop">Stop</label>
+                                    <input id="Stop">
+                                  </form>
                               </div>
                             </li>
                             <li class="accordion-item" data-accordion-item>
-                              <a href="#" class="accordion-title accordion-title--100">Wärmeerzeugung</a>
+                              <a href="#" class="accordion-title accordion-title--100">Variable</a>
                               <div class="accordion-content" data-tab-content>
-                                <textarea></textarea>
-                                <button class="button">I do nothing!</button>
+                                <form id="Variable">
+
+                                  <label>Variable</label>
+                                  <select name="variable">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                  </select>
+                                </form>
                               </div>
                             </li>
                             <li class="accordion-item" data-accordion-item>
-                              <a href="#" class="accordion-title accordion-title--100">Strombedarf</a>
+                              <a href="#" class="accordion-title accordion-title--100">Flag</a>
                               <div class="accordion-content" data-tab-content>
-                                Type your name!
-                                <input type="text"></input>
+                                Some Input:
+                                <input type="text">
                               </div>
                             </li>
                           </ul>
@@ -159,22 +166,12 @@
           
                         <!-- Third panel content -->
                         <div class="tabs-panel" id="panel3v">
-                          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-                          <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+
                         </div>
           
                         <!-- Fourth panel content -->
                         <div class="tabs-panel" id="panel4v">
-                          <p>Four</p>
+                          <p>This will show some graphs soon</p>
                           <img class="thumbnail" src="{% static 'stemp_abw/img/generic/rectangle-2.jpg' %}">
                         </div>
                       </div>
@@ -256,7 +253,10 @@
     <script type="text/javascript">
 
             // define a var which holds a GEOJSON from a URL provided by django
-            var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}"
+            var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}";
+            var mouse_click_location = "{% url 'WAM_APP_FRED:MouseClick'|add:'.data' %}";
+
+
 
             function map_init_basic (map, options) {
               var popup = L.popup();
@@ -268,7 +268,7 @@
                 position: 'topright'
               }).addTo(map);
 
-              L.marker([53.4554, 9.6211]).addTo(map); // example marker to quickly show if map loads
+              //L.marker([53.4554, 9.6211]).addTo(map); // example marker to quickly show if map loads
 
               // CIRCLE MARKER --> maybe outsource this section //////////////////////////////////////
               // create an object with a list of options to style the circle marker
@@ -297,18 +297,39 @@
                     async: true,
                     // if the data-source can be accessed, create a GEOJSON layer
                     success: function(loca){
-
                       // create the GeoJSON layer from the myLayerData object
-                      L.geoJSON(loca, myLayerOptions).addTo(map)
+                      L.geoJSON(loca).addTo(map)
 
                     }
               });
 
               // return current location of the mouse-courser
               // access the original DOM even translate to L.LatLag instance
-              maker.on('click', function (ev) {
-                var latlng = map.mouseEventToLatLng(ev.originalEvent)
-              });
+              // Rest-full return the value to the server with POST with jQuery
+              map.on('click', onMapClick);
+
+              function onMapClick(ev) {
+                  var latlng = map.mouseEventToLatLng(ev.originalEvent);
+                  $.ajax({
+                      type: 'POST',
+                      url: mouse_click_location,
+                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                      data: {'lat': latlng.lat, 'long': latlng.lng},
+                      //success: function(data){alert("youhou" + data);}
+                  });
+	          };
+
+
+	        var dataurl = '{% url 'WAM_APP_FRED:data' %}';
+            // Download GeoJSON via Ajax
+            $.getJSON(dataurl, function (data) {
+                // Add GeoJSON layer
+                 var ft = L.geoJSON(data, myLayerOptions).addTo(map);
+                 console.log(ft)
+
+            });
+
+
 
             };
 
