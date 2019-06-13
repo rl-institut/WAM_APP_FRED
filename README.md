@@ -142,7 +142,7 @@ TBD
 ## Source data 
 
 The following is an overview of the data sources used within the WAM_APP_FRED and provides where to find 
-and how to access them. The WAM_APP_FRED defines three main topics . Each of these topics has its own source data.
+and how to access them.
 
 | Topic 1.         |          |
 | ------------- | -------- |
