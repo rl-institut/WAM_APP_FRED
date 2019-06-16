@@ -3,7 +3,6 @@ from django.conf.urls import url
 from . import views
 from WAM_APP_FRED.serial_views import Serializer
 
-
 from djgeojson.views import GeoJSONLayerView
 
 from .models import WeatherStation

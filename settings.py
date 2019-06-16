@@ -1,4 +1,6 @@
-#app setting e.g. add default  map size
+# app setting e.g. add default  map size
+# flake8: noqa
+
 
 LEAFLET_CONFIG = {
     # conf here

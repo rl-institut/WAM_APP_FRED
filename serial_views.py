@@ -1,24 +1,20 @@
 # serialize data for all models
 from django.http import HttpResponse
-
 from .app_settings import LOCAL_TESTING
-
-
 
 if not LOCAL_TESTING:
     import WAM_APP_FRED.oep_models as oep_models
-# from WAM_APP_FRED.db_sqla import *
 from shapely.wkb import loads as loadswkb
 import geojson
 from geojson import Point, Feature, FeatureCollection, dumps
 from geoalchemy2 import functions
 import sqlahelper as sah
-from datetime import datetime
+import WAM_APP_FRED.oep_models as oep_modles
+
 
 # def serializer():
 #     """
-#     Easy example:
-#     returns the queried table id, geom as GEOJSON featureCollection
+#     returns the queryed table id, geom as GEOJSON featureCollection
 #     serializer for table without relations
 #     :return: dict - geojson featureCollection
 #     """
@@ -30,7 +26,7 @@ from datetime import datetime
 #
 #     features = []
 #
-#     for record in session.query(oep_models.classes['Location']).limit(100):
+#     for record in session.query(oep_modles.classes['Location']).limit(100):
 #         geometry = loads(str(record.point), True)
 #         propertys = record.id
 #         feature = Feature(id=record.id, geometry=geometry)
@@ -39,26 +35,24 @@ from datetime import datetime
 #
 #     return dumps(FeatureCollection(features))
 
+
 class Serializer():
     """
     returns a query result containing a full record from OEP table as GEOJSON featureCollection.
     All related tables are joined and the values are included as property within the GEOJSON.
-
     :return: dict - geojson featureCollection
     """
-
-    if LOCAL_TESTING is False:
-        # TODO: after testing done change to input param
-        Session = sah.get_session()
-        session = Session()
+    # pylint: disable=unnecessary-pass, no-self-use
+    # ToDO: after testing done change to input pram
+    Session = sah.get_session()
+    session = Session()
     ##############################################
 
     def wseries_geometry_view(self):
         """
-        returns a query result containing a full record from OEP table as GEOJSON featureCollection.
-        Just the geometry is included.
+        returns a query result containing a full record from OEP table as GEOJSON
+        featureCollection. Just the geometry is included.
         All related tables are joined and the values are included as property within the GEOJSON.
-
         :return:
         """
 
@@ -128,7 +122,6 @@ class Serializer():
     #     return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
 
 
-
     def wseries_get_single_point(request):
         """
         Return the data for the closest weather-point for a given position
@@ -146,8 +139,6 @@ class Serializer():
             lat = float(request.POST.get('lat'))
             long = float(request.POST.get('long'))
             print(lat, long)
-
-
             geometry = Point((lat, long))
             # geometry = loadswkb(str(record.Series.location.point), True)
             # feature = Feature(id=record.Series.id, geometry=geometry)
@@ -179,16 +170,16 @@ class Serializer():
 
     def kw_list_property_view(self):
         """
-        This function will return a geojson with all property´s for each power-plant
+        This function will return a geojson with all properties' for each power-plant
         :return:
         """
         pass
 
     def district_feedin_series(self):
         """
-        This function will return a json/geojson with pre calculated data for a single or multiple district.
+        This function will return a json/geojson with pre calculated data for a single or multiple
+        district.
         The data will include a feedin time series for each district.
         :return:
         """
         pass
-

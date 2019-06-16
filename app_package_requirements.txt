@@ -1,3 +1,0 @@
-pip
-    -django-leaflet
-    -django-geojson
