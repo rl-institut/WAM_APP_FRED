@@ -1,11 +1,10 @@
 from django.urls import path
 from django.conf.urls import url
-from . import views
-from WAM_APP_FRED.serial_views import Serializer
-
 from djgeojson.views import GeoJSONLayerView
-
+from WAM_APP_FRED.serial_views import Serializer
+from . import views
 from .models import WeatherStation
+
 
 app_name = 'WAM_APP_FRED'
 

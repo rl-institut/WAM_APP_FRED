@@ -1,6 +1,6 @@
 # app setting e.g. add default  map size
 # flake8: noqa
-
+# pylint: skip-file
 
 LEAFLET_CONFIG = {
     # conf here

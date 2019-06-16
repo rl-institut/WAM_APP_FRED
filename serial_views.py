@@ -1,15 +1,14 @@
 # serialize data for all models
 from django.http import HttpResponse
-from .app_settings import LOCAL_TESTING
-
-if not LOCAL_TESTING:
-    import WAM_APP_FRED.oep_models as oep_models
-from shapely.wkb import loads as loadswkb
 import geojson
 from geojson import Point, Feature, FeatureCollection, dumps
-from geoalchemy2 import functions
+# from geoalchemy2 import functions
+# from shapely.wkb import loads as loadswkb
 import sqlahelper as sah
-import WAM_APP_FRED.oep_models as oep_modles
+
+# from .app_settings import LOCAL_TESTING
+# if not LOCAL_TESTING:
+#     import WAM_APP_FRED.oep_models as oep_models
 
 
 # def serializer():
@@ -42,7 +41,7 @@ class Serializer():
     All related tables are joined and the values are included as property within the GEOJSON.
     :return: dict - geojson featureCollection
     """
-    # pylint: disable=unnecessary-pass, no-self-use
+    # pylint: disable=unnecessary-pass, no-self-use, no-self-argument
     # ToDO: after testing done change to input pram
     Session = sah.get_session()
     session = Session()
@@ -75,11 +74,10 @@ class Serializer():
         # return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
         return HttpResponse(dumps(gj['features']), content_type="application/json")
 
-
-
     # def wseries_property_view(self):
     #     """
-    #     returns a query result containing a full record from OEP table as GEOJSON featureCollection.
+    #     returns a query result containing a full record from OEP table as GEOJSON
+    #     featureCollection.
     #     No geometry is included.
     #     All related tables are joined and the values are included as property within the GEOJSON.
     #
@@ -100,8 +98,9 @@ class Serializer():
     #         # record.Series.timespan.segments not included "list to long"
     #         # record.Series.values not included "list to long"
     #         # ToDo: How to handel the DateTimeObj so it is Json Serializeable
-    #         # timespan_collection = {"Start": record.Series.timespan.start.strftime('%b %d %Y %I:%M%p'),
-    #         #                        "Stop": record.Series.timespan.stop.strftime('%b %d %Y %I:%M%p'),
+    #         # timespan_collection = {
+    #         "Start": record.Series.timespan.start.strftime('%b %d %Y %I:%M%p'),
+    #         "Stop": record.Series.timespan.stop.strftime('%b %d %Y %I:%M%p'),
     #         #                        "Resolution": record.Series.timespan.resolution}
     #
     #         netcdf = record.Series.variable.netcdf_attributes
@@ -120,7 +119,6 @@ class Serializer():
     #         features.append(feature)
     #
     #     return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
-
 
     def wseries_get_single_point(request):
         """
@@ -145,12 +143,12 @@ class Serializer():
             feature = Feature(id=102, geometry=geometry)
             features.append(feature)
 
-
             # for record in Serializer.session.query(
             #         oep_models.classes['Series'],
             #         oep_models.classes['Timespan'],
             #         oep_models.classes['Variable']
-            # ).join(oep_models.classes['Timespan']).join(oep_models.classes['Variable']).limit(1000):
+            # ).join(oep_models.classes['Timespan']
+            # ).join(oep_models.classes['Variable']).limit(1000):
             #
             #     geom = ""
             #     propertys = ""
