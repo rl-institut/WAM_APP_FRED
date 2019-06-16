@@ -7,6 +7,7 @@ if not LOCAL_TESTING:
     import WAM_APP_FRED.oep_models as oep_models
 # from WAM_APP_FRED.db_sqla import *
 from shapely.wkb import loads as loadswkb
+import geojson
 from geojson import Point, Feature, FeatureCollection, dumps
 from geoalchemy2 import functions
 import sqlahelper as sah
@@ -61,16 +62,22 @@ class Serializer():
 
         features = []
 
-        for record in Serializer.session.query(
-                oep_models.classes['Series'],
-                oep_models.classes['Location']
-        ).join(oep_models.classes['Location']).limit(10):
+        with open('static/landkreis.geojson') as f:
+            gj = geojson.load(f)
 
-            geometry = loadswkb(str(record.Series.location.point), True)
-            feature = Feature(id=record.Series.id, geometry=geometry)
-            features.append(feature)
+        print(len(gj['features']))
+        # for record in Serializer.session.query(
+        #         oep_models.classes['Series'],
+        #         oep_models.classes['Location']
+        # ).join(oep_models.classes['Location']).limit(10):
+        geometry = Point((10.01, 53.57))
+        # geometry = loadswkb(str(record.Series.location.point), True)
+        # feature = Feature(id=record.Series.id, geometry=geometry)
+        feature = Feature(id=101, geometry=geometry)
+        features.append(feature)
 
-        return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
+        # return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
+        return HttpResponse(dumps(gj['features']), content_type="application/json")
 
 
 
