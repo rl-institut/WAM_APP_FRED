@@ -321,7 +321,17 @@
                       data: {'lat': latlng.lat, 'long': latlng.lng},
                       //success: function(data){alert("youhou" + data);}
                   });
-	};
+	          };
+
+
+	        var dataurl = '{% url 'WAM_APP_FRED:data' %}';
+            // Download GeoJSON via Ajax
+            $.getJSON(dataurl, function (data) {
+                // Add GeoJSON layer
+                 var ft = L.geoJSON(data, myLayerOptions).addTo(map);
+                 console.log(ft)
+
+            });
 
 
 
