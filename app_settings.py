@@ -1,5 +1,5 @@
 # create sqlalchemy con
-
+import os
 from sqlalchemy import create_engine
 import sqlahelper
 
@@ -7,6 +7,10 @@ import sqlahelper
 from wam import settings  # pylint: disable=import-error
 
 
+# add the package leaflet to the wam core project installed apps
+if os.name == 'posix':
+    settings.INSTALLED_APPS.append('leaflet')
+LOCAL_TESTING = True
 wam_config = settings.config['DATABASES']['OEP']
 
 # ##########################################SQLAlchemy ENGINE#######################################
