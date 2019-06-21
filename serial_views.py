@@ -57,7 +57,7 @@ class Serializer():
 
         features = []
 
-        with open('static/landkreis.geojson') as f:
+        with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson') as f:
             gj = geojson.load(f)
 
         print(len(gj['features']))
