@@ -51,8 +51,8 @@ class Serializer():
     def ger_boundaries_view(self):
         features = []
 
-        with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as f:
-            gj = geojson.load(f)
+        with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
+            gj = geojson.load(g)
 
         return HttpResponse(dumps(gj), content_type="application/json")
 
@@ -64,21 +64,21 @@ class Serializer():
         :return:
         """
 
-        features = []
-
-        with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson') as f:
-            gj = geojson.load(f)
-
-        print(len(gj['features']))
-        # for record in Serializer.session.query(
-        #         oep_models.classes['Series'],
-        #         oep_models.classes['Location']
-        # ).join(oep_models.classes['Location']).limit(10):
-        geometry = Point((10.01, 53.57))
-        # geometry = loadswkb(str(record.Series.location.point), True)
-        # feature = Feature(id=record.Series.id, geometry=geometry)
-        feature = Feature(id=101, geometry=geometry)
-        features.append(feature)
+        # features = []
+        #
+        # with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson') as f:
+        #     gj = geojson.load(f)
+        #
+        # print(len(gj['features']))
+        # # for record in Serializer.session.query(
+        # #         oep_models.classes['Series'],
+        # #         oep_models.classes['Location']
+        # # ).join(oep_models.classes['Location']).limit(10):
+        # geometry = Point((10.01, 53.57))
+        # # geometry = loadswkb(str(record.Series.location.point), True)
+        # # feature = Feature(id=record.Series.id, geometry=geometry)
+        # feature = Feature(id=101, geometry=geometry)
+        # features.append(feature)
 
         # return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
         # return HttpResponse(dumps(gj['features']), content_type="application/json")
