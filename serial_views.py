@@ -5,6 +5,7 @@ from geojson import Point, Feature, FeatureCollection, dumps
 # from geoalchemy2 import functions
 # from shapely.wkb import loads as loadswkb
 import sqlahelper as sah
+import WAM_APP_FRED.oep_models as oep_models
 
 # from .app_settings import LOCAL_TESTING
 # if not LOCAL_TESTING:
@@ -47,6 +48,14 @@ class Serializer():
     session = Session()
     ##############################################
 
+    def ger_boundaries_view(self):
+        features = []
+
+        with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as f:
+            gj = geojson.load(f)
+
+        return HttpResponse(dumps(gj), content_type="application/json")
+
     def wseries_geometry_view(self):
         """
         returns a query result containing a full record from OEP table as GEOJSON
@@ -72,7 +81,7 @@ class Serializer():
         features.append(feature)
 
         # return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
-        return HttpResponse(dumps(gj['features']), content_type="application/json")
+        # return HttpResponse(dumps(gj['features']), content_type="application/json")
 
     # def wseries_property_view(self):
     #     """
@@ -132,6 +141,9 @@ class Serializer():
         """
 
         features = []
+
+
+
         if request.method == 'POST':
             print(request.POST)
             lat = float(request.POST.get('lat'))
@@ -159,12 +171,30 @@ class Serializer():
         return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
         # return HttpResponse(feature, content_type="application/json")
 
-    def pp_list_geometry_view(self):
+    def ppr_list_geometry_view(self, request):
         """
         This function will return a geojson with all power-plants
         :return:
         """
-        pass
+        features = []
+
+
+
+        if request.method == 'POST':
+            print(request.POST)
+            lat = float(request.POST.get('lat'))
+            long = float(request.POST.get('long'))
+            print(lat, long)
+            geometry = Point((lat, long))
+            # geometry = loadswkb(str(record.Series.location.point), True)
+            # feature = Feature(id=record.Series.id, geometry=geometry)
+            feature = Feature(id=102, geometry=geometry)
+            features.append(feature)
+
+        elif request.method == 'GET':
+            print(request.GET)
+
+        return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
 
     def kw_list_property_view(self):
         """
