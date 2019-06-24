@@ -253,8 +253,10 @@
     <script type="text/javascript">
 
             // define a var which holds a GEOJSON from a URL provided by django
-            var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}";
+          
             var mouse_click_location = "{% url 'WAM_APP_FRED:MouseClick'|add:'.data' %}";
+
+            var ger_boundaries = "{% url 'WAM_APP_FRED:GerBoundary'|add:'.data' %}";
 
 
 
@@ -289,20 +291,6 @@
               };
               ///////////////////////////////////////////////////////////////////////////////////////
 
-
-              // create a ajax call for locations_dataurl
-              $.ajax({
-                    url: locations_dataurl,
-                    dataType: 'json',
-                    async: true,
-                    // if the data-source can be accessed, create a GEOJSON layer
-                    success: function(loca){
-                      // create the GeoJSON layer from the myLayerData object
-                      L.geoJSON(loca).addTo(map)
-
-                    }
-              });
-
               // return current location of the mouse-courser
               // access the original DOM even translate to L.LatLag instance
               // Rest-full return the value to the server with POST with jQuery
@@ -316,22 +304,67 @@
                       headers: {'X-CSRFToken': '{{ csrf_token }}'},
                       data: {'lat': latlng.lat, 'long': latlng.lng},
                       //success: function(data){alert("youhou" + data);}
-                  });
-	          };
+                    });
+	                };
+            
+              // This is style setting for german boundary
+              //should be outsourced -> style.css
+              var highlightStyle = {
+                opacity: 0.7,
+                weight: 2,
+                fillOpacity: 0.7,
+                color: "#0000ff",
+                fillColor: "#0ba0ff",
+              };
 
+              var GerBoundStyle = {
+                opacity: 0.7,
+                weight: 1,
+                fillOpacity: 0.7,
+                color: "#000000",
+                fillColor: "#0BC11C",
+              };
 
-	        var dataurl = '{% url 'WAM_APP_FRED:data' %}';
-            // Download GeoJSON via Ajax
-            $.getJSON(dataurl, function (data) {
-                // Add GeoJSON layer
-                 var ft = L.geoJSON(data, myLayerOptions).addTo(map);
-                 console.log(ft)
+              var GerBoundZoomLvlStyle = {
+                opacity: 0.7,
+                weight: 1,
+                fillOpacity: 0.0,
+                color: "#000000",
+                fillColor: "#0BC11C",
+              };
 
-            });
-
-
-
+              // Germany region boundaries
+              $.ajax({
+                url: ger_boundaries,
+                dataType: 'json',
+                async: true,
+                success: function(boundary){
+                  function onEachFeature(boundary, layer) {
+                    layer.on('mouseover', function () {
+                    this.setStyle(highlightStyle);
+                    });
+                    layer.on('mouseout', function () {
+                      this.setStyle(GerBoundStyle);
+                    });
+                    layer.on('click', function () {
+                      this.setStyle(GerBoundZoomLvlStyle);
+                    });
+                    }
+                  var layer = new L.geoJSON(boundary, {
+                    onEachFeature: onEachFeature,
+                    style: function (feature, latlng) {
+                      return GerBoundStyle;
+                    }
+                  })
+                  map.addLayer(layer)
+                }
+              }); 
+            
             };
+
+
+      var ppl_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
+
 
     </script>
 
