@@ -13,7 +13,10 @@ urlpatterns = [
     path('', views.webgui_test, name='index'),
 
     # just point geometrys as geojson featureCollection
-    path('Locations.data/', Serializer.wseries_geometry_view, name='Locations.data'),
+    # path('Locations.data/', Serializer.wseries_geometry_view, name='Locations.data'),
     path('MouseClick.data/', Serializer.wseries_get_single_point, name='MouseClick.data'),
-    url(r'^data.geojson$', GeoJSONLayerView.as_view(model=WeatherStation), name='data')
+    # url(r'^data.geojson$', GeoJSONLayerView.as_view(model=WeatherStation), name='data'),
+    path('GerBoundary.data/', Serializer.ger_boundaries_view, name='GerBoundary.data'),
+    path('PowerPlantRegister.data/', GeoJSONLayerView.as_view(model='') , name='PowerPlantRegister.data')
+
 ]
