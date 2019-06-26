@@ -21,7 +21,7 @@ from sqlalchemy.orm import relationship
 import sqlahelper as sah
 from geoalchemy2 import types as geotypes
 
-import WAM_APP_FRED.app_settings
+# import WAM_APP_FRED.app_settings
 # from geoalchemy2.types import Geometry
 # from WAM_APP_FRED.cli.openFRED import mapped_classes, db_session
 
@@ -160,7 +160,7 @@ def ppr_mapping(metadata):
     return classes
 
 
-# contains open_FRED related tables as sqla class
+# contains open_FRED related tables as SQLAlchemy class
 open_fred_classes = mapped_classes(metadata_1)
 ego_dp_res_classes = ppr_mapping(metadata_2)
 
