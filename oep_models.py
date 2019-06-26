@@ -13,23 +13,25 @@ from sqlalchemy import (
     MetaData,
     String as Str,
     Text,
-    UniqueConstraint as UC,)
+    UniqueConstraint as UC,
+    Table)
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 import sqlahelper as sah
 from geoalchemy2 import types as geotypes
 
-# import WAM_APP_FRED.app_settings
+import WAM_APP_FRED.app_settings
 # from geoalchemy2.types import Geometry
 # from WAM_APP_FRED.cli.openFRED import mapped_classes, db_session
 
 
 # ##########################################SQLAlchemy setup########################################
-SCHEMA = 'model_draft'
+SCHEMA_1 = 'model_draft'
+SCHEMA_2 = 'supply'
 engine = sah.get_engine('oep_engine')
-metadata = MetaData(schema=SCHEMA, bind=engine, reflect=True)
-
+metadata_1 = MetaData(schema=SCHEMA_1, bind=engine)
+metadata_2 = MetaData(schema=SCHEMA_2, bind=engine)
 # ##########################################TABLE DEFINITION########################################
 
 # included function from github: https://github.com/open-fred/cli/blob/master/openFRED.py
@@ -133,6 +135,31 @@ def mapped_classes(metadata):
 
     return classes
 
+def ppr_mapping(metadata):
+    """
+    Returns classes mapped to the OEDB database via SQLAlchemy.
+    The classes are reflected(autoload=True) and stored in a dictionary keyed by
+    class names. The dictionary also contains the special entry `__Base__`,
+    which an SQLAlchemy `declarative_base` instance used as the base class from
+    which all mapped classes inherit.
+    """
+
+    Base = declarative_base(metadata=metadata)
+    classes = {"__Base__": Base}
+
+    class ResPowerPlantRegister(Base):
+        __table__ = Table('ego_dp_res_powerplant', metadata)
+        Table('ego_dp_res_powerplant', metadata, extend_existing=True, autoload=True)
+
+    classes["ResPowerPlant"] = ResPowerPlantRegister
+    return classes
+
 
 # contains open_FRED related tables as sqla class
-classes = mapped_classes(metadata)
+open_fred_classes = mapped_classes(metadata_1)
+ego_dp_res_classes = ppr_mapping(metadata_2)
+
+print('WAIT')
+
+
+
