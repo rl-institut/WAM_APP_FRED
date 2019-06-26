@@ -4,6 +4,7 @@ import geojson
 from geojson import Point, Feature, FeatureCollection, dumps
 # from geoalchemy2 import functions
 # from shapely.wkb import loads as loadswkb
+from shapely.geometry import MultiPolygon
 import sqlahelper as sah
 import WAM_APP_FRED.oep_models as oep_models
 
@@ -38,7 +39,9 @@ import WAM_APP_FRED.oep_models as oep_models
 
 class Serializer():
     """
-    returns a query result containing a full record from OEP table as GEOJSON featureCollection.
+    Base Class for methods that retrun a Query result in a non-proprietary file format.
+    Provides a the func. to get data (sql or api are main data sources)
+    Mainly returns a query result containing a full record from OEP table as GEOJSON featureCollection.
     All related tables are joined and the values are included as property within the GEOJSON.
     :return: dict - geojson featureCollection
     """
@@ -48,13 +51,18 @@ class Serializer():
     session = Session()
     ##############################################
 
+    # Serializer attributes
+    features = []
+    with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
+    # ToDO: Remove after testing done
+    # with open('F:\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
+        gj = geojson.load(g)
+
     def ger_boundaries_view(self):
-        features = []
 
-        with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
-            gj = geojson.load(g)
+        germany_boundaries = Serializer.gj
 
-        return HttpResponse(dumps(gj), content_type="application/json")
+        return HttpResponse(dumps(germany_boundaries), content_type="application/json")
 
     def wseries_geometry_view(self):
         """
@@ -142,8 +150,6 @@ class Serializer():
 
         features = []
 
-
-
         if request.method == 'POST':
             print(request.POST)
             lat = float(request.POST.get('lat'))
@@ -171,31 +177,51 @@ class Serializer():
         return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
         # return HttpResponse(feature, content_type="application/json")
 
-    def ppr_list_geometry_view(self, request):
+    def ppr_view(self, request):
         """
         This function will return a geojson with all power-plants
         :return:
         """
-        features = []
+
+
+        # if request.method == 'POST':
+        #     print(request.POST)
+        #     # lat = float(request.POST.get('lat'))
+        #     # long = float(request.POST.get('long'))
+        #     region_id = str()
+        #     print(region_id)
+        #
+        #     if region_id in Serializer.gj['features']['properties']['name']:
+        #         region_boundary = Serializer.gj['features']['geometry']['coordinates']
+        #         geometry = MultiPolygon(region_boundary)
+        #         # geometry = loadswkb(str(record.Series.location.point), True)
+        #         # feature = Feature(id=record.Series.id, geometry=geometry)
+        #         feature = Feature(id=102, geometry=geometry)
+        #         self.features.append(feature)
+        #
+        # elif request.method == 'GET':
+        #     print(request.GET)
 
 
 
-        if request.method == 'POST':
-            print(request.POST)
-            lat = float(request.POST.get('lat'))
-            long = float(request.POST.get('long'))
-            print(lat, long)
-            geometry = Point((lat, long))
-            # geometry = loadswkb(str(record.Series.location.point), True)
-            # feature = Feature(id=record.Series.id, geometry=geometry)
-            feature = Feature(id=102, geometry=geometry)
-            features.append(feature)
+        region_id = str(request)
+        # print(region_id)
 
-        elif request.method == 'GET':
-            print(request.GET)
+        for f in Serializer.gj['features']:
+            if region_id in f['properties']['name']:
+                region_boundary = f['geometry']['coordinates']
+                boundary_geometry = MultiPolygon(region_boundary)
+                result = Serializer.session.query()
+                geometry = ''
+                feature = Feature(id=region_id, geometry=boundary_geometry)
+                # feature = Feature(id=region_id, geometry=geometry)
+                self.features.append(feature)
 
-        return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
+        print(self.features)
 
+        # return HttpResponse(dumps(self.features), content_type="application/json")
+
+    # ToDO: this needed?
     def kw_list_property_view(self):
         """
         This function will return a geojson with all properties' for each power-plant
@@ -203,7 +229,7 @@ class Serializer():
         """
         pass
 
-    def district_feedin_series(self):
+    def district_feedin_series_view(self):
         """
         This function will return a json/geojson with pre calculated data for a single or multiple
         district.
@@ -211,3 +237,10 @@ class Serializer():
         :return:
         """
         pass
+
+#############TESTING#####################
+# sa = Serializer()
+# POST_REGION = 'Niedersachsen'
+# sa.ppr_list_geometry_view(request=POST_REGION)
+# print('WAIT')
+#########################################
