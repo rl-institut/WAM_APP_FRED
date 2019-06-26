@@ -144,13 +144,17 @@ def ppr_mapping(metadata):
     which all mapped classes inherit.
     """
 
+    # SQLAlchemy Base
     Base = declarative_base(metadata=metadata)
     classes = {"__Base__": Base}
 
+    # Table definition with MetaData object
     class ResPowerPlantRegister(Base):
         __table__ = Table('ego_dp_res_powerplant', metadata)
+        # reflect the existing table with autoload from DB and add values as extend_existing
         Table('ego_dp_res_powerplant', metadata, extend_existing=True, autoload=True)
 
+    # Add Table to dict
     classes["ResPowerPlant"] = ResPowerPlantRegister
     return classes
 
@@ -159,7 +163,6 @@ def ppr_mapping(metadata):
 open_fred_classes = mapped_classes(metadata_1)
 ego_dp_res_classes = ppr_mapping(metadata_2)
 
-print('WAIT')
 
 
 
