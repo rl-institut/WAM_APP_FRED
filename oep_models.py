@@ -163,7 +163,3 @@ def ppr_mapping(metadata):
 # contains open_FRED related tables as SQLAlchemy class
 open_fred_classes = mapped_classes(metadata_1)
 ego_dp_res_classes = ppr_mapping(metadata_2)
-
-
-
-
