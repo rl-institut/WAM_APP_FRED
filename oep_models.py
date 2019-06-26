@@ -135,6 +135,7 @@ def mapped_classes(metadata):
 
     return classes
 
+
 def ppr_mapping(metadata):
     """
     Returns classes mapped to the OEDB database via SQLAlchemy.
