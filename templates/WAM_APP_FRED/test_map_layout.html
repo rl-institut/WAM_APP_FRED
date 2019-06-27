@@ -254,6 +254,21 @@
     <script type="text/javascript">
 
 
+            var highlightStyle = {
+                  opacity: 0.7,
+                  weight: 2,
+                  fillOpacity: 0.7,
+                  color: "#0000ff",
+                  fillColor: "#0ba0ff",
+              };
+              var clickedStyle = {
+                  opacity: 0.7,
+                  weight: 2,
+                  fillOpacity: 0.7,
+                  color: "#00ff00",
+                  fillColor: "#00ffff",
+              };
+
             // define a var which holds a GEOJSON from a URL provided by django
             var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}";
             var mouse_click_location = "{% url 'WAM_APP_FRED:MouseClick'|add:'.data' %}";
@@ -277,6 +292,59 @@
               };
 
 
+              function displayWeatherDataPoint(feature){
+                  var marker = wdl.getLayer(feature.properties.leaflet_id);
+                  var popup = marker.getPopup();
+                  const variable = feature.properties.variable
+                  var popupContent = '<h4>' + variable +
+                  '</h4></br><div id="tester" style="width:300px;height:250px;"></div>';
+                  popup.setContent(popupContent)
+                  marker.feature.properties = feature.properties
+                  TESTER = document.getElementById('tester');
+                  var height = feature.properties.heights[0];
+                  Plotly.plot( TESTER, [{
+                  x: feature.properties.data[height]['x'],
+                  y: feature.properties.data[height]['y']}], {
+                  margin: { t: 0 } } );
+                  }
+
+              function onWeatherDataPointClick (event) {
+
+                  var marker = event.sourceTarget;
+                  var leaflet_id = L.stamp(marker);
+                  var popup = marker.getPopup();
+                  var latlng = marker.getLatLng();
+                  var location_id = marker.feature.properties.id;
+                  // this need to be linked to user choice
+                  var variable_id = 12;
+
+                  var start_time = '2002-01-31T23:00:00';
+                  var end_time = '2002-03-31T23:00:00';
+
+                  // do not fetch the data a second time
+                  if (marker.feature.properties.variable){
+                  console.log('not fetching data a second time')
+                  displayWeatherDataPoint(marker.feature)
+                  }
+                  else{
+                  // here make a call to django and dl the data for that point
+                  $.ajax({
+                      type: 'POST',
+                      url: weather_data_click_location,
+                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                      data: {
+                      'lat': latlng.lat,
+                      'lon': latlng.lng,
+                      'leaflet_id': leaflet_id,
+                      'location_id': location_id,
+                      'variable_id': variable_id,
+                      'start_time': start_time,
+                      'end_time': end_time
+                      },
+                      success: displayWeatherDataPoint,
+                  });
+                  }
+              }
 
               let wdataOptions = {
                 pointToLayer: createWDataPoint,

@@ -18,6 +18,6 @@ urlpatterns = [
 
     # just point geometrys as geojson featureCollection
     path('Locations.data/', Serializer.wseries_geometry_view, name='Locations.data'),
-    url(r'^data.geojson$', GeoJSONLayerView.as_view(model=WeatherStation), name='data')
     path('MouseClick.data/', wseries_get_single_point, name='MouseClick.data'),
+    path('WeatherPointClick.data/', wseries_fetch_data_single_point, name='WeatherPointClick.data'),
 ]
