@@ -18,6 +18,7 @@
     <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
     {% leaflet_js %}
     {% leaflet_css %}
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   </head>
   <body>
 
@@ -252,14 +253,56 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script type="text/javascript">
 
+
             // define a var which holds a GEOJSON from a URL provided by django
             var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}";
             var mouse_click_location = "{% url 'WAM_APP_FRED:MouseClick'|add:'.data' %}";
+            var weather_data_click_location = "{% url 'WAM_APP_FRED:WeatherPointClick'|add:'.data' %}";
 
 
 
             function map_init_basic (map, options) {
               var popup = L.popup();
+
+              let wdataStyle = {
+                    opacity: 0.7,
+                    weight: 1,
+                    fillOpacity: 0.7,
+                    color: "#da9700",
+                    fillColor: "#da9700",
+                radius: 5
+              };
+              function createWDataPoint (feature, latlng) {
+                return L.circleMarker(latlng, wdataStyle)
+              };
+
+
+
+              let wdataOptions = {
+                pointToLayer: createWDataPoint,
+                onEachFeature: function(feature, layer) {
+                layer.on('mouseover', function () {
+                  this.setStyle(highlightStyle);
+                });
+                layer.on('click', function () {
+                  this.setStyle(highlightStyle);
+                });
+                layer.on('mouseout', function () {
+                  this.setStyle(wdataStyle);
+                });
+                  layer.bindPopup('Loading...');
+
+                  layer.on('click', onWeatherDataPointClick);
+                  }
+              };
+
+              var wdl = new L.geoJSON(null, wdataOptions);
+
+              var wdl_saved = new L.geoJSON(null, wdataOptions);
+
+
+              wdl.addTo(map);
+              wdl_saved.addTo(map);
 
 
               // Move zoom control
@@ -278,10 +321,14 @@
                 radius: 5
               };
 
+
+
               // add all of the GeoJSON data to the empty layer we created
               function createCircles (feature, latlng) {
                 return L.circleMarker(latlng, myLayerStyle)
               }
+
+
 
               // create an options object that specifies which function will called on each feature
               let myLayerOptions = {
@@ -308,29 +355,23 @@
               // Rest-full return the value to the server with POST with jQuery
               map.on('click', onMapClick);
 
-              function onMapClick(ev) {
+            function addWeatherPoint(data) {
+                // Clear the GeoJSON layer
+                wdl.clearLayers()
+                // Add GeoJSON data in the layer
+                wdl.addData(data)
+            }
+
+	          function onMapClick(ev) {
                   var latlng = map.mouseEventToLatLng(ev.originalEvent);
                   $.ajax({
                       type: 'POST',
                       url: mouse_click_location,
                       headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                      data: {'lat': latlng.lat, 'long': latlng.lng},
-                      //success: function(data){alert("youhou" + data);}
+                      data: {'lat': latlng.lat, 'lon': latlng.lng},
+                      success: addWeatherPoint,
                   });
 	          };
-
-
-	        var dataurl = '{% url 'WAM_APP_FRED:data' %}';
-            // Download GeoJSON via Ajax
-            $.getJSON(dataurl, function (data) {
-                // Add GeoJSON layer
-                 var ft = L.geoJSON(data, myLayerOptions).addTo(map);
-                 console.log(ft)
-
-            });
-
-
-
             };
 
     </script>

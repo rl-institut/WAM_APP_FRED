@@ -1,10 +1,12 @@
 # serialize data for all models
+import datetime
 from django.http import HttpResponse
+import sqlalchemy as sa
+import sqlahelper as sah
 import geojson
 from geojson import Point, Feature, FeatureCollection, dumps
-# from geoalchemy2 import functions
-# from shapely.wkb import loads as loadswkb
-import sqlahelper as sah
+from geoalchemy2.elements import WKTElement
+from shapely.wkb import loads as loadswkb
 
 # from .app_settings import LOCAL_TESTING
 # if not LOCAL_TESTING:
@@ -181,3 +183,59 @@ class Serializer():
         :return:
         """
         pass
+
+
+def wseries_get_single_point(request):
+    """
+    Return the closest weather-point for a given position
+    as GeoJSON.
+    The given position is provided as HTTP POST/GET method.
+
+    request: is the current mouse position (@click) from client
+
+    :return: GeoJSON feature as HTTP response
+    """
+
+    features = []
+    if request.method == 'POST':
+        # get the latitude and longitude of the mouseClick event
+        lon = float(request.POST.get('lon'))
+        lat = float(request.POST.get('lat'))
+
+        if not LOCAL_TESTING:
+            clicked_p = WKTElement(f'POINT ({lon} {lat})', srid=4326)
+
+            # Find the 5 nearest points from the mouse click in the oedb table
+            # model_draft.openfred_locations, which has an 'id' and a 'point' column.
+            # The point column is the geographical coordinates in a binary format
+            oep_query = Serializer.session.query(open_fred_classes['Location']).order_by(
+                open_fred_classes['Location'].point.distance_centroid(clicked_p)
+            ).limit(5)
+            nearest_points = []
+            for record in oep_query:
+                nearest_points.append(record.id)
+
+            for record in oep_query:
+
+                i = record.id
+                coord = record.point
+                pos = geojson.Feature(
+                    geometry=loadswkb(str(coord), True),
+                    properties=dict(
+                        id=i
+                    )
+                )
+                features.append(pos)
+
+        else:
+            pos = geojson.Feature(
+                geometry=Point((lon, lat)),
+                properties=dict(
+                    id=101
+                )
+            )
+            features.append(pos)
+    elif request.method == 'GET':
+        print(request.GET)
+
+    return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
