@@ -1,13 +1,10 @@
 from django.urls import path
-from django.conf.urls import url
-from djgeojson.views import GeoJSONLayerView
 from WAM_APP_FRED.serial_views import (
     Serializer,
     wseries_get_single_point,
     wseries_fetch_data_single_point
 )
 from . import views
-from .models import WeatherStation
 
 
 app_name = 'WAM_APP_FRED'
