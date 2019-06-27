@@ -1,11 +1,14 @@
 # serialize data for all models
 from django.http import HttpResponse
 import geojson
-from geojson import Point, Feature, FeatureCollection, dumps
-# from geoalchemy2 import functions
-# from shapely.wkb import loads as loadswkb
-from shapely.geometry import MultiPolygon
+from geojson import Point, MultiPolygon, Feature, FeatureCollection, dumps
+from geoalchemy2 import functions as func
+from geoalchemy2.shape import from_shape, to_shape
+from shapely.wkb import loads as loadswkb
+from shapely.wkt import loads, dumps
+from shapely.geometry import MultiPolygon as sMP, Point, shape
 import sqlahelper as sah
+from sqlalchemy.orm import load_only
 import WAM_APP_FRED.oep_models as oep_models
 
 # from .app_settings import LOCAL_TESTING
@@ -28,7 +31,7 @@ import WAM_APP_FRED.oep_models as oep_models
 #     features = []
 #
 #     for record in session.query(oep_modles.classes['Location']).limit(100):
-#         geometry = loads(str(record.point), True)
+#         geometry = loadswkb(str(record.point), True)
 #         propertys = record.id
 #         feature = Feature(id=record.id, geometry=geometry)
 #
@@ -51,11 +54,12 @@ class Serializer():
     session = Session()
     ##############################################
 
-    # Serializer attributes
+    # list that stores all query results that are defined as feature object
     features = []
     with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
     # ToDO: Remove after testing done
     # with open('F:\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
+    # with open(r'C:\Users\Jonas H\PycharmProjects\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
         gj = geojson.load(g)
 
     def ger_boundaries_view(self):
@@ -203,21 +207,40 @@ class Serializer():
         #     print(request.GET)
 
 
-
         region_id = str(request)
         # print(region_id)
-
+        # stores the current region boundary
+        wkbs = []
         for f in Serializer.gj['features']:
             if region_id in f['properties']['name']:
                 region_boundary = f['geometry']['coordinates']
                 boundary_geometry = MultiPolygon(region_boundary)
-                result = Serializer.session.query()
-                geometry = ''
+                # create shapely geometry from geojson feature
+                _geom = shape(boundary_geometry)
+                # convert shaply.geometry to wkbelement
+                # query_geom = from_shape(_geom, srid=4326)
+
+                # wkbs.append(_geom)
+                wkbs.append(from_shape(_geom, srid=3035))
+
                 feature = Feature(id=region_id, geometry=boundary_geometry)
                 # feature = Feature(id=region_id, geometry=geometry)
                 self.features.append(feature)
 
-        print(self.features)
+        # Query the DB with the given wkbelement as input
+        for wkb in wkbs:
+            for record in Serializer.session.query(oep_models.ego_dp_res_classes['ResPowerPlant'].rea_geom_new.ST_Contains(wkb)).limit(2000000):
+                # seems to be never true, tested ST_Contains and shaply.gem.contains -> is it data or me
+                if record is True:
+                    # this is not used or tested  properly -> record never Ture
+                    test = to_shape(record.rea_geom_new)
+                    ger_bou = wkb.contains(test)
+                    if ger_bou is True:
+                        print('WAITT')
+                        region_contains = loadswkb(str(record.rea_geom_new), True)
+                        feature = Feature(id=region_id, geometry=region_contains)
+
+                        print('WAIT')
 
         # return HttpResponse(dumps(self.features), content_type="application/json")
 
@@ -238,9 +261,9 @@ class Serializer():
         """
         pass
 
-#############TESTING#####################
+############TESTING#####################
 # sa = Serializer()
-# POST_REGION = 'Niedersachsen'
-# sa.ppr_list_geometry_view(request=POST_REGION)
+# POST_REGION = 'Brandenburg'
+# sa.ppr_view(request=POST_REGION)
 # print('WAIT')
-#########################################
+# ########################################
