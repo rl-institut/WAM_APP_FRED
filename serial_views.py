@@ -56,10 +56,10 @@ class Serializer():
 
     # list that stores all query results that are defined as feature object
     features = []
-    with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
+    # with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
     # ToDO: Remove after testing done
     # with open('F:\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
-    # with open(r'C:\Users\Jonas H\PycharmProjects\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
+    with open(r'C:\Users\Jonas H\PycharmProjects\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
         gj = geojson.load(g)
 
     def ger_boundaries_view(self):
@@ -221,18 +221,20 @@ class Serializer():
                 # query_geom = from_shape(_geom, srid=4326)
 
                 # wkbs.append(_geom)
-                wkbs.append(from_shape(_geom, srid=3035))
+                # wkbs.append(from_shape(_geom, srid=3035))
+                wkbs.append(from_shape(_geom, srid=4326))
 
-                feature = Feature(id=region_id, geometry=boundary_geometry)
+                # feature = Feature(id=region_id, geometry=boundary_geometry)
                 # feature = Feature(id=region_id, geometry=geometry)
-                self.features.append(feature)
+                # self.features.append(feature)
 
         # Query the DB with the given wkbelement as input
         for wkb in wkbs:
-            for record in Serializer.session.query(oep_models.ego_dp_res_classes['ResPowerPlant'].rea_geom_new.ST_Contains(wkb)).limit(2000000):
+            for record in Serializer.session.query(
+                    oep_models.ego_dp_res_classes['ResPowerPlant'].geom.ST_Within(wkb)).limit(100):
                 # seems to be never true, tested ST_Contains and shaply.gem.contains -> is it data or me
-                if record is True:
-                    # this is not used or tested  properly -> record never Ture
+                if record[0] is True:
+                    # this is not used or tested  properly -> is record ever false?
                     test = to_shape(record.rea_geom_new)
                     ger_bou = wkb.contains(test)
                     if ger_bou is True:
@@ -263,7 +265,7 @@ class Serializer():
 
 ############TESTING#####################
 # sa = Serializer()
-# POST_REGION = 'Brandenburg'
+# POST_REGION = 'Bayern'
 # sa.ppr_view(request=POST_REGION)
 # print('WAIT')
 # ########################################
