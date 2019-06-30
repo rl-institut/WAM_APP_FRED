@@ -5,7 +5,7 @@ from geojson import Point, MultiPolygon, Feature, FeatureCollection, dumps
 from geoalchemy2 import functions as func
 from geoalchemy2.shape import from_shape, to_shape
 from shapely.wkb import loads as loadswkb
-from shapely.wkt import loads, dumps
+from shapely.wkt import loads, dumps as geomdumps
 from shapely.geometry import MultiPolygon as sMP, Point, shape
 import sqlahelper as sah
 from sqlalchemy.orm import load_only
@@ -55,11 +55,11 @@ class Serializer():
     ##############################################
 
     # list that stores all query results that are defined as feature object
-    features = []
-    # with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
+    myfeatures = []
+    with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
     # ToDO: Remove after testing done
     # with open('F:\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
-    with open(r'C:\Users\Jonas H\PycharmProjects\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
+    # with open(r'C:\Users\Jonas H\PycharmProjects\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
         gj = geojson.load(g)
 
     def ger_boundaries_view(self):
@@ -181,12 +181,11 @@ class Serializer():
         return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
         # return HttpResponse(feature, content_type="application/json")
 
-    def ppr_view(self, request):
+    def ppr_view(self, request='Bayern'):
         """
         This function will return a geojson with all power-plants
         :return:
         """
-
 
         # if request.method == 'POST':
         #     print(request.POST)
@@ -205,8 +204,7 @@ class Serializer():
         #
         # elif request.method == 'GET':
         #     print(request.GET)
-
-
+        myfeatures = []
         region_id = str(request)
         # print(region_id)
         # stores the current region boundary
@@ -231,20 +229,25 @@ class Serializer():
         # Query the DB with the given wkbelement as input
         for wkb in wkbs:
             for record in Serializer.session.query(
-                    oep_models.ego_dp_res_classes['ResPowerPlant'].geom.ST_Within(wkb)).limit(100):
+                    oep_models.ego_dp_res_classes['ResPowerPlant'].geom)\
+                    .filter(oep_models.ego_dp_res_classes['ResPowerPlant'].geom.ST_Within(wkb)).limit(100):
                 # seems to be never true, tested ST_Contains and shaply.gem.contains -> is it data or me
-                if record[0] is True:
+                # if record[0] is True:
                     # this is not used or tested  properly -> is record ever false?
-                    test = to_shape(record.rea_geom_new)
-                    ger_bou = wkb.contains(test)
-                    if ger_bou is True:
-                        print('WAITT')
-                        region_contains = loadswkb(str(record.rea_geom_new), True)
-                        feature = Feature(id=region_id, geometry=region_contains)
+                # region_contains = to_shape(record.geom)
+                region_contains = loadswkb(str(record.geom), True)
+                    # ger_bou = wkb.contains(test)
+                    # # if ger_bou is True:
+                    #     print('WAITT')
+                    #     region_contains = loadswkb(str(record.rea_geom_new), True)
+                    #     feature = Feature(id=region_id, geometry=region_contains)
 
-                        print('WAIT')
+                feature = Feature(id=1, geometry=region_contains)
+                myfeatures.append(feature)
 
-        # return HttpResponse(dumps(self.features), content_type="application/json")
+                # print('WAIT')
+
+        return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
 
     # ToDO: this needed?
     def kw_list_property_view(self):
@@ -263,7 +266,7 @@ class Serializer():
         """
         pass
 
-############TESTING#####################
+# ###########TESTING#####################
 # sa = Serializer()
 # POST_REGION = 'Bayern'
 # sa.ppr_view(request=POST_REGION)
