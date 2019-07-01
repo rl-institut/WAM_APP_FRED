@@ -258,6 +258,8 @@
 
             var ger_boundaries = "{% url 'WAM_APP_FRED:GerBoundary'|add:'.data' %}";
 
+            var ppl_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
+
 
 
             function map_init_basic (map, options) {
@@ -302,7 +304,7 @@
                       type: 'POST',
                       url: mouse_click_location,
                       headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                      data: {'lat': latlng.lat, 'long': latlng.lng},
+                      data: {'lat': latlng.lat, 'long': latlng.lng}
                       //success: function(data){alert("youhou" + data);}
                     });
 	                };
@@ -358,12 +360,25 @@
                   })
                   map.addLayer(layer)
                 }
-              }); 
+              });
+
+              // res PowerPlants in region boundaries
+              $.ajax({
+                    url: ppl_location,
+                    dataType: 'json',
+                    async: true,
+                    success: function(powerplant){
+                        var layer = new L.geoJSON(powerplant, {
+                            pointToLayer: createCircles
+                        });
+                        map.addLayer(layer)
+                        }
+                });
             
             };
 
 
-      var ppl_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
+
 
 
     </script>
