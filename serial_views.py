@@ -8,7 +8,8 @@ from shapely.wkb import loads as loadswkb
 from shapely.wkt import loads, dumps as geomdumps
 from shapely.geometry import MultiPolygon as sMP, Point, shape
 import sqlahelper as sah
-from sqlalchemy.orm import load_only
+from sqlalchemy.orm import load_only, Bundle
+from sqlalchemy import and_
 import WAM_APP_FRED.oep_models as oep_models
 
 # from .app_settings import LOCAL_TESTING
@@ -59,7 +60,8 @@ class Serializer():
     with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
     # ToDO: Remove after testing done
     # with open('F:\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
-    # with open(r'C:\Users\Jonas H\PycharmProjects\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
+    # with open(r'C:\Users\Jonas H\PycharmProjects\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson',
+    #           encoding='UTF-8') as g:
         gj = geojson.load(g)
 
     def ger_boundaries_view(self):
@@ -181,7 +183,7 @@ class Serializer():
         return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
         # return HttpResponse(feature, content_type="application/json")
 
-    def ppr_view(self, request='Bayern'):
+    def ppr_view(self, request='Berlin'):
         """
         This function will return a geojson with all power-plants
         :return:
@@ -228,20 +230,21 @@ class Serializer():
 
         # Query the DB with the given wkbelement as input
         for wkb in wkbs:
-            for record in Serializer.session.query(
-                    oep_models.ego_dp_res_classes['ResPowerPlant'].geom)\
-                    .filter(oep_models.ego_dp_res_classes['ResPowerPlant'].geom.ST_Within(wkb)).limit(100):
-                # seems to be never true, tested ST_Contains and shaply.gem.contains -> is it data or me
-                # if record[0] is True:
-                    # this is not used or tested  properly -> is record ever false?
-                # region_contains = to_shape(record.geom)
-                region_contains = loadswkb(str(record.geom), True)
-                    # ger_bou = wkb.contains(test)
-                    # # if ger_bou is True:
-                    #     print('WAITT')
-                    #     region_contains = loadswkb(str(record.rea_geom_new), True)
-                    #     feature = Feature(id=region_id, geometry=region_contains)
+            res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
+            tbl_cols = Bundle('powerplant', res_powerplant_tbl.id, res_powerplant_tbl.electrical_capacity,
+                              res_powerplant_tbl.generation_type, res_powerplant_tbl.generation_subtype,
+                              res_powerplant_tbl.city, res_powerplant_tbl.postcode,
+                              res_powerplant_tbl.voltage_level_var, res_powerplant_tbl.subst_id,
+                              res_powerplant_tbl.geom, res_powerplant_tbl.scenario)
 
+            # ToDo: Insert dropdown selection in the filter options like 'solar'
+            # ToDo: Change the geom column to rea_geom_new mind there is another srid 3035 in this column
+            for record in Serializer.session.query(tbl_cols)\
+                    .filter(and_(tbl_cols.c.geom.ST_Within(wkb), tbl_cols.c.scenario == 'Status Quo',
+                                 tbl_cols.c.generation_type == 'solar')).limit(1000):
+
+                region_contains = loadswkb(str(record.powerplant.geom), True)
+                feature_prop = ''
                 feature = Feature(id=1, geometry=region_contains)
                 myfeatures.append(feature)
 
