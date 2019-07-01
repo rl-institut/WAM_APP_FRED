@@ -17,6 +17,6 @@ urlpatterns = [
     path('MouseClick.data/', Serializer.wseries_get_single_point, name='MouseClick.data'),
     # url(r'^data.geojson$', GeoJSONLayerView.as_view(model=WeatherStation), name='data'),
     path('GerBoundary.data/', Serializer.ger_boundaries_view, name='GerBoundary.data'),
-    path('PowerPlantRegister.data/', GeoJSONLayerView.as_view(model='') , name='PowerPlantRegister.data')
+    path('PowerPlantRegister.data/', Serializer.ppr_view, name='PowerPlantRegister.data')
 
 ]
