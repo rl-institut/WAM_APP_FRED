@@ -7,8 +7,6 @@ import oedialect  # noqa pylint: disable=unused-import
 from wam import settings  # pylint: disable=import-error
 
 # add the package leaflet to the wam core project installed apps
-if os.name == 'posix':
-    settings.INSTALLED_APPS.append('leaflet')
 
 LOCAL_TESTING = settings.config['WAM'].as_bool('LOCAL_TESTING')
 wam_config = settings.config['DATABASES']['OEP']
