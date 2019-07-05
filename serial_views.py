@@ -5,12 +5,9 @@ import sqlalchemy as sa
 import sqlahelper as sah
 import geojson
 from geojson import Point, MultiPolygon, Feature, FeatureCollection, dumps
-from geoalchemy2 import functions as func
-from geoalchemy2.shape import from_shape, to_shape
-from shapely.wkb import loads as loadswkb
-from shapely.wkt import loads, dumps as geomdumps
-from shapely.geometry import MultiPolygon as sMP, Point, shape
-from sqlalchemy.orm import load_only, Bundle
+from geoalchemy2.shape import from_shape
+from shapely.geometry import Point, shape
+from sqlalchemy.orm import Bundle
 from sqlalchemy import and_
 from geoalchemy2.elements import WKTElement
 from shapely.wkb import loads as loadswkb
@@ -57,10 +54,6 @@ class Serializer(View):
     # list that stores all query results that are defined as feature object
     myfeatures = []
     with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
-    # ToDO: Remove after testing done
-    # with open('F:\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
-    # with open(r'C:\Users\Jonas H\PycharmProjects\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson',
-    #           encoding='UTF-8') as g:
         gj = geojson.load(g)
 
     def ger_boundaries_view(self):
@@ -93,9 +86,7 @@ class Serializer(View):
         # elif request.method == 'GET':
         #     print(request.GET)
         myfeatures = []
-        myfeatures_property = []
         region_id = str(request)
-        # print(region_id)
         # stores the current region boundary
         res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
@@ -112,10 +103,6 @@ class Serializer(View):
                 # wkbs.append(_geom)
                 # wkbs.append(from_shape(_geom, srid=3035))
                 wkbs.append(from_shape(_geom, srid=4326))
-
-                # feature = Feature(id=region_id, geometry=boundary_geometry)
-                # feature = Feature(id=region_id, geometry=geometry)
-                # self.features.append(feature)
 
         if LOCAL_TESTING is False:
             # Query the DB with the given wkbelement as input
@@ -150,7 +137,6 @@ class Serializer(View):
         if request.method == 'POST':
             pp_id = int(request.POST.get('pp_id'))
             leaflet_id = int(request.POST.get('leaflet_id'))
-
 
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
             tbl_cols_property = Bundle('powerplant_prop', res_powerplant_tbl.id,
@@ -208,7 +194,6 @@ def ppr_popup_view(request):
             pp_id = int(request.POST.get('pp_id'))
             leaflet_id = int(request.POST.get('leaflet_id'))
 
-
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
             tbl_cols_property = Bundle('powerplant_prop', res_powerplant_tbl.version,
                                        res_powerplant_tbl.id,
@@ -221,8 +206,7 @@ def ppr_popup_view(request):
 
             for record in Serializer.session.query(tbl_cols_property)\
                     .filter(and_(tbl_cols_property.c.version == EGO_DP_VERSION, tbl_cols_property.c.id == pp_id)):
-                region_property = dict(  # leaflet_id=leaflet_id,
-                                       pp_id=record.powerplant_prop.id,
+                region_property = dict(pp_id=record.powerplant_prop.id,
                                        # ToDo: How to convert from decimal
                                        electrical_capacity="",  # float(record.electrical_capacity),
                                        generation_type=record.powerplant_prop.generation_type,
@@ -238,7 +222,6 @@ def ppr_popup_view(request):
                 print(feature_prop)
         print(mypopup_content)
         return HttpResponse(dumps(mypopup_content), content_type="application/json")
-
 
 
 def wseries_get_single_point(request):
