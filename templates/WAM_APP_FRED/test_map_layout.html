@@ -276,7 +276,8 @@
 
             var ger_boundaries = "{% url 'WAM_APP_FRED:GerBoundary'|add:'.data' %}";
 
-            var ppl_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
+            var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
+            var ppr_contend = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
 
 
 
@@ -298,6 +299,7 @@
 
               function displayWeatherDataPoint(feature){
                   var marker = wdl.getLayer(feature.properties.leaflet_id);
+
                   var popup = marker.getPopup();
                   const variable = feature.properties.variable
                   var popupContent = '<h4>' + variable +
@@ -368,6 +370,7 @@
                   }
               };
 
+
               var wdl = new L.geoJSON(null, wdataOptions);
 
               var wdl_saved = new L.geoJSON(null, wdataOptions);
@@ -412,6 +415,7 @@
               // access the original DOM even translate to L.LatLag instance
               // Rest-full return the value to the server with POST with jQuery
               map.on('click', onMapClick);
+
 
             function addWeatherPoint(data) {
                 // Clear the GeoJSON layer
@@ -485,19 +489,95 @@
                 }
               });
 
+              //PowePlantRegister StartSection
+              ///////////////////////////////////////////////////////////////////////////////////////////////////////
               // res PowerPlants in region boundaries
+
+
+
+
+
+            // function addPowerPlantPoint(data) {
+            //     // Clear the GeoJSON layer
+            //     ppl.clearLayers()
+            //     // Add GeoJSON data in the layer
+            //     ppl.addData(data)
+            // }
+
+              function enablePopup(feature, layer) {
+                layer.on('mouseover', function () {
+                  this.setStyle(highlightStyle);
+                });
+                layer.on('click', function () {
+                  this.setStyle(highlightStyle);
+                });
+                layer.on('mouseout', function () {
+                  this.setStyle(wdataStyle);
+                });
+                  layer.bindPopup('Loading...');
+
+                  layer.on('click', onPowerPlantDataPointClick);
+                  }
+
+
+
               $.ajax({
-                    url: ppl_location,
+                    url: ppr_location,
                     dataType: 'json',
                     async: true,
                     success: function(powerplant){
+
                         var layer = new L.geoJSON(powerplant, {
+                            onEachFeature: enablePopup,
                             pointToLayer: createCircles
                         });
                         map.addLayer(layer)
                         }
                 });
-            
+
+
+
+                function onPowerPlantDataPointClick (event) {
+                  var marker = event.sourceTarget;
+                  // console.log(marker);
+                  var leaflet_id = L.stamp(marker);
+                  var pp_id = marker.feature.id;
+                  console.log(pp_id)
+                $.ajax({
+                      type: 'POST',
+                      url: ppr_contend,
+                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                      data: {
+                      'leaflet_id': leaflet_id,
+                      'pp_id': pp_id
+                      },
+                      success: function(thispopupcontend){
+                        displayPowerPlantDataPoint(thispopupcontend, marker)
+                      }
+                  });
+              }
+
+                function displayPowerPlantDataPoint(feature, marker) {
+                  // console.log(feature);
+                  if (feature.property) {
+                    var keys = Object.keys(feature.property);
+                    var content = '<table class="selection_detail">';
+                    
+                    for (let i = 0, len = keys.length; i < len; i++) {
+                      content = content + '<tr><td align="right"><b>' + keys[i] + '</b>:</td><td>' + feature.property[keys[i]] + '</td></tr>'
+                    }
+                    content = content + '</table>';
+                    
+                    // console.log(marker);
+                    marker._popup.setContent(content);
+
+                  }
+                }
+              //
+
+
+              //PowePlantRegister EndSection
+              ///////////////////////////////////////////////////////////////////////////////////////////////////////
             };
 
 
