@@ -1,6 +1,7 @@
 # serialize data for all models
 import datetime
 from django.http import HttpResponse
+from django.views import View
 import sqlalchemy as sa
 import sqlahelper as sah
 import geojson
@@ -12,9 +13,8 @@ from sqlalchemy import and_
 from geoalchemy2.elements import WKTElement
 from shapely.wkb import loads as loadswkb
 from dateutil import parser
-from wam import settings
+from wam import settings  # pylint: disable=import-error
 
-from django.views import View
 
 from .app_settings import LOCAL_TESTING
 if not LOCAL_TESTING:
@@ -34,7 +34,7 @@ TIME_STEPS = {
 }
 
 # provide newest dataprocessing id
-EGO_DP_VERSION = settings.config['FRED']['EGO_DP_VERSION']
+EGO_DP_VERSION = settings.config['WAM_APP_FRED']['EGO_DP_VERSION']
 
 
 class Serializer(View):
@@ -149,7 +149,7 @@ class Serializer(View):
 
             for record in Serializer.session.query(tbl_cols_property)\
                     .filter(and_(tbl_cols_property.c.id is pp_id)):
-                region_property = dict(leaflet_id = leaflet_id,
+                region_property = dict(leaflet_id=leaflet_id,
                                        pp_id=record.powerplant.id,
                                        electrical_capacity=record.powerplant.electrical_capacity,
                                        generation_type=record.powerplant.generation_type,
@@ -181,47 +181,98 @@ class Serializer(View):
 # print('WAIT')
 # ########################################
 
+def ppr_view(request):
+    """
+    This function will return a geojson with all power-plants
+    :return:
+    """
+
+    myfeatures = []
+
+    if request.method == 'POST':
+        region_id = str(request.POST.get('region_name'))
+        # stores the current region boundary
+        res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
+
+        wkbs = []
+        for f in Serializer.gj['features']:
+            if region_id in f['properties']['name']:
+                region_boundary = f['geometry']['coordinates']
+                boundary_geometry = MultiPolygon(region_boundary)
+                # create shapely geometry from geojson feature
+                _geom = shape(boundary_geometry)
+                # convert shaply.geometry to wkbelement
+                # query_geom = from_shape(_geom, srid=4326)
+
+                # wkbs.append(_geom)
+                # wkbs.append(from_shape(_geom, srid=3035))
+                wkbs.append(from_shape(_geom, srid=4326))
+
+        if LOCAL_TESTING is False:
+            # Query the DB with the given wkbelement as input
+            for wkb in wkbs:
+                tbl_cols = Bundle('powerplant', res_powerplant_tbl.id, res_powerplant_tbl.geom,
+                                  res_powerplant_tbl.generation_type, res_powerplant_tbl.scenario)
+
+                # ToDo: Insert dropdown selection in the filter options like 'solar'
+                # ToDo: Change the geom column to rea_geom_new: mind there is another srid 3035 in this column
+                for record in Serializer.session.query(tbl_cols)\
+                        .filter(and_(tbl_cols.c.geom.ST_Within(wkb), tbl_cols.c.scenario == 'Status Quo',
+                                     tbl_cols.c.generation_type == 'solar')).limit(1000):
+
+                    region_contains = loadswkb(str(record.powerplant.geom), True)
+
+                    # feature_prop = Feature(id=record.powerplant.id, property='')
+                    feature = Feature(id=record.powerplant.id, geometry=region_contains, property='')
+                    myfeatures.append(feature)
+    elif request.method == 'GET':
+        print(request.GET)
+
+    return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
+
+
 def ppr_popup_view(request):
-        """
-                This function will return a geojson with all properties for a power-plant
-                :return:
-        """
+    """
+        This function will return a geojson with all properties for a power-plant
+        :return:
+    """
 
-        mypopup_content = []
-        # pp = power plant
-        if request.method == 'POST':
-            print(request.POST.get('pp_id'))
-            pp_id = int(request.POST.get('pp_id'))
-            leaflet_id = int(request.POST.get('leaflet_id'))
+    mypopup_content = []
+    # pp = power plant
+    if request.method == 'POST':
+        print(request.POST.get('pp_id'))
+        pp_id = int(request.POST.get('pp_id'))
+        leaflet_id = int(request.POST.get('leaflet_id'))
 
-            res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
-            tbl_cols_property = Bundle('powerplant_prop', res_powerplant_tbl.version,
-                                       res_powerplant_tbl.id,
-                                       res_powerplant_tbl.electrical_capacity,
-                                       res_powerplant_tbl.generation_type,
-                                       res_powerplant_tbl.generation_subtype,
-                                       res_powerplant_tbl.city, res_powerplant_tbl.postcode,
-                                       res_powerplant_tbl.voltage_level_var, res_powerplant_tbl.subst_id,
-                                       res_powerplant_tbl.scenario)
+        res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
+        tbl_cols_property = Bundle('powerplant_prop', res_powerplant_tbl.version,
+                                    res_powerplant_tbl.id,
+                                    res_powerplant_tbl.electrical_capacity,
+                                    res_powerplant_tbl.generation_type,
+                                    res_powerplant_tbl.generation_subtype,
+                                    res_powerplant_tbl.city, res_powerplant_tbl.postcode,
+                                    res_powerplant_tbl.voltage_level_var, res_powerplant_tbl.subst_id,
+                                    res_powerplant_tbl.scenario)
+        for record in Serializer.session.query(tbl_cols_property)\
+            .filter(and_(tbl_cols_property.c.version == EGO_DP_VERSION, tbl_cols_property.c.id == pp_id)):
+            region_property = dict(pp_id=record.powerplant_prop.id,
+                                   # ToDo: How to convert from decimal
+                                   electrical_capacity="",  # float(record.electrical_capacity),
+                                   generation_type=record.powerplant_prop.generation_type,
+                                   generation_subtype=record.powerplant_prop.generation_subtype,
+                                   city=record.powerplant_prop.city,
+                                   postcode=record.powerplant_prop.postcode,
+                                   voltage_level=record.powerplant_prop.voltage_level_var,
+                                   ego_subst_id=record.powerplant_prop.subst_id,
+                                   scenario=record.powerplant_prop.scenario)
+            feature_prop = Feature(id=record.powerplant_prop.id, property=region_property)
+            mypopup_content = feature_prop
+            print(feature_prop)
+    elif request.method == 'GET':
+        print(request.GET)
 
-            for record in Serializer.session.query(tbl_cols_property)\
-                    .filter(and_(tbl_cols_property.c.version == EGO_DP_VERSION, tbl_cols_property.c.id == pp_id)):
-                region_property = dict(pp_id=record.powerplant_prop.id,
-                                       # ToDo: How to convert from decimal
-                                       electrical_capacity="",  # float(record.electrical_capacity),
-                                       generation_type=record.powerplant_prop.generation_type,
-                                       generation_subtype=record.powerplant_prop.generation_subtype,
-                                       city=record.powerplant_prop.city,
-                                       postcode=record.powerplant_prop.postcode,
-                                       voltage_level=record.powerplant_prop.voltage_level_var,
-                                       ego_subst_id=record.powerplant_prop.subst_id,
-                                       scenario=record.powerplant_prop.scenario)
-
-                feature_prop = Feature(id=record.powerplant_prop.id, property=region_property)
-                mypopup_content = feature_prop
-                print(feature_prop)
-        print(mypopup_content)
-        return HttpResponse(dumps(mypopup_content), content_type="application/json")
+    print(mypopup_content)
+    return HttpResponse(dumps(mypopup_content), content_type="application/json")
 
 
 def wseries_get_single_point(request):
