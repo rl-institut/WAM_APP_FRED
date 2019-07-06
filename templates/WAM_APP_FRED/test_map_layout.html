@@ -475,8 +475,12 @@
                     layer.on('mouseout', function () {
                       this.setStyle(GerBoundStyle);
                     });
-                    layer.on('click', function () {
+                    // select region and request data
+                    layer.on('click', function (event) {
                       this.setStyle(GerBoundZoomLvlStyle);
+                      region = event.sourceTarget;
+                      // console.log(region);
+                      loadRegionPowerPlants(region, layer);
                     });
                     }
                   var layer = new L.geoJSON(boundary, {
@@ -493,17 +497,6 @@
               ///////////////////////////////////////////////////////////////////////////////////////////////////////
               // res PowerPlants in region boundaries
 
-
-
-
-
-            // function addPowerPlantPoint(data) {
-            //     // Clear the GeoJSON layer
-            //     ppl.clearLayers()
-            //     // Add GeoJSON data in the layer
-            //     ppl.addData(data)
-            // }
-
               function enablePopup(feature, layer) {
                 layer.on('mouseover', function () {
                   this.setStyle(highlightStyle);
@@ -517,9 +510,36 @@
                   layer.bindPopup('Loading...');
 
                   layer.on('click', onPowerPlantDataPointClick);
-                  }
+              }
+              
+              // request all power plants conatined in selected region
+              // also include the generation_type option 
+              function loadRegionPowerPlants(region, layer){
+                region_name = region.feature.properties.name;
+                console.log(region);
+                $.ajax({
+                    url: ppr_location,
+                    type: 'POST',
+                    async: true,
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                      data: {
+                      'region_name': region_name,
+                      'generation_type': ''
+                      },
+                    success: function(powerplant){
+                      var layer = new L.geoJSON(powerplant, {
+                        onEachFeature: enablePopup,
+                        pointToLayer: createCircles
+                      });
+                      map.addLayer(layer)
+                    }
+                  });
+                }
+              
+              // add all power plants from url to map
+              function addPowerPlantToMap(){
 
-
+              }
 
               $.ajax({
                     url: ppr_location,
@@ -543,7 +563,7 @@
                   var leaflet_id = L.stamp(marker);
                   var pp_id = marker.feature.id;
                   console.log(pp_id)
-                $.ajax({
+                  $.ajax({
                       type: 'POST',
                       url: ppr_contend,
                       headers: {'X-CSRFToken': '{{ csrf_token }}'},
@@ -555,7 +575,7 @@
                         displayPowerPlantDataPoint(thispopupcontend, marker)
                       }
                   });
-              }
+                }
 
                 function displayPowerPlantDataPoint(feature, marker) {
                   // console.log(feature);
