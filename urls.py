@@ -3,6 +3,7 @@ from WAM_APP_FRED.serial_views import (
     Serializer,
     wseries_get_single_point,
     wseries_fetch_data_single_point,
+    ppr_view,
     ppr_popup_view
 )
 from . import views
@@ -22,7 +23,8 @@ urlpatterns = [
     ),
     path('GerBoundary.data/', Serializer.ger_boundaries_view, name='GerBoundary.data'),
     
-    path('PowerPlantRegister.data/', Serializer.ppr_view, name='PowerPlantRegister.data'),
+    # path('PowerPlantRegister.data/', Serializer.ppr_view, name='PowerPlantRegister.data'),
+    path('PowerPlantRegister.data/', ppr_view, name='PowerPlantRegister.data'),
     path('PowerPlantPopup.data/', ppr_popup_view, name='PowerPlantPopup.data')
 
 ]
