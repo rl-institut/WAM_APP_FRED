@@ -512,6 +512,7 @@
                   layer.on('click', onPowerPlantDataPointClick);
               }
               
+              var regionPowerPlantgroup = L.layerGroup().addTo(map);
               // request all power plants conatined in selected region
               // also include the generation_type option 
               function loadRegionPowerPlants(region, layer){
@@ -531,7 +532,15 @@
                         onEachFeature: enablePopup,
                         pointToLayer: createCircles
                       });
-                      map.addLayer(layer)
+                      //map.addLayer(layer)
+                      if (regionPowerPlantgroup.getLayers().length != 0) {
+                        regionPowerPlantgroup.clearLayers();
+                      } 
+                      else {
+                        regionPowerPlantgroup.addLayer(layer)
+                        
+                      }
+
                     }
                   });
                 }
@@ -540,7 +549,7 @@
               function addPowerPlantToMap(){
 
               }
-
+              
               $.ajax({
                     url: ppr_location,
                     dataType: 'json',
