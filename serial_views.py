@@ -9,8 +9,10 @@ from geoalchemy2.elements import WKTElement
 from shapely.wkb import loads as loadswkb
 from dateutil import parser
 
+
 from .app_settings import LOCAL_TESTING
 if not LOCAL_TESTING:
+    import WAM_APP_FRED.oep_models as oep_models
     from WAM_APP_FRED.oep_models import open_fred_classes
 
 HOUR = '1:00:00'
@@ -76,14 +78,18 @@ class Serializer():
         """
         pass
 
-    def district_feedin_series(self):
-        """
-        This function will return a json/geojson with pre calculated data for a single or multiple
-        district.
-        The data will include a feedin time series for each district.
-        :return:
-        """
-        pass
+
+def district_feedin_series(self):
+    """
+    This function will return a json/geojson with pre calculated data for a single or multiple
+    district.
+    The data will include a feedin time series for each district.
+    :return:
+    """
+    myfeature = []
+    openfred_ts_tbl = oep_models.ts_mapping('OpenFredTimesSeries')
+
+    #insert ajax postrequest data and query
 
 
 def wseries_get_single_point(request):
