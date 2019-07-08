@@ -100,25 +100,35 @@
                                 <i class ="icon ion-information-circled icon--small" title="Informationen zum Inhalt"></i>
                               </legend>
                               <div>
-                                <input type="radio" name="generation_type" value="statusQuo" id="Solar" required checked>
+                                <input type="radio" name="generation_type" value="solar" id="Solar" required checked>
                                 <label for="Solar">Photovoltaikanlagen</label>
                               </div>
                               <div>
-                                <input type="radio" name="generation_type" value="germany" id="scenarioGermany">
-                                <label for="scenarioGermany">Deutsches Klimaschutzziel</label>
+                                <input type="radio" name="generation_type" value="wind" id="Wind">
+                                <label for="Wind">Windkraftanlagen</label>
                               </div>
                               <div>
-                                <input type="radio" name="generation_type" value="100" id="scenario100">
-                                <label for="scenario100">100% EE in der Region</label>
+                                <input type="radio" name="generation_type" value="geothermal" id="Geothermal">
+                                <label for="Geothermal">Geothermieanlagen</label>
+                              </div>
+                              <div>
+                                <input type="radio" name="generation_type" value="run_of_river" id="Run_of_river">
+                                <label for="Run_of_river">Wasserkraftanlage</label>
+                              </div>
+                              <div>
+                                <input type="radio" name="generation_type" value="gas" id="Gas">
+                                <label for="Gas">Gaskraftwerk</label>
+                              </div>
+                              <div>
+                                <input type="radio" name="generation_type" value="reservoir" id="Reservoir">
+                                <label for="Reservoir">Pumpspeicherkraftwerk</label>
+                              </div>
+                              <div>
+                                <input type="radio" name="generation_type" value="biomass" id="Biomass">
+                                <label for="Biomass">Biogasanlage</label>
                               </div>
                             </fieldset>
                           </form>
-
-                          <div class="panel__text panel__text--highlighted">
-                            <p id="scenarioPanelText">
-                                <span style="font-weight:700">Status Quo</span><span style="display:inline-block"></span>
-                            </p>
-                          </div>
                         </div>
           
                         <!-- Second panel content -->
@@ -517,7 +527,8 @@
               // also include the generation_type option 
               function loadRegionPowerPlants(region, layer){
                 region_name = region.feature.properties.name;
-                console.log(region);
+                generation_type = $("input[name=generation_type]:checked").val();
+
                 $.ajax({
                     url: ppr_location,
                     type: 'POST',
@@ -525,7 +536,7 @@
                     headers: {'X-CSRFToken': '{{ csrf_token }}'},
                       data: {
                       'region_name': region_name,
-                      'generation_type': ''
+                      'generation_type': generation_type
                       },
                     success: function(powerplant){
                       var layer = new L.geoJSON(powerplant, {
