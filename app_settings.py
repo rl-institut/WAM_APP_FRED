@@ -13,8 +13,6 @@ LOCAL_TESTING = settings.config['WAM'].as_bool('LOCAL_TESTING')
 wam_config = settings.config['DATABASES']['OEP']
 # wam_config = settings.config['DATABASES']['OEP_DIALECT']
 
-
-
 # ##########################################SQLAlchemy ENGINE#######################################
 if not LOCAL_TESTING:
     # db connection string for sqlalchemy-engine
