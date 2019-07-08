@@ -3,13 +3,13 @@ import datetime
 from django.http import HttpResponse
 from django.views import View
 import sqlalchemy as sa
+from sqlalchemy import and_
+from sqlalchemy.orm import Bundle
 import sqlahelper as sah
 import geojson
 from geojson import Point, MultiPolygon, Feature, FeatureCollection, dumps
 from geoalchemy2.shape import from_shape
-from shapely.geometry import Point as shapelyPoint, shape
-from sqlalchemy.orm import Bundle
-from sqlalchemy import and_
+from shapely.geometry import shape
 from geoalchemy2.elements import WKTElement
 from shapely.wkb import loads as loadswkb
 from dateutil import parser
