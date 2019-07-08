@@ -100,15 +100,15 @@
                                 <i class ="icon ion-information-circled icon--small" title="Informationen zum Inhalt"></i>
                               </legend>
                               <div>
-                                <input type="radio" name="scenario" value="statusQuo" id="scenarioStatusQuo" required checked>
-                                <label for="scenarioStatusQuo">Status Quo</label>
+                                <input type="radio" name="generation_type" value="statusQuo" id="Solar" required checked>
+                                <label for="Solar">Photovoltaikanlagen</label>
                               </div>
                               <div>
-                                <input type="radio" name="scenario" value="germany" id="scenarioGermany">
+                                <input type="radio" name="generation_type" value="germany" id="scenarioGermany">
                                 <label for="scenarioGermany">Deutsches Klimaschutzziel</label>
                               </div>
                               <div>
-                                <input type="radio" name="scenario" value="100" id="scenario100">
+                                <input type="radio" name="generation_type" value="100" id="scenario100">
                                 <label for="scenario100">100% EE in der Region</label>
                               </div>
                             </fieldset>
@@ -533,12 +533,11 @@
                         pointToLayer: createCircles
                       });
                       //map.addLayer(layer)
-                      if (regionPowerPlantgroup.getLayers().length != 0) {
-                        regionPowerPlantgroup.clearLayers();
+                      if (regionPowerPlantgroup.getLayers().length === 0) {
+                        regionPowerPlantgroup.addLayer(layer)
                       } 
                       else {
-                        regionPowerPlantgroup.addLayer(layer)
-                        
+                        regionPowerPlantgroup.clearLayers();
                       }
 
                     }
