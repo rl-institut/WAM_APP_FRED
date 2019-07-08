@@ -72,13 +72,6 @@ class Serializer(View):
         pass
 
 
-# ###########TESTING#####################
-# sa = Serializer()
-# POST_REGION = 'Bayern'
-# sa.ppr_view(request=POST_REGION)
-# print('WAIT')
-# ########################################
-
 def ppr_view(request):
     """
     This function will return a geojson with all power-plants
@@ -150,7 +143,7 @@ def ppr_popup_view(request):
     mypopup_content = []
     # pp = power plant
     if request.method == 'POST':
-        print(request.POST.get('pp_id'))
+        # print(request.POST.get('pp_id'))
         pp_id = int(request.POST.get('pp_id'))
         leaflet_id = int(request.POST.get('leaflet_id'))
 
@@ -191,11 +184,11 @@ def ppr_popup_view(request):
             )
             feature_prop = Feature(id=record.powerplant_prop.id, property=region_property)
             mypopup_content = feature_prop
-            print(feature_prop)
+            # print(feature_prop)
     elif request.method == 'GET':
         print(request.GET)
 
-    print(mypopup_content)
+    # print(mypopup_content)
     return HttpResponse(dumps(mypopup_content), content_type="application/json")
 
 
