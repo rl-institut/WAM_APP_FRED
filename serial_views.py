@@ -39,7 +39,7 @@ EGO_DP_VERSION = fred_config['WAM_APP_FRED']['EGO_DP_VERSION']
 
 class Serializer(View):
     """
-    Base Class for methods that retrun a Query result in a non-proprietary file format.
+    Base Class for methods that return a the result of a SQL query in a non-proprietary file format.
     Provides a the func. to get data (sql or api are main data sources)
     Mainly returns a query result containing a full record from OEP table as GEOJSON featureCollection.
     All related tables are joined and the values are included as property within the GEOJSON.
