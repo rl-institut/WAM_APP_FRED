@@ -533,13 +533,14 @@
                       var layer = new L.geoJSON(powerplant, {
                         onEachFeature: enablePopup,
                         pointToLayer: createCircles
+                      var clusters = L.markerClusterGroup();
+                      clusters.addLayer(layer);
                       });
-                      //map.addLayer(layer)
                       if (regionPowerPlantgroup.getLayers().length != 0) {
                         regionPowerPlantgroup.clearLayers();
                       } 
                       else {
-                        regionPowerPlantgroup.addLayer(layer)
+                        regionPowerPlantgroup.addLayer(clusters)
                         
                       }
 
