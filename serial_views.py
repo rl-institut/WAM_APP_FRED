@@ -1,22 +1,22 @@
 # serialize data for all models
 import datetime
 from django.http import HttpResponse
+from django.views import View
 import sqlalchemy as sa
 import sqlahelper as sah
 import geojson
 from geojson import Point, MultiPolygon, Feature, FeatureCollection, dumps
-from geoalchemy2 import functions as func
-from geoalchemy2.shape import from_shape, to_shape
-from shapely.wkb import loads as loadswkb
-from shapely.wkt import loads, dumps as geomdumps
-from shapely.geometry import MultiPolygon as sMP, Point, shape
-from sqlalchemy.orm import load_only, Bundle
+from geoalchemy2.shape import from_shape
+from shapely.geometry import Point as shapelyPoint, shape
+from sqlalchemy.orm import Bundle
 from sqlalchemy import and_
 from geoalchemy2.elements import WKTElement
 from shapely.wkb import loads as loadswkb
 from dateutil import parser
 
-from .app_settings import LOCAL_TESTING
+
+from .app_settings import LOCAL_TESTING, fred_config
+
 if not LOCAL_TESTING:
     import WAM_APP_FRED.oep_models as oep_models
     from WAM_APP_FRED.oep_models import open_fred_classes
@@ -33,10 +33,13 @@ TIME_STEPS = {
     ZERO: 60,
 }
 
+# provide newest dataprocessing id
+EGO_DP_VERSION = fred_config['WAM_APP_FRED']['EGO_DP_VERSION']
 
-class Serializer():
+
+class Serializer(View):
     """
-    Base Class for methods that retrun a Query result in a non-proprietary file format.
+    Base Class for methods that return a the result of a SQL query in a non-proprietary file format.
     Provides a the func. to get data (sql or api are main data sources)
     Mainly returns a query result containing a full record from OEP table as GEOJSON featureCollection.
     All related tables are joined and the values are included as property within the GEOJSON.
@@ -51,10 +54,6 @@ class Serializer():
     # list that stores all query results that are defined as feature object
     myfeatures = []
     with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
-    # ToDO: Remove after testing done
-    # with open('F:\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson', encoding='UTF-8') as g:
-    # with open(r'C:\Users\Jonas H\PycharmProjects\WAM\WAM_APP_FRED\static\WAM_APP_FRED\geodata\germany.geojson',
-    #           encoding='UTF-8') as g:
         gj = geojson.load(g)
 
     def ger_boundaries_view(self):
@@ -63,57 +62,29 @@ class Serializer():
 
         return HttpResponse(dumps(germany_boundaries), content_type="application/json")
 
-    def wseries_geometry_view(self):
+    def district_feedin_series_view(self):
         """
-        returns a query result containing a full record from OEP table as GEOJSON
-        featureCollection. Just the geometry is included.
-        All related tables are joined and the values are included as property within the GEOJSON.
+        This function will return a json/geojson with pre calculated data for a single or multiple
+        district.
+        The data will include a feedin time series for each district.
         :return:
         """
+        pass
 
-        features = []
 
-        with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson') as f:
-            gj = geojson.load(f)
+def ppr_view(request):
+    """
+    This function will return a geojson with all power-plants
+    :return:
+    """
 
-        print(len(gj['features']))
+    myfeatures = []
 
-        geometry = Point((10.01, 53.57))
-        # geometry = loadswkb(str(record.Series.location.point), True)
-        # feature = Feature(id=record.Series.id, geometry=geometry)
-        feature = Feature(id=101, geometry=geometry)
-        features.append(feature)
-
-        # return HttpResponse(dumps(FeatureCollection(features)), content_type="application/json")
-        return HttpResponse(dumps(gj['features']), content_type="application/json")
-
-    def ppr_view(self, request='Berlin'):
-        """
-        This function will return a geojson with all power-plants
-        :return:
-        """
-
-        # if request.method == 'POST':
-        #     print(request.POST)
-        #     # lat = float(request.POST.get('lat'))
-        #     # long = float(request.POST.get('long'))
-        #     region_id = str()
-        #     print(region_id)
-        #
-        #     if region_id in Serializer.gj['features']['properties']['name']:
-        #         region_boundary = Serializer.gj['features']['geometry']['coordinates']
-        #         geometry = MultiPolygon(region_boundary)
-        #         # geometry = loadswkb(str(record.Series.location.point), True)
-        #         # feature = Feature(id=record.Series.id, geometry=geometry)
-        #         feature = Feature(id=102, geometry=geometry)
-        #         self.features.append(feature)
-        #
-        # elif request.method == 'GET':
-        #     print(request.GET)
-        myfeatures = []
-        region_id = str(request)
-        # print(region_id)
+    if request.method == 'POST':
+        region_id = str(request.POST.get('region_name'))
         # stores the current region boundary
+        res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
+
         wkbs = []
         for f in Serializer.gj['features']:
             if region_id in f['properties']['name']:
@@ -128,59 +99,98 @@ class Serializer():
                 # wkbs.append(from_shape(_geom, srid=3035))
                 wkbs.append(from_shape(_geom, srid=4326))
 
-                # feature = Feature(id=region_id, geometry=boundary_geometry)
-                # feature = Feature(id=region_id, geometry=geometry)
-                # self.features.append(feature)
-
         if LOCAL_TESTING is False:
             # Query the DB with the given wkbelement as input
             for wkb in wkbs:
-                res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
-                tbl_cols = Bundle('powerplant', res_powerplant_tbl.id, res_powerplant_tbl.electrical_capacity,
-                                  res_powerplant_tbl.generation_type, res_powerplant_tbl.generation_subtype,
-                                  res_powerplant_tbl.city, res_powerplant_tbl.postcode,
-                                  res_powerplant_tbl.voltage_level_var, res_powerplant_tbl.subst_id,
-                                  res_powerplant_tbl.geom, res_powerplant_tbl.scenario)
+                tbl_cols = Bundle('powerplant', res_powerplant_tbl.id, res_powerplant_tbl.geom,
+                                  res_powerplant_tbl.generation_type, res_powerplant_tbl.scenario)
+
+                oep_query = Serializer.session.query(tbl_cols) \
+                    .filter(
+                        and_(
+                            tbl_cols.c.geom.ST_Within(wkb),
+                            tbl_cols.c.scenario == 'Status Quo',
+                            tbl_cols.c.generation_type == 'solar'
+                        )
+                    ).limit(1000)
 
                 # ToDo: Insert dropdown selection in the filter options like 'solar'
-                # ToDo: Change the geom column to rea_geom_new mind there is another srid 3035 in this column
-                for record in Serializer.session.query(tbl_cols)\
-                        .filter(and_(tbl_cols.c.geom.ST_Within(wkb), tbl_cols.c.scenario == 'Status Quo',
-                                     tbl_cols.c.generation_type == 'solar')).limit(1000):
+                # ToDo: Change the geom column to rea_geom_new: mind there is another
+                #  srid 3035 in this column
+                for record in oep_query:
 
                     region_contains = loadswkb(str(record.powerplant.geom), True)
-                    feature_prop = ''
-                    feature = Feature(id=1, geometry=region_contains)
+
+                    # feature_prop = Feature(id=record.powerplant.id, property='')
+                    feature = Feature(
+                        id=record.powerplant.id,
+                        geometry=region_contains,
+                        property=''
+                    )
                     myfeatures.append(feature)
+    elif request.method == 'GET':
+        print(request.GET)
 
-                    # print('WAIT')
+    return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
 
-        return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
 
-    # ToDO: this needed?
-    def kw_list_property_view(self):
-        """
-        This function will return a geojson with all properties' for each power-plant
+def ppr_popup_view(request):
+    """
+        This function will return a geojson with all properties for a power-plant
         :return:
-        """
-        pass
+    """
 
-    def district_feedin_series_view(self):
-        """
-        This function will return a json/geojson with pre calculated data for a single or multiple
-        district.
-        The data will include a feedin time series for each district.
-        :return:
-        """
-        pass
+    mypopup_content = []
+    # pp = power plant
+    if request.method == 'POST':
+        # print(request.POST.get('pp_id'))
+        pp_id = int(request.POST.get('pp_id'))
+        leaflet_id = int(request.POST.get('leaflet_id'))
 
+        res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
+        tbl_cols_property = Bundle(
+            'powerplant_prop',
+            res_powerplant_tbl.version,
+            res_powerplant_tbl.id,
+            res_powerplant_tbl.electrical_capacity,
+            res_powerplant_tbl.generation_type,
+            res_powerplant_tbl.generation_subtype,
+            res_powerplant_tbl.city,
+            res_powerplant_tbl.postcode,
+            res_powerplant_tbl.voltage_level_var,
+            res_powerplant_tbl.subst_id,
+            res_powerplant_tbl.scenario
+        )
+        oep_query = Serializer.session.query(tbl_cols_property) \
+            .filter(
+            and_(
+                tbl_cols_property.c.version == EGO_DP_VERSION,
+                tbl_cols_property.c.id == pp_id
+            )
+        )
 
-# ###########TESTING#####################
-# sa = Serializer()
-# POST_REGION = 'Bayern'
-# sa.ppr_view(request=POST_REGION)
-# print('WAIT')
-# ########################################
+        for record in oep_query:
+            region_property = dict(
+                pp_id=record.powerplant_prop.id,
+                # ToDo: How to convert from decimal
+                electrical_capacity="",  # float(record.electrical_capacity),
+                generation_type=record.powerplant_prop.generation_type,
+                generation_subtype=record.powerplant_prop.generation_subtype,
+                city=record.powerplant_prop.city,
+                postcode=record.powerplant_prop.postcode,
+                voltage_level=record.powerplant_prop.voltage_level_var,
+                ego_subst_id=record.powerplant_prop.subst_id,
+                scenario=record.powerplant_prop.scenario
+            )
+            feature_prop = Feature(id=record.powerplant_prop.id, property=region_property)
+            mypopup_content = feature_prop
+            # print(feature_prop)
+    elif request.method == 'GET':
+        print(request.GET)
+
+    # print(mypopup_content)
+    return HttpResponse(dumps(mypopup_content), content_type="application/json")
+
 
 def wseries_get_single_point(request):
     """
@@ -268,13 +278,13 @@ def wseries_fetch_data_single_point(request):
                 open_fred_classes['Location'],
             ) \
                 .filter(
-                    sa.and_(
-                        open_fred_classes['Timespan'].start >= start_time,
-                        open_fred_classes['Timespan'].start <= end_time,
-                        open_fred_classes['Variable'].id == variable_id,
-                        open_fred_classes['Location'].id == location_id,
+                sa.and_(
+                    open_fred_classes['Timespan'].start >= start_time,
+                    open_fred_classes['Timespan'].start <= end_time,
+                    open_fred_classes['Variable'].id == variable_id,
+                    open_fred_classes['Location'].id == location_id,
                     )
-                ) \
+            ) \
                 .join(open_fred_classes['Timespan']) \
                 .join(open_fred_classes['Variable']) \
                 .join(open_fred_classes['Location'])
