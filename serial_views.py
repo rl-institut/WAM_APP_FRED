@@ -83,6 +83,7 @@ def ppr_view(request):
 
     if request.method == 'POST':
         region_id = str(request.POST.get('region_name'))
+        generation_type = str(request.POST.get('generation_type'))
         # stores the current region boundary
         res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
@@ -111,11 +112,10 @@ def ppr_view(request):
                         and_(
                             tbl_cols.c.geom.ST_Within(wkb),
                             tbl_cols.c.scenario == 'Status Quo',
-                            tbl_cols.c.generation_type == 'solar'
+                            tbl_cols.c.generation_type == generation_type
                         )
                     ).limit(1000)
 
-                # ToDo: Insert dropdown selection in the filter options like 'solar'
                 # ToDo: Change the geom column to rea_geom_new: mind there is another
                 #  srid 3035 in this column
                 for record in oep_query:
