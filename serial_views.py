@@ -7,16 +7,16 @@ import sqlahelper as sah
 import geojson
 from geojson import Point, MultiPolygon, Feature, FeatureCollection, dumps
 from geoalchemy2.shape import from_shape
-from shapely.geometry import Point, shape
+from shapely.geometry import Point as shapelyPoint, shape
 from sqlalchemy.orm import Bundle
 from sqlalchemy import and_
 from geoalchemy2.elements import WKTElement
 from shapely.wkb import loads as loadswkb
 from dateutil import parser
-from wam import settings  # pylint: disable=import-error
 
 
-from .app_settings import LOCAL_TESTING
+from .app_settings import LOCAL_TESTING, fred_config
+
 if not LOCAL_TESTING:
     import WAM_APP_FRED.oep_models as oep_models
     from WAM_APP_FRED.oep_models import open_fred_classes
@@ -34,7 +34,7 @@ TIME_STEPS = {
 }
 
 # provide newest dataprocessing id
-EGO_DP_VERSION = settings.config['WAM_APP_FRED']['EGO_DP_VERSION']
+EGO_DP_VERSION = fred_config['WAM_APP_FRED']['EGO_DP_VERSION']
 
 
 class Serializer(View):
