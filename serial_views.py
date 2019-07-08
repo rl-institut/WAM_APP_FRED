@@ -145,7 +145,7 @@ def ppr_popup_view(request):
     if request.method == 'POST':
         # print(request.POST.get('pp_id'))
         pp_id = int(request.POST.get('pp_id'))
-        leaflet_id = int(request.POST.get('leaflet_id'))
+        # leaflet_id = int(request.POST.get('leaflet_id'))
 
         res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
         tbl_cols_property = Bundle(
