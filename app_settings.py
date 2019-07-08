@@ -6,11 +6,7 @@ from configobj import ConfigObj
 
 from wam import settings  # pylint: disable=import-error
 
-
-# add the package leaflet to the wam core project installed apps
-if os.name == 'posix':
-    settings.INSTALLED_APPS.append('leaflet')
-
+# add local config file
 fred_config = ConfigObj(os.path.join(settings.BASE_DIR, 'WAM_APP_FRED', 'config', 'fred_app.cfg'))
 
 LOCAL_TESTING = settings.config['WAM'].as_bool('LOCAL_TESTING')

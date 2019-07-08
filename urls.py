@@ -22,8 +22,6 @@ urlpatterns = [
         name='WeatherPointClick.data'
     ),
     path('GerBoundary.data/', Serializer.ger_boundaries_view, name='GerBoundary.data'),
-    
-    # path('PowerPlantRegister.data/', Serializer.ppr_view, name='PowerPlantRegister.data'),
     path('PowerPlantRegister.data/', ppr_view, name='PowerPlantRegister.data'),
     path('PowerPlantPopup.data/', ppr_popup_view, name='PowerPlantPopup.data')
 
