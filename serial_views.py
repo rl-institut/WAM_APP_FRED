@@ -112,7 +112,7 @@ class Serializer(View):
 
                 # ToDo: Insert dropdown selection in the filter options like 'solar'
                 # ToDo: Change the geom column to rea_geom_new mind there is another srid 3035 in this column
-                for record in Serializer.session.query(tbl_cols)\
+                for record in Serializer.session.query(tbl_cols) \
                         .filter(and_(tbl_cols.c.geom.ST_Within(wkb), tbl_cols.c.scenario == 'Status Quo',
                                      tbl_cols.c.generation_type == 'solar')).limit(1000):
 
@@ -139,26 +139,32 @@ class Serializer(View):
             leaflet_id = int(request.POST.get('leaflet_id'))
 
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
-            tbl_cols_property = Bundle('powerplant_prop', res_powerplant_tbl.id,
-                                       res_powerplant_tbl.electrical_capacity,
-                                       res_powerplant_tbl.generation_type,
-                                       res_powerplant_tbl.generation_subtype,
-                                       res_powerplant_tbl.city, res_powerplant_tbl.postcode,
-                                       res_powerplant_tbl.voltage_level_var, res_powerplant_tbl.subst_id,
-                                       res_powerplant_tbl.scenario)
+            tbl_cols_property = Bundle(
+                'powerplant_prop', res_powerplant_tbl.id,
+                res_powerplant_tbl.electrical_capacity,
+                res_powerplant_tbl.generation_type,
+                res_powerplant_tbl.generation_subtype,
+                res_powerplant_tbl.city, res_powerplant_tbl.postcode,
+                res_powerplant_tbl.voltage_level_var, res_powerplant_tbl.subst_id,
+                res_powerplant_tbl.scenario
+            )
 
-            for record in Serializer.session.query(tbl_cols_property)\
-                    .filter(and_(tbl_cols_property.c.id is pp_id)):
-                region_property = dict(leaflet_id=leaflet_id,
-                                       pp_id=record.powerplant.id,
-                                       electrical_capacity=record.powerplant.electrical_capacity,
-                                       generation_type=record.powerplant.generation_type,
-                                       generation_subtype=record.powerplant.generation_subtype,
-                                       city=record.powerplant.city,
-                                       postcode=record.powerplant.postcode,
-                                       voltage_level=record.powerplant.voltage_level_var,
-                                       ego_subst_id=record.powerplant.subst_id,
-                                       scenario=record.powerplant.scenario)
+            oep_query = Serializer.session.query(tbl_cols_property) \
+                .filter(and_(tbl_cols_property.c.id is pp_id))
+
+            for record in oep_query:
+                region_property = dict(
+                    leaflet_id=leaflet_id,
+                    pp_id=record.powerplant.id,
+                    electrical_capacity=record.powerplant.electrical_capacity,
+                    generation_type=record.powerplant.generation_type,
+                    generation_subtype=record.powerplant.generation_subtype,
+                    city=record.powerplant.city,
+                    postcode=record.powerplant.postcode,
+                    voltage_level=record.powerplant.voltage_level_var,
+                    ego_subst_id=record.powerplant.subst_id,
+                    scenario=record.powerplant.scenario
+                )
                 feature_prop = Feature(id=record.powerplant.id, property=region_property)
                 mypopup_content.append(feature_prop)
 
@@ -214,16 +220,28 @@ def ppr_view(request):
                 tbl_cols = Bundle('powerplant', res_powerplant_tbl.id, res_powerplant_tbl.geom,
                                   res_powerplant_tbl.generation_type, res_powerplant_tbl.scenario)
 
+                oep_query = Serializer.session.query(tbl_cols) \
+                    .filter(
+                        and_(
+                            tbl_cols.c.geom.ST_Within(wkb),
+                            tbl_cols.c.scenario == 'Status Quo',
+                            tbl_cols.c.generation_type == 'solar'
+                        )
+                    ).limit(1000)
+
                 # ToDo: Insert dropdown selection in the filter options like 'solar'
-                # ToDo: Change the geom column to rea_geom_new: mind there is another srid 3035 in this column
-                for record in Serializer.session.query(tbl_cols)\
-                        .filter(and_(tbl_cols.c.geom.ST_Within(wkb), tbl_cols.c.scenario == 'Status Quo',
-                                     tbl_cols.c.generation_type == 'solar')).limit(1000):
+                # ToDo: Change the geom column to rea_geom_new: mind there is another
+                #  srid 3035 in this column
+                for record in oep_query:
 
                     region_contains = loadswkb(str(record.powerplant.geom), True)
 
                     # feature_prop = Feature(id=record.powerplant.id, property='')
-                    feature = Feature(id=record.powerplant.id, geometry=region_contains, property='')
+                    feature = Feature(
+                        id=record.powerplant.id,
+                        geometry=region_contains,
+                        property=''
+                    )
                     myfeatures.append(feature)
     elif request.method == 'GET':
         print(request.GET)
@@ -245,26 +263,40 @@ def ppr_popup_view(request):
         leaflet_id = int(request.POST.get('leaflet_id'))
 
         res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
-        tbl_cols_property = Bundle('powerplant_prop', res_powerplant_tbl.version,
-                                    res_powerplant_tbl.id,
-                                    res_powerplant_tbl.electrical_capacity,
-                                    res_powerplant_tbl.generation_type,
-                                    res_powerplant_tbl.generation_subtype,
-                                    res_powerplant_tbl.city, res_powerplant_tbl.postcode,
-                                    res_powerplant_tbl.voltage_level_var, res_powerplant_tbl.subst_id,
-                                    res_powerplant_tbl.scenario)
-        for record in Serializer.session.query(tbl_cols_property)\
-            .filter(and_(tbl_cols_property.c.version == EGO_DP_VERSION, tbl_cols_property.c.id == pp_id)):
-            region_property = dict(pp_id=record.powerplant_prop.id,
-                                   # ToDo: How to convert from decimal
-                                   electrical_capacity="",  # float(record.electrical_capacity),
-                                   generation_type=record.powerplant_prop.generation_type,
-                                   generation_subtype=record.powerplant_prop.generation_subtype,
-                                   city=record.powerplant_prop.city,
-                                   postcode=record.powerplant_prop.postcode,
-                                   voltage_level=record.powerplant_prop.voltage_level_var,
-                                   ego_subst_id=record.powerplant_prop.subst_id,
-                                   scenario=record.powerplant_prop.scenario)
+        tbl_cols_property = Bundle(
+            'powerplant_prop',
+            res_powerplant_tbl.version,
+            res_powerplant_tbl.id,
+            res_powerplant_tbl.electrical_capacity,
+            res_powerplant_tbl.generation_type,
+            res_powerplant_tbl.generation_subtype,
+            res_powerplant_tbl.city,
+            res_powerplant_tbl.postcode,
+            res_powerplant_tbl.voltage_level_var,
+            res_powerplant_tbl.subst_id,
+            res_powerplant_tbl.scenario
+        )
+        oep_query = Serializer.session.query(tbl_cols_property) \
+            .filter(
+            and_(
+                tbl_cols_property.c.version == EGO_DP_VERSION,
+                tbl_cols_property.c.id == pp_id
+            )
+        )
+
+        for record in oep_query:
+            region_property = dict(
+                pp_id=record.powerplant_prop.id,
+                # ToDo: How to convert from decimal
+                electrical_capacity="",  # float(record.electrical_capacity),
+                generation_type=record.powerplant_prop.generation_type,
+                generation_subtype=record.powerplant_prop.generation_subtype,
+                city=record.powerplant_prop.city,
+                postcode=record.powerplant_prop.postcode,
+                voltage_level=record.powerplant_prop.voltage_level_var,
+                ego_subst_id=record.powerplant_prop.subst_id,
+                scenario=record.powerplant_prop.scenario
+            )
             feature_prop = Feature(id=record.powerplant_prop.id, property=region_property)
             mypopup_content = feature_prop
             print(feature_prop)
@@ -361,13 +393,13 @@ def wseries_fetch_data_single_point(request):
                 open_fred_classes['Location'],
             ) \
                 .filter(
-                    sa.and_(
-                        open_fred_classes['Timespan'].start >= start_time,
-                        open_fred_classes['Timespan'].start <= end_time,
-                        open_fred_classes['Variable'].id == variable_id,
-                        open_fred_classes['Location'].id == location_id,
+                sa.and_(
+                    open_fred_classes['Timespan'].start >= start_time,
+                    open_fred_classes['Timespan'].start <= end_time,
+                    open_fred_classes['Variable'].id == variable_id,
+                    open_fred_classes['Location'].id == location_id,
                     )
-                ) \
+            ) \
                 .join(open_fred_classes['Timespan']) \
                 .join(open_fred_classes['Variable']) \
                 .join(open_fred_classes['Location'])
