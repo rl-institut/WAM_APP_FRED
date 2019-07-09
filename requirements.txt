@@ -8,3 +8,4 @@ shapely
 geojson
 oedialect
 python-dateutil
+configobj
