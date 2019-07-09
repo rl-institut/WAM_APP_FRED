@@ -297,6 +297,12 @@
                 iconAnchor:   [18, 44], // point of the icon which will correspond to marker's location
                 popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
             });
+            var hydroIcon = L.icon({
+                iconUrl: "{% static 'WAM_APP_FRED/img/Pin_hydropower_color_v2.svg' %}",
+                iconSize:     [36, 44], // size of the icon
+                iconAnchor:   [18, 44], // point of the icon which will correspond to marker's location
+                popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
+            });
       
             var highlightStyle = {
                   opacity: 0.7,
@@ -304,6 +310,13 @@
                   fillOpacity: 0.7,
                   color: "#0000ff",
                   fillColor: "#0ba0ff",
+              };
+            var highlightStyleMouseOver = {
+                opacity: 0.7,
+                weight: 2,
+                fillOpacity: 0.7,
+                color: "#0000ff",
+                fillColor: "#305EE2",
               };
               var clickedStyle = {
                   opacity: 0.7,
@@ -398,7 +411,7 @@
                 pointToLayer: createWDataPoint,
                 onEachFeature: function(feature, layer) {
                 layer.on('mouseover', function () {
-                  this.setStyle(highlightStyle);
+                  this.setStyle(highlightStyleMouseOver);
                 });
                 layer.on('click', function () {
                   this.setStyle(highlightStyle);
@@ -480,14 +493,6 @@
 
               // This is style setting for german boundary
               //should be outsourced -> style.css
-              var highlightStyle = {
-                opacity: 0.7,
-                weight: 2,
-                fillOpacity: 0.7,
-                color: "#0000ff",
-                fillColor: "#0ba0ff",
-              };
-
               var GerBoundStyle = {
                 opacity: 0.7,
                 weight: 1,
@@ -512,13 +517,14 @@
                 success: function(boundary){
                   function onEachFeature(boundary, layer) {
                     layer.on('mouseover', function () {
-                    this.setStyle(highlightStyle);
+                    this.setStyle(highlightStyleMouseOver);
                     });
                     layer.on('mouseout', function () {
                       this.setStyle(GerBoundStyle);
                     });
                     // select region and request data
                     layer.on('click', function (event) {
+                      console.log(event)
                       this.setStyle(GerBoundZoomLvlStyle);
                       region = event.sourceTarget;
                       // console.log(region);
@@ -541,7 +547,7 @@
 
               function enablePowPlPopup(feature, layer) {
                 layer.on('mouseover', function () {
-                  this.setStyle(highlightStyle);
+                  this.setStyle(highlightStyleMouseOver);
                 });
                 layer.on('click', function () {
                   this.setStyle(highlightStyle);
@@ -638,13 +644,73 @@
                     }
                     content = content + '</table>';
                     
-                    // console.log(marker);
+                    console.log(marker);
                     marker._popup.setContent(content);
+
+                    // is this working????
+                    addPowerPlantMarker(feature, marker);
 
                   }
                 }
-              //
 
+              // add icon on to clicked circelmarker 
+              function addPowerPlantMarker (feature, marker){
+                // ugly function body insert generic or somithing simillar
+                if (feature.property.generation_subtype == "solar_roof_mounted") {
+                  return L.marker(marker._latlng, {icon: solarRoofIcon});
+                }
+                if (feature.properties.generation_subtype == "solar_ground_mounted") {
+                  return L.marker(marker._latlng, {icon: solarGroundIcon});
+                }
+                if (feature.property.generation_subtype == "solar") {
+                  return L.marker(marker._latlng, {icon: solarGroundIcon});
+                }
+                if (feature.properties.generation_subtype == "biomass") {
+                  return L.marker(marker._latlng, {icon: biomassIcon});
+                }
+                if (feature.properties.generation_subtype == "biogas") {
+                  return L.marker(marker._latlng, {icon: biomassIcon});
+                }
+                if (feature.properties.generation_subtype == "biogas_dry_fermentation") {
+                  return L.marker(marker._latlng, {icon: biomassIcon});
+                }              
+                if (feature.properties.generation_subtype == "biofuel") {
+                  return L.marker(marker._latlng, {icon: biomassIcon});
+                }   
+                if (feature.properties.generation_subtype == "wind_offshore") {
+                  return L.marker(marker._latlng, {icon: windOffIcon});
+                }
+                if (feature.properties.generation_subtype == "wind_onshore") {
+                  return L.marker(marker._latlng, {icon: windOnIcon});
+                }
+                if (feature.properties.generation_subtype == "hydro") {
+                  return L.marker(marker._latlng, {icon: hydroIcon});
+                }
+                if (feature.properties.generation_subtype == "geothermal") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "gas") {
+                  // insert icon not availabe -> add when available  
+                }
+                if (feature.properties.generation_subtype == "biogas_from_grid") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "gas_mine") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "gas_sewage") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "gas_landfill") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "wood") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "waste_wood") {
+                  // insert icon not availabe -> add when available
+                } 
+              }
 
               //PowePlantRegister EndSection
               ///////////////////////////////////////////////////////////////////////////////////////////////////////
