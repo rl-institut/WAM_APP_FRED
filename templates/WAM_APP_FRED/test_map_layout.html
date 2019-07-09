@@ -334,7 +334,7 @@
             var ger_boundaries = "{% url 'WAM_APP_FRED:GerBoundary'|add:'.data' %}";
 
             var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
-            var ppr_contend = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
+            var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
 
 
             function map_init_basic (map, options) {
@@ -382,28 +382,28 @@
                   var start_time = '2002-01-31T23:00:00';
                   var end_time = '2002-03-31T23:00:00';
 
-                  // do not fetch the data a second time
                   if (marker.feature.properties.variable){
-                  console.log('not fetching data a second time')
-                  displayWeatherDataPoint(marker.feature)
+                    // do not fetch the data a second time
+                    console.log('not fetching data a second time')
+                    displayWeatherDataPoint(marker.feature)
                   }
                   else{
-                  // here make a call to django and dl the data for that point
-                  $.ajax({
-                      type: 'POST',
-                      url: weather_data_click_location,
-                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                      data: {
-                      'lat': latlng.lat,
-                      'lon': latlng.lng,
-                      'leaflet_id': leaflet_id,
-                      'location_id': location_id,
-                      'variable_id': variable_id,
-                      'start_time': start_time,
-                      'end_time': end_time
-                      },
-                      success: displayWeatherDataPoint,
-                  });
+                    // here make a call to django and dl the data for that point
+                    $.ajax({
+                        type: 'POST',
+                        url: weather_data_click_location,
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        data: {
+                        'lat': latlng.lat,
+                        'lon': latlng.lng,
+                        'leaflet_id': leaflet_id,
+                        'location_id': location_id,
+                        'variable_id': variable_id,
+                        'start_time': start_time,
+                        'end_time': end_time
+                        },
+                        success: displayWeatherDataPoint,
+                    });
                   }
               }
 
@@ -597,13 +597,12 @@
               function addPowerPlantToMap(){
 
               }
-              
+
               $.ajax({
                     url: ppr_location,
                     dataType: 'json',
                     async: true,
                     success: function(powerplant){
-
                         var layer = new L.geoJSON(powerplant, {
                             onEachFeature: enablePowPlPopup,
                             pointToLayer: createCircles
@@ -611,25 +610,25 @@
                         map.addLayer(layer)
                         }
                 });
-
+                
 
 
                 function onPowerPlantDataPointClick (event) {
                   var marker = event.sourceTarget;
-                  // console.log(marker);
+                  console.log(marker);
                   var leaflet_id = L.stamp(marker);
                   var pp_id = marker.feature.id;
                   console.log(pp_id)
                   $.ajax({
                       type: 'POST',
-                      url: ppr_contend,
+                      url: ppr_content,
                       headers: {'X-CSRFToken': '{{ csrf_token }}'},
                       data: {
                       'leaflet_id': leaflet_id,
                       'pp_id': pp_id
                       },
-                      success: function(thispopupcontend){
-                        displayPowerPlantDataPoint(thispopupcontend, marker)
+                      success: function(thispopupcontent){
+                        displayPowerPlantDataPoint(thispopupcontent, marker)
                       }
                   });
                 }
@@ -655,7 +654,7 @@
 
               // add icon on to clicked circelmarker 
               function addPowerPlantMarker (feature, marker){
-                // ugly function body insert generic or somithing simillar
+                // ugly function body insert generic or something similar
                 if (feature.property.generation_subtype == "solar_roof_mounted") {
                   return L.marker(marker._latlng, {icon: solarRoofIcon});
                 }
