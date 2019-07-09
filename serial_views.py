@@ -123,7 +123,6 @@ def ppr_view(request):
                         geometry=region_contains,
                         property=''
                     )
-                    print(feature)
                     myfeatures.append(feature)
     elif request.method == 'GET':
         print(request.GET)
