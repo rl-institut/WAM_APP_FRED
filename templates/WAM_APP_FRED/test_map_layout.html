@@ -258,7 +258,13 @@
                 iconAnchor:   [19, 72], // point of the icon which will correspond to marker's location
                 popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
             });
-
+            
+            var solarRoofIcon = L.icon({
+                iconUrl: "{% static 'WAM_APP_FRED/img/Pin_solarenergy_roof_color_v2.svg' %}",
+                iconSize:     [36, 44], // size of the icon
+                iconAnchor:   [18, 38], // point of the icon which will correspond to marker's location
+                popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
+            });
 
             var solarGroundIcon = L.icon({
                 iconUrl: "{% static 'WAM_APP_FRED/img/Pin_solarenergy_ground_color_v2.svg' %}",
