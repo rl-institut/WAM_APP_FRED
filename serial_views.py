@@ -8,8 +8,8 @@ import sqlahelper as sah
 import geojson
 from geojson import Point, MultiPolygon, Feature, FeatureCollection, dumps
 from geoalchemy2.shape import from_shape
-from shapely.geometry import shape
 from geoalchemy2.elements import WKTElement
+from shapely.geometry import shape
 from shapely.wkb import loads as loadswkb
 from dateutil import parser
 
@@ -114,13 +114,13 @@ def ppr_view(request):
                     tbl_cols
                 ) \
                     .filter(
-                    and_(
-                        # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
-                        res_powerplant_tbl.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
-                        tbl_cols.c.scenario == EGO_DP_SCENARIO,
-                        tbl_cols.c.generation_type == generation_type
-                    )
-                ).limit(1000)
+                        and_(
+                            # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
+                            res_powerplant_tbl.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
+                            tbl_cols.c.scenario == EGO_DP_SCENARIO,
+                            tbl_cols.c.generation_type == generation_type
+                        )
+                    ).limit(1000)
 
                 for record in oep_query:
                     # region_contains = loadswkb(str(record.powerplant.rea_geom_new), True)
@@ -173,11 +173,11 @@ def ppr_popup_view(request):
             )
             oep_query = Serializer.session.query(tbl_cols_property) \
                 .filter(
-                and_(
-                    tbl_cols_property.c.version == EGO_DP_VERSION,
-                    tbl_cols_property.c.id == pp_id
+                    and_(
+                        tbl_cols_property.c.version == EGO_DP_VERSION,
+                        tbl_cols_property.c.id == pp_id
+                    )
                 )
-            )
 
             for record in oep_query:
                 region_property = dict(
@@ -306,7 +306,7 @@ def wseries_fetch_data_single_point(request):
                         open_fred_classes['Variable'].id == variable_id,
                         open_fred_classes['Location'].id == location_id,
                     )
-            ) \
+                ) \
                 .join(open_fred_classes['Timespan']) \
                 .join(open_fred_classes['Variable']) \
                 .join(open_fred_classes['Location'])
