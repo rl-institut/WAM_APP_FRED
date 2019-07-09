@@ -2,7 +2,6 @@
 import datetime
 from django.http import HttpResponse
 from django.views import View
-import sqlalchemy as sa
 from sqlalchemy import and_
 from sqlalchemy.orm import Bundle
 import sqlahelper as sah
@@ -85,8 +84,9 @@ def ppr_view(request):
     if request.method == 'POST':
         region_id = str(request.POST.get('region_name'))
         generation_type = str(request.POST.get('generation_type'))
-        # stores the current region boundary
-        res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
+        if LOCAL_TESTING is False:
+            # stores the current region boundary
+            res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
         wkbs = []
         for f in Serializer.gj['features']:
@@ -97,24 +97,31 @@ def ppr_view(request):
                 _geom = shape(boundary_geometry)
                 wkbs.append(from_shape(_geom, srid=4326))
 
-        if LOCAL_TESTING is False:
-            # Query the DB with the given wkbelement as input
-            for wkb in wkbs:
+        # Query the DB with the given wkbelement as input
+        for wkb in wkbs:
+            if LOCAL_TESTING is False:
                 # define the table columns for query
-                tbl_cols = Bundle('powerplant', res_powerplant_tbl.id,
-                                  res_powerplant_tbl.generation_type,
-                                  res_powerplant_tbl.scenario)
+                tbl_cols = Bundle(
+                    'powerplant',
+                    res_powerplant_tbl.id,
+                    res_powerplant_tbl.generation_type,
+                    res_powerplant_tbl.scenario
+                )
                 # create query
                 # ToDo: Is there a way to apply ST_Transform to Bundle
-                oep_query = Serializer.session.query(res_powerplant_tbl.rea_geom_new.ST_Transform(4326), tbl_cols) \
+                oep_query = Serializer.session.query(
+                    res_powerplant_tbl.rea_geom_new.ST_Transform(4326),
+                    tbl_cols
+                ) \
                     .filter(
-                        and_(
-                            # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
-                            res_powerplant_tbl.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
-                            tbl_cols.c.scenario == EGO_DP_SCENARIO,
-                            tbl_cols.c.generation_type == generation_type
-                        )
-                    ).limit(1000)
+                    and_(
+                        # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
+                        res_powerplant_tbl.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
+                        tbl_cols.c.scenario == EGO_DP_SCENARIO,
+                        tbl_cols.c.generation_type == generation_type
+                    )
+                ).limit(1000)
+
                 for record in oep_query:
                     # region_contains = loadswkb(str(record.powerplant.rea_geom_new), True)
                     region_contains = loadswkb(str(record[0]), True)
@@ -124,6 +131,15 @@ def ppr_view(request):
                         property=''
                     )
                     myfeatures.append(feature)
+            else:
+                region_contains = loadswkb(str(wkb), True).centroid
+                feature = Feature(
+                    id=101,
+                    geometry=region_contains,
+                    property=''
+                )
+                myfeatures.append(feature)
+
     elif request.method == 'GET':
         print(request.GET)
 
@@ -137,54 +153,64 @@ def ppr_popup_view(request):
     """
 
     mypopup_content = []
-    # pp = power plant
     if request.method == 'POST':
-        # print(request.POST.get('pp_id'))
         pp_id = int(request.POST.get('pp_id'))
-        # leaflet_id = int(request.POST.get('leaflet_id'))
 
-        res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
-        tbl_cols_property = Bundle(
-            'powerplant_prop',
-            res_powerplant_tbl.version,
-            res_powerplant_tbl.id,
-            res_powerplant_tbl.electrical_capacity,
-            res_powerplant_tbl.generation_type,
-            res_powerplant_tbl.generation_subtype,
-            res_powerplant_tbl.city,
-            res_powerplant_tbl.postcode,
-            res_powerplant_tbl.voltage_level_var,
-            res_powerplant_tbl.subst_id,
-            res_powerplant_tbl.scenario
-        )
-        oep_query = Serializer.session.query(tbl_cols_property) \
-            .filter(
-            and_(
-                tbl_cols_property.c.version == EGO_DP_VERSION,
-                tbl_cols_property.c.id == pp_id
+        if LOCAL_TESTING is False:
+            res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
+            tbl_cols_property = Bundle(
+                'powerplant_prop',
+                res_powerplant_tbl.version,
+                res_powerplant_tbl.id,
+                res_powerplant_tbl.electrical_capacity,
+                res_powerplant_tbl.generation_type,
+                res_powerplant_tbl.generation_subtype,
+                res_powerplant_tbl.city,
+                res_powerplant_tbl.postcode,
+                res_powerplant_tbl.voltage_level_var,
+                res_powerplant_tbl.subst_id,
+                res_powerplant_tbl.scenario
             )
-        )
+            oep_query = Serializer.session.query(tbl_cols_property) \
+                .filter(
+                and_(
+                    tbl_cols_property.c.version == EGO_DP_VERSION,
+                    tbl_cols_property.c.id == pp_id
+                )
+            )
 
-        for record in oep_query:
+            for record in oep_query:
+                region_property = dict(
+                    pp_id=record.powerplant_prop.id,
+                    # ToDo: How to convert from decimal
+                    electrical_capacity="",  # float(record.electrical_capacity),
+                    generation_type=record.powerplant_prop.generation_type,
+                    generation_subtype=record.powerplant_prop.generation_subtype,
+                    city=record.powerplant_prop.city,
+                    postcode=record.powerplant_prop.postcode,
+                    voltage_level=record.powerplant_prop.voltage_level_var,
+                    ego_subst_id=record.powerplant_prop.subst_id,
+                    scenario=record.powerplant_prop.scenario
+                )
+                feature_prop = Feature(id=record.powerplant_prop.id, property=region_property)
+                mypopup_content.append(feature_prop)
+        else:
             region_property = dict(
-                pp_id=record.powerplant_prop.id,
-                # ToDo: How to convert from decimal
-                electrical_capacity="",  # float(record.electrical_capacity),
-                generation_type=record.powerplant_prop.generation_type,
-                generation_subtype=record.powerplant_prop.generation_subtype,
-                city=record.powerplant_prop.city,
-                postcode=record.powerplant_prop.postcode,
-                voltage_level=record.powerplant_prop.voltage_level_var,
-                ego_subst_id=record.powerplant_prop.subst_id,
-                scenario=record.powerplant_prop.scenario
+                pp_id=101,
+                electrical_capacity=1700,
+                generation_type='wind',
+                generation_subtype='',
+                city='Berlin',
+                postcode=10000,
+                voltage_level=100,
+                ego_subst_id=101,
+                scenario='Test'
             )
-            feature_prop = Feature(id=record.powerplant_prop.id, property=region_property)
-            mypopup_content = feature_prop
-            # print(feature_prop)
+            feature_prop = Feature(id=101, property=region_property)
+            mypopup_content.append(feature_prop)
     elif request.method == 'GET':
         print(request.GET)
 
-    # print(mypopup_content)
     return HttpResponse(dumps(mypopup_content), content_type="application/json")
 
 
@@ -274,11 +300,11 @@ def wseries_fetch_data_single_point(request):
                 open_fred_classes['Location'],
             ) \
                 .filter(
-                sa.and_(
-                    open_fred_classes['Timespan'].start >= start_time,
-                    open_fred_classes['Timespan'].start <= end_time,
-                    open_fred_classes['Variable'].id == variable_id,
-                    open_fred_classes['Location'].id == location_id,
+                    and_(
+                        open_fred_classes['Timespan'].start >= start_time,
+                        open_fred_classes['Timespan'].start <= end_time,
+                        open_fred_classes['Variable'].id == variable_id,
+                        open_fred_classes['Location'].id == location_id,
                     )
             ) \
                 .join(open_fred_classes['Timespan']) \
