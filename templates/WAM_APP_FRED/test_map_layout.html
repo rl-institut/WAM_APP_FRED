@@ -507,7 +507,7 @@
               ///////////////////////////////////////////////////////////////////////////////////////////////////////
               // res PowerPlants in region boundaries
 
-              function enablePopup(feature, layer) {
+              function enablePowPlPopup(feature, layer) {
                 layer.on('mouseover', function () {
                   this.setStyle(highlightStyle);
                 });
@@ -540,7 +540,7 @@
                       },
                     success: function(powerplant){
                       var layer = new L.geoJSON(powerplant, {
-                        onEachFeature: enablePopup,
+                        onEachFeature: enablePowPlPopup,
                         pointToLayer: createCircles
                       });
                       //map.addLayer(layer)
@@ -567,7 +567,7 @@
                     success: function(powerplant){
 
                         var layer = new L.geoJSON(powerplant, {
-                            onEachFeature: enablePopup,
+                            onEachFeature: enablePowPlPopup,
                             pointToLayer: createCircles
                         });
                         map.addLayer(layer)
@@ -597,7 +597,6 @@
                 }
 
                 function displayPowerPlantDataPoint(feature, marker) {
-                  // console.log(feature);
                   if (feature.property) {
                     var keys = Object.keys(feature.property);
                     var content = '<table class="selection_detail">';
