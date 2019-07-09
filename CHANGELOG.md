@@ -16,15 +16,28 @@ Here is a template for new release sections
 ### Removed
 -
 ```
-## [Unreleased]
+## [Unrealeased]
+
+### Added
+
+### Changed
+
+### Removed
+
+
+
+## [0.0.1] - 2019-07-09
 
 ### Added
 - CHANGELOG.md
-- geojson serializer of the data from the oep server
+- geojson serializer of the data from the oep API
 - requirements.txt
-
-### Changed
--
+- oep query for the openfred weather data
+- license
+- interactive click with the map to display weather data
+- leaflet config file in config folder
+- linting (.py files only)
+- README
 
 ### Removed
 - db_sqla.py file
