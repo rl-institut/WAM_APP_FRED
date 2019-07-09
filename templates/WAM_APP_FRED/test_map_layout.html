@@ -18,6 +18,7 @@
     <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
     {% leaflet_js %}
     {% leaflet_css %}
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   </head>
   <body>
 
@@ -69,19 +70,19 @@
                     <ul class="vertical tabs" data-tabs id="offcanvas-tabs">
                       <li class="tabs-title is-active">
                         <a href="#panel-energy-system">
-                          <img src="{% static 'WAM_APP_FRED/img/icons_custom/Enavi_Energy_w.svg' %}">
+                          <img src="{% static 'WAM_APP_FRED/img/tab_icons/weather.svg' %}">
                           <h2 class="tabs-title__head">Weather Data</h2>
                         </a>
                       </li>
                       <li class="tabs-title">
                         <a href="#panel-scenario">
-                          <img src="{% static 'WAM_APP_FRED/img/icons_custom/Enavi_Results_w.svg' %}">
+                          <img src="{% static 'WAM_APP_FRED/img/tab_icons/powerplants.svg' %}">
                           <h2 class="tabs-title__head">Power Plant Register</h2>
                         </a>
                       </li>
                       <li class="tabs-title">
                         <a href="#panel4v">
-                          <img src="{% static 'WAM_APP_FRED/img/icons_custom/Windrad.svg' %}">
+                          <img src="{% static 'WAM_APP_FRED/img/tab_icons/feedin.svg' %}">
                           <h2 class="tabs-title__head">Feedin-Time Series</h2>
                         </a>
                       </li>
@@ -196,7 +197,7 @@
                 <i class="icon ion-android-options"></i>
               </button>
 
-              {% leaflet_map "map" callback="window.map_init_basic" %}
+              {% leaflet_map "map" callback="window.map_init_basic" settings_overrides=leaflet_config%}
       
             </div>
           </main>
@@ -221,23 +222,23 @@
             <div class="cell medium-8 large-6">
               <ul class="map-footer__logo">
                 <li>
-                  <a href="https://www.energieavantgarde.de/" target="_blank" title="Energieavantgarde Anhalt">
-                    <img class="map-footer__logo-eaa" src="{% static 'stemp_abw/img/EAA_logo.png' %}" alt="Logo Energieavantgarde Anhalt">
+                  <a href="https://www.ovgu.de/" target="_blank" title="Otto von Guericke Universität Magdeburg">
+                    <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/ovgu.svg' %}" alt="Logo OVGU">
                   </a>
                 </li>
                 <li>
                   <a href="https://reiner-lemoine-institut.de/" target="_blank" title="Reiner Lemoine Institut">
-                    <img class="map-footer__logo-rli" src="{% static 'stemp_abw/img/rli_logo.png' %}" alt="Logo Reiner Lemoine Institut">
+                    <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/rli.svg' %}" alt="Logo Reiner Lemoine Institut">
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.kopernikus-projekte.de/" target="_blank" title="Kopernikus Projekte">
-                    <img class="map-footer__logo-kopernikus" src="{% static 'stemp_abw/img/kopernikus_logo.png' %}" alt="Logo Kopernikus">
+                  <a href="https://reiner-lemoine-institut.de/open_fred-open-feed-time-series-based-renewable-energy-database/" target="_blank" title="open_FRED">
+                    <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/open_fred.svg' %}" alt="Logo open_FRED">
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.bmbf.de/" target="_blank" title="Bundesministerium für Bildung und Forschung">
-                    <img class="map-footer__logo-bmbf" src="{% static 'stemp_abw/img/BMBF_widget_final.png' %}" alt="Logo BMBF">
+                  <a href="https://www.bmwi.de/Navigation/DE/Home/home.html" target="_blank" title="Bundesminitserium für Wirtschaft und Energie">
+                    <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/bmwi.svg' %}" alt="Logo BMWI">
                   </a>
                 </li>
               </ul>
@@ -286,14 +287,122 @@
                 iconAnchor:   [18, 44], // point of the icon which will correspond to marker's location
                 popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
             });
+      
+            var highlightStyle = {
+                  opacity: 0.7,
+                  weight: 2,
+                  fillOpacity: 0.7,
+                  color: "#0000ff",
+                  fillColor: "#0ba0ff",
+              };
+              var clickedStyle = {
+                  opacity: 0.7,
+                  weight: 2,
+                  fillOpacity: 0.7,
+                  color: "#00ff00",
+                  fillColor: "#00ffff",
+              };
+
             // define a var which holds a GEOJSON from a URL provided by django
             var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}";
             var mouse_click_location = "{% url 'WAM_APP_FRED:MouseClick'|add:'.data' %}";
-
+            var weather_data_click_location = "{% url 'WAM_APP_FRED:WeatherPointClick'|add:'.data' %}";
 
 
             function map_init_basic (map, options) {
               var popup = L.popup();
+
+              let wdataStyle = {
+                    opacity: 0.7,
+                    weight: 1,
+                    fillOpacity: 0.7,
+                    color: "#da9700",
+                    fillColor: "#da9700",
+                radius: 5
+              };
+              function createWDataPoint (feature, latlng) {
+                return L.circleMarker(latlng, wdataStyle)
+              };
+
+              function displayWeatherDataPoint(feature){
+                  var marker = wdl.getLayer(feature.properties.leaflet_id);
+                  var popup = marker.getPopup();
+                  const variable = feature.properties.variable
+                  var popupContent = '<h4>' + variable +
+                  '</h4></br><div id="tester" style="width:300px;height:250px;"></div>';
+                  popup.setContent(popupContent)
+                  marker.feature.properties = feature.properties
+                  TESTER = document.getElementById('tester');
+                  var height = feature.properties.heights[0];
+                  Plotly.plot( TESTER, [{
+                  x: feature.properties.data[height]['x'],
+                  y: feature.properties.data[height]['y']}], {
+                  margin: { t: 0 } } );
+                  }
+
+              function onWeatherDataPointClick (event) {
+
+                  var marker = event.sourceTarget;
+                  var leaflet_id = L.stamp(marker);
+                  var popup = marker.getPopup();
+                  var latlng = marker.getLatLng();
+                  var location_id = marker.feature.properties.id;
+                  // this need to be linked to user choice
+                  var variable_id = 12;
+
+                  var start_time = '2002-01-31T23:00:00';
+                  var end_time = '2002-03-31T23:00:00';
+
+                  // do not fetch the data a second time
+                  if (marker.feature.properties.variable){
+                  console.log('not fetching data a second time')
+                  displayWeatherDataPoint(marker.feature)
+                  }
+                  else{
+                  // here make a call to django and dl the data for that point
+                  $.ajax({
+                      type: 'POST',
+                      url: weather_data_click_location,
+                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                      data: {
+                      'lat': latlng.lat,
+                      'lon': latlng.lng,
+                      'leaflet_id': leaflet_id,
+                      'location_id': location_id,
+                      'variable_id': variable_id,
+                      'start_time': start_time,
+                      'end_time': end_time
+                      },
+                      success: displayWeatherDataPoint,
+                  });
+                  }
+              }
+
+              let wdataOptions = {
+                pointToLayer: createWDataPoint,
+                onEachFeature: function(feature, layer) {
+                layer.on('mouseover', function () {
+                  this.setStyle(highlightStyle);
+                });
+                layer.on('click', function () {
+                  this.setStyle(highlightStyle);
+                });
+                layer.on('mouseout', function () {
+                  this.setStyle(wdataStyle);
+                });
+                  layer.bindPopup('Loading...');
+
+                  layer.on('click', onWeatherDataPointClick);
+                  }
+              };
+
+              var wdl = new L.geoJSON(null, wdataOptions);
+
+              var wdl_saved = new L.geoJSON(null, wdataOptions);
+
+
+              wdl.addTo(map);
+              wdl_saved.addTo(map);
 
 
               // Move zoom control
@@ -312,10 +421,14 @@
                 radius: 5
               };
 
+
+
               // add all of the GeoJSON data to the empty layer we created
               function createCircles (feature, latlng) {
                 return L.circleMarker(latlng, myLayerStyle)
               }
+
+
 
               // create an options object that specifies which function will called on each feature
               let myLayerOptions = {
@@ -342,29 +455,23 @@
               // Rest-full return the value to the server with POST with jQuery
               map.on('click', onMapClick);
 
-              function onMapClick(ev) {
+            function addWeatherPoint(data) {
+                // Clear the GeoJSON layer
+                wdl.clearLayers()
+                // Add GeoJSON data in the layer
+                wdl.addData(data)
+            }
+
+	          function onMapClick(ev) {
                   var latlng = map.mouseEventToLatLng(ev.originalEvent);
                   $.ajax({
                       type: 'POST',
                       url: mouse_click_location,
                       headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                      data: {'lat': latlng.lat, 'long': latlng.lng},
-                      //success: function(data){alert("youhou" + data);}
+                      data: {'lat': latlng.lat, 'lon': latlng.lng},
+                      success: addWeatherPoint,
                   });
 	          };
-
-
-	        var dataurl = '{% url 'WAM_APP_FRED:data' %}';
-            // Download GeoJSON via Ajax
-            $.getJSON(dataurl, function (data) {
-                // Add GeoJSON layer
-                 var ft = L.geoJSON(data, myLayerOptions).addTo(map);
-                 console.log(ft)
-
-            });
-
-
-
             };
 
     </script>
