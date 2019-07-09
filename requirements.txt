@@ -6,3 +6,6 @@ sqlahelper
 geoalchemy2
 shapely
 geojson
+oedialect
+python-dateutil
+configobj
