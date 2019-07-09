@@ -561,7 +561,25 @@
               }
               
               var regionPowerPlantgroup = L.layerGroup().addTo(map);
-              // request all power plants conatined in selected region
+
+              function createPowerPlantsPoints(powerplants){
+                  var layer = new L.geoJSON(powerplants, {
+                    onEachFeature: enablePowPlPopup,
+                    pointToLayer: createCircles
+                  });
+                  if (regionPowerPlantgroup.getLayers().length === 0) {
+                    regionPowerPlantgroup.addLayer(layer)
+                  }
+                  else {
+                    regionPowerPlantgroup.clearLayers();
+                    regionPowerPlantgroup.addLayer(layer)
+                  }
+              }
+
+
+
+
+              // request all power plants contained in selected region
               // also include the generation_type option 
               function loadRegionPowerPlants(region, layer){
                 region_name = region.feature.properties.name;
@@ -576,20 +594,7 @@
                       'region_name': region_name,
                       'generation_type': generation_type
                       },
-                    success: function(powerplant){
-                      var layer = new L.geoJSON(powerplant, {
-                        onEachFeature: enablePowPlPopup,
-                        pointToLayer: createCircles
-                      });
-                      //map.addLayer(layer)
-                      if (regionPowerPlantgroup.getLayers().length === 0) {
-                        regionPowerPlantgroup.addLayer(layer)
-                      } 
-                      else {
-                        regionPowerPlantgroup.clearLayers();
-                      }
-
-                    }
+                    success: createPowerPlantsPoints
                   });
                 }
               
@@ -610,7 +615,7 @@
                         map.addLayer(layer)
                         }
                 });
-                
+
 
 
                 function onPowerPlantDataPointClick (event) {
