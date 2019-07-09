@@ -6,11 +6,14 @@ from WAM_APP_FRED.config.leaflet import LEAFLET_CONFIG
 def fred_map(request):
     return render(request, 'WAM_APP_FRED/fred_map.html')
 
+
 def imprint(request):
     return render(request, 'WAM_APP_FRED/imprint.html')
 
+
 def privacy(request):
     return render(request, 'WAM_APP_FRED/privacy_policy.html')
+
 
 def webgui_test(request):
     return render(
