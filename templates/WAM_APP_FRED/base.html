@@ -1,0 +1,19 @@
+<!doctype html>
+
+{% load static %}
+
+<html class="no-js" lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>openFRED App</title>
+    {% block header %}{% endblock %}
+  </head>
+
+  <body>
+    <div class="u-vh--100">
+      {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>
