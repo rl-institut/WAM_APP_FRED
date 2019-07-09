@@ -8,7 +8,7 @@ from sqlalchemy.orm import Bundle
 import sqlahelper as sah
 import geojson
 from geojson import Point, MultiPolygon, Feature, FeatureCollection, dumps
-from geoalchemy2.shape import from_shape
+from geoalchemy2.shape import from_shape, to_shape
 from shapely.geometry import shape
 from geoalchemy2.elements import WKTElement
 from shapely.wkb import loads as loadswkb
@@ -35,6 +35,7 @@ TIME_STEPS = {
 
 # provide newest dataprocessing id
 EGO_DP_VERSION = fred_config['WAM_APP_FRED']['EGO_DP_VERSION']
+EGO_DP_SCENARIO = fred_config['WAM_APP_FRED']['SCENARIO']
 
 
 class Serializer(View):
@@ -94,40 +95,35 @@ def ppr_view(request):
                 boundary_geometry = MultiPolygon(region_boundary)
                 # create shapely geometry from geojson feature
                 _geom = shape(boundary_geometry)
-                # convert shaply.geometry to wkbelement
-                # query_geom = from_shape(_geom, srid=4326)
-
-                # wkbs.append(_geom)
-                # wkbs.append(from_shape(_geom, srid=3035))
                 wkbs.append(from_shape(_geom, srid=4326))
 
         if LOCAL_TESTING is False:
             # Query the DB with the given wkbelement as input
             for wkb in wkbs:
-                tbl_cols = Bundle('powerplant', res_powerplant_tbl.id, res_powerplant_tbl.geom,
-                                  res_powerplant_tbl.generation_type, res_powerplant_tbl.scenario)
-
-                oep_query = Serializer.session.query(tbl_cols) \
+                # define the table columns for query
+                tbl_cols = Bundle('powerplant', res_powerplant_tbl.id,
+                                  res_powerplant_tbl.generation_type,
+                                  res_powerplant_tbl.scenario)
+                # create query
+                # ToDo: Is there a way to apply ST_Transform to Bundle
+                oep_query = Serializer.session.query(res_powerplant_tbl.rea_geom_new.ST_Transform(4326), tbl_cols) \
                     .filter(
                         and_(
-                            tbl_cols.c.geom.ST_Within(wkb),
-                            tbl_cols.c.scenario == 'Status Quo',
+                            # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
+                            res_powerplant_tbl.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
+                            tbl_cols.c.scenario == EGO_DP_SCENARIO,
                             tbl_cols.c.generation_type == generation_type
                         )
                     ).limit(1000)
-
-                # ToDo: Change the geom column to rea_geom_new: mind there is another
-                #  srid 3035 in this column
                 for record in oep_query:
-
-                    region_contains = loadswkb(str(record.powerplant.geom), True)
-
-                    # feature_prop = Feature(id=record.powerplant.id, property='')
+                    # region_contains = loadswkb(str(record.powerplant.rea_geom_new), True)
+                    region_contains = loadswkb(str(record[0]), True)
                     feature = Feature(
                         id=record.powerplant.id,
                         geometry=region_contains,
                         property=''
                     )
+                    print(feature)
                     myfeatures.append(feature)
     elif request.method == 'GET':
         print(request.GET)
