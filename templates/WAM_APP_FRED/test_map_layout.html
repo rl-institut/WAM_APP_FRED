@@ -100,25 +100,35 @@
                                 <i class ="icon ion-information-circled icon--small" title="Informationen zum Inhalt"></i>
                               </legend>
                               <div>
-                                <input type="radio" name="scenario" value="statusQuo" id="scenarioStatusQuo" required checked>
-                                <label for="scenarioStatusQuo">Status Quo</label>
+                                <input type="radio" name="generation_type" value="solar" id="Solar" required checked>
+                                <label for="Solar">Photovoltaikanlagen</label>
                               </div>
                               <div>
-                                <input type="radio" name="scenario" value="germany" id="scenarioGermany">
-                                <label for="scenarioGermany">Deutsches Klimaschutzziel</label>
+                                <input type="radio" name="generation_type" value="wind" id="Wind">
+                                <label for="Wind">Windkraftanlagen</label>
                               </div>
                               <div>
-                                <input type="radio" name="scenario" value="100" id="scenario100">
-                                <label for="scenario100">100% EE in der Region</label>
+                                <input type="radio" name="generation_type" value="geothermal" id="Geothermal">
+                                <label for="Geothermal">Geothermieanlagen</label>
+                              </div>
+                              <div>
+                                <input type="radio" name="generation_type" value="run_of_river" id="Run_of_river">
+                                <label for="Run_of_river">Wasserkraftanlage</label>
+                              </div>
+                              <div>
+                                <input type="radio" name="generation_type" value="gas" id="Gas">
+                                <label for="Gas">Gaskraftwerk</label>
+                              </div>
+                              <div>
+                                <input type="radio" name="generation_type" value="reservoir" id="Reservoir">
+                                <label for="Reservoir">Pumpspeicherkraftwerk</label>
+                              </div>
+                              <div>
+                                <input type="radio" name="generation_type" value="biomass" id="Biomass">
+                                <label for="Biomass">Biogasanlage</label>
                               </div>
                             </fieldset>
                           </form>
-
-                          <div class="panel__text panel__text--highlighted">
-                            <p id="scenarioPanelText">
-                                <span style="font-weight:700">Status Quo</span><span style="display:inline-block"></span>
-                            </p>
-                          </div>
                         </div>
           
                         <!-- Second panel content -->
@@ -287,6 +297,12 @@
                 iconAnchor:   [18, 44], // point of the icon which will correspond to marker's location
                 popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
             });
+            var hydroIcon = L.icon({
+                iconUrl: "{% static 'WAM_APP_FRED/img/Pin_hydropower_color_v2.svg' %}",
+                iconSize:     [36, 44], // size of the icon
+                iconAnchor:   [18, 44], // point of the icon which will correspond to marker's location
+                popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
+            });
       
             var highlightStyle = {
                   opacity: 0.7,
@@ -294,6 +310,13 @@
                   fillOpacity: 0.7,
                   color: "#0000ff",
                   fillColor: "#0ba0ff",
+              };
+            var highlightStyleMouseOver = {
+                opacity: 0.7,
+                weight: 2,
+                fillOpacity: 0.7,
+                color: "#0000ff",
+                fillColor: "#305EE2",
               };
               var clickedStyle = {
                   opacity: 0.7,
@@ -304,9 +327,14 @@
               };
 
             // define a var which holds a GEOJSON from a URL provided by django
-            var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}";
+          
             var mouse_click_location = "{% url 'WAM_APP_FRED:MouseClick'|add:'.data' %}";
             var weather_data_click_location = "{% url 'WAM_APP_FRED:WeatherPointClick'|add:'.data' %}";
+
+            var ger_boundaries = "{% url 'WAM_APP_FRED:GerBoundary'|add:'.data' %}";
+
+            var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
+            var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
 
 
             function map_init_basic (map, options) {
@@ -326,6 +354,7 @@
 
               function displayWeatherDataPoint(feature){
                   var marker = wdl.getLayer(feature.properties.leaflet_id);
+
                   var popup = marker.getPopup();
                   const variable = feature.properties.variable
                   var popupContent = '<h4>' + variable +
@@ -353,28 +382,28 @@
                   var start_time = '2002-01-31T23:00:00';
                   var end_time = '2002-03-31T23:00:00';
 
-                  // do not fetch the data a second time
                   if (marker.feature.properties.variable){
-                  console.log('not fetching data a second time')
-                  displayWeatherDataPoint(marker.feature)
+                    // do not fetch the data a second time
+                    console.log('not fetching data a second time')
+                    displayWeatherDataPoint(marker.feature)
                   }
                   else{
-                  // here make a call to django and dl the data for that point
-                  $.ajax({
-                      type: 'POST',
-                      url: weather_data_click_location,
-                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                      data: {
-                      'lat': latlng.lat,
-                      'lon': latlng.lng,
-                      'leaflet_id': leaflet_id,
-                      'location_id': location_id,
-                      'variable_id': variable_id,
-                      'start_time': start_time,
-                      'end_time': end_time
-                      },
-                      success: displayWeatherDataPoint,
-                  });
+                    // here make a call to django and dl the data for that point
+                    $.ajax({
+                        type: 'POST',
+                        url: weather_data_click_location,
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        data: {
+                        'lat': latlng.lat,
+                        'lon': latlng.lng,
+                        'leaflet_id': leaflet_id,
+                        'location_id': location_id,
+                        'variable_id': variable_id,
+                        'start_time': start_time,
+                        'end_time': end_time
+                        },
+                        success: displayWeatherDataPoint,
+                    });
                   }
               }
 
@@ -382,7 +411,7 @@
                 pointToLayer: createWDataPoint,
                 onEachFeature: function(feature, layer) {
                 layer.on('mouseover', function () {
-                  this.setStyle(highlightStyle);
+                  this.setStyle(highlightStyleMouseOver);
                 });
                 layer.on('click', function () {
                   this.setStyle(highlightStyle);
@@ -395,6 +424,7 @@
                   layer.on('click', onWeatherDataPointClick);
                   }
               };
+
 
               var wdl = new L.geoJSON(null, wdataOptions);
 
@@ -436,24 +466,11 @@
               };
               ///////////////////////////////////////////////////////////////////////////////////////
 
-
-              // create a ajax call for locations_dataurl
-              $.ajax({
-                    url: locations_dataurl,
-                    dataType: 'json',
-                    async: true,
-                    // if the data-source can be accessed, create a GEOJSON layer
-                    success: function(loca){
-                      // create the GeoJSON layer from the myLayerData object
-                      L.geoJSON(loca).addTo(map)
-
-                    }
-              });
-
               // return current location of the mouse-courser
               // access the original DOM even translate to L.LatLag instance
               // Rest-full return the value to the server with POST with jQuery
               map.on('click', onMapClick);
+
 
             function addWeatherPoint(data) {
                 // Clear the GeoJSON layer
@@ -472,7 +489,237 @@
                       success: addWeatherPoint,
                   });
 	          };
+
+
+              // This is style setting for german boundary
+              //should be outsourced -> style.css
+              var GerBoundStyle = {
+                opacity: 0.7,
+                weight: 1,
+                fillOpacity: 0.7,
+                color: "#000000",
+                fillColor: "#0BC11C",
+              };
+
+              var GerBoundZoomLvlStyle = {
+                opacity: 0.7,
+                weight: 1,
+                fillOpacity: 0.0,
+                color: "#000000",
+                fillColor: "#0BC11C",
+              };
+
+              // Germany region boundaries
+              $.ajax({
+                url: ger_boundaries,
+                dataType: 'json',
+                async: true,
+                success: function(boundary){
+                  function onEachFeature(boundary, layer) {
+                    layer.on('mouseover', function () {
+                    this.setStyle(highlightStyleMouseOver);
+                    });
+                    layer.on('mouseout', function () {
+                      this.setStyle(GerBoundStyle);
+                    });
+                    // select region and request data
+                    layer.on('click', function (event) {
+                      console.log(event)
+                      this.setStyle(GerBoundZoomLvlStyle);
+                      region = event.sourceTarget;
+                      // console.log(region);
+                      loadRegionPowerPlants(region, layer);
+                    });
+                    }
+                  var layer = new L.geoJSON(boundary, {
+                    onEachFeature: onEachFeature,
+                    style: function (feature, latlng) {
+                      return GerBoundStyle;
+                    }
+                  })
+                  map.addLayer(layer)
+                }
+              });
+
+              //PowePlantRegister StartSection
+              ///////////////////////////////////////////////////////////////////////////////////////////////////////
+              // res PowerPlants in region boundaries
+
+              function enablePowPlPopup(feature, layer) {
+                layer.on('mouseover', function () {
+                  this.setStyle(highlightStyleMouseOver);
+                });
+                layer.on('click', function () {
+                  this.setStyle(highlightStyle);
+                });
+                layer.on('mouseout', function () {
+                  this.setStyle(wdataStyle);
+                });
+                  layer.bindPopup('Loading...');
+
+                  layer.on('click', onPowerPlantDataPointClick);
+              }
+              
+              var regionPowerPlantgroup = L.layerGroup().addTo(map);
+
+              function createPowerPlantsPoints(powerplants){
+                  var layer = new L.geoJSON(powerplants, {
+                    onEachFeature: enablePowPlPopup,
+                    pointToLayer: createCircles
+                  });
+                  if (regionPowerPlantgroup.getLayers().length === 0) {
+                    regionPowerPlantgroup.addLayer(layer)
+                  }
+                  else {
+                    regionPowerPlantgroup.clearLayers();
+                    regionPowerPlantgroup.addLayer(layer)
+                  }
+              }
+
+
+
+
+              // request all power plants contained in selected region
+              // also include the generation_type option 
+              function loadRegionPowerPlants(region, layer){
+                region_name = region.feature.properties.name;
+                generation_type = $("input[name=generation_type]:checked").val();
+
+                $.ajax({
+                    url: ppr_location,
+                    type: 'POST',
+                    async: true,
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                      data: {
+                      'region_name': region_name,
+                      'generation_type': generation_type
+                      },
+                    success: createPowerPlantsPoints
+                  });
+                }
+              
+              // add all power plants from url to map
+              function addPowerPlantToMap(){
+
+              }
+
+              $.ajax({
+                    url: ppr_location,
+                    dataType: 'json',
+                    async: true,
+                    success: function(powerplant){
+                        var layer = new L.geoJSON(powerplant, {
+                            onEachFeature: enablePowPlPopup,
+                            pointToLayer: createCircles
+                        });
+                        map.addLayer(layer)
+                        }
+                });
+
+
+
+                function onPowerPlantDataPointClick (event) {
+                  var marker = event.sourceTarget;
+                  console.log(marker);
+                  var leaflet_id = L.stamp(marker);
+                  var pp_id = marker.feature.id;
+                  console.log(pp_id)
+                  $.ajax({
+                      type: 'POST',
+                      url: ppr_content,
+                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                      data: {
+                      'leaflet_id': leaflet_id,
+                      'pp_id': pp_id
+                      },
+                      success: function(thispopupcontent){
+                        displayPowerPlantDataPoint(thispopupcontent, marker)
+                      }
+                  });
+                }
+
+                function displayPowerPlantDataPoint(feature, marker) {
+                  if (feature.property) {
+                    var keys = Object.keys(feature.property);
+                    var content = '<table class="selection_detail">';
+                    
+                    for (let i = 0, len = keys.length; i < len; i++) {
+                      content = content + '<tr><td align="right"><b>' + keys[i] + '</b>:</td><td>' + feature.property[keys[i]] + '</td></tr>'
+                    }
+                    content = content + '</table>';
+                    
+                    console.log(marker);
+                    marker._popup.setContent(content);
+
+                    // is this working????
+                    addPowerPlantMarker(feature, marker);
+
+                  }
+                }
+
+              // add icon on to clicked circelmarker 
+              function addPowerPlantMarker (feature, marker){
+                // ugly function body insert generic or something similar
+                if (feature.property.generation_subtype == "solar_roof_mounted") {
+                  return L.marker(marker._latlng, {icon: solarRoofIcon});
+                }
+                if (feature.properties.generation_subtype == "solar_ground_mounted") {
+                  return L.marker(marker._latlng, {icon: solarGroundIcon});
+                }
+                if (feature.property.generation_subtype == "solar") {
+                  return L.marker(marker._latlng, {icon: solarGroundIcon});
+                }
+                if (feature.properties.generation_subtype == "biomass") {
+                  return L.marker(marker._latlng, {icon: biomassIcon});
+                }
+                if (feature.properties.generation_subtype == "biogas") {
+                  return L.marker(marker._latlng, {icon: biomassIcon});
+                }
+                if (feature.properties.generation_subtype == "biogas_dry_fermentation") {
+                  return L.marker(marker._latlng, {icon: biomassIcon});
+                }              
+                if (feature.properties.generation_subtype == "biofuel") {
+                  return L.marker(marker._latlng, {icon: biomassIcon});
+                }   
+                if (feature.properties.generation_subtype == "wind_offshore") {
+                  return L.marker(marker._latlng, {icon: windOffIcon});
+                }
+                if (feature.properties.generation_subtype == "wind_onshore") {
+                  return L.marker(marker._latlng, {icon: windOnIcon});
+                }
+                if (feature.properties.generation_subtype == "hydro") {
+                  return L.marker(marker._latlng, {icon: hydroIcon});
+                }
+                if (feature.properties.generation_subtype == "geothermal") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "gas") {
+                  // insert icon not availabe -> add when available  
+                }
+                if (feature.properties.generation_subtype == "biogas_from_grid") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "gas_mine") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "gas_sewage") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "gas_landfill") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "wood") {
+                  // insert icon not availabe -> add when available
+                }
+                if (feature.properties.generation_subtype == "waste_wood") {
+                  // insert icon not availabe -> add when available
+                } 
+              }
+
+              //PowePlantRegister EndSection
+              ///////////////////////////////////////////////////////////////////////////////////////////////////////
             };
+
 
     </script>
 
