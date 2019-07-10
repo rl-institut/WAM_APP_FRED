@@ -165,6 +165,7 @@ def ppr_mapping(metadata):
     classes["ResPowerPlant"] = ResPowerPlantRegister
     return classes
 
+
 def ts_mapping(metadata):
     """
       Returns classes mapped to the OEDB database via SQLAlchemy.
@@ -181,7 +182,7 @@ def ts_mapping(metadata):
     class OpenFredTimesSeries(Base):
         __table__ = Table('openfred_timeseries_ch', metadata)
         # reflect the existing table with autoload from DB and add values as extend_existing
-        Table('openfred_timeseries_ch', metadata,  extend_existing=True, autoload=True)
+        Table('openfred_timeseries_ch', metadata, extend_existing=True, autoload=True)
 
         # Convert the type Decimal into float for python
         for column in __table__.columns.values():

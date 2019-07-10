@@ -150,7 +150,6 @@ def ppr_view(request):
     return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
 
 
-
 def district_feedin_series(request):
     """
     This function will return a json/geojson with pre calculated data for a single or multiple
@@ -165,33 +164,22 @@ def district_feedin_series(request):
 
         timespan = []
         values = []
+        nut = ''
         for record in oep_query:
             timespan.append(record.time)
             values.append(record.feedin)
-            # props = dict(
-            #    id=record.id,
-            #    time=record.time,
-            #    feedin=record.feedin,
-            #    nut=record.nut,
-            #    technology=record.technology
-            # )
-        # openfred_ts_tbl = oep_models.ts_mapping('OpenFredTimesSeries')
-
-        print('in there')
+            nut = record.nut
 
         myfeature = dict(
             timespan=timespan,
             values=values,
-            nut=record.nut,
-            # technology=record.technology
+            nut=nut,
         )
-
-
     elif request.method == 'GET':
         print(request.GET)
 
-    #insert ajax postrequest data and query
     return HttpResponse(dumps(myfeature), content_type="application/json")
+
 
 def ppr_popup_view(request):
     """
