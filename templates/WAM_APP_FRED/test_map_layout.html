@@ -357,11 +357,11 @@
                   ' Height '+ user_height + ' m' +
                   '</h4></br><div id="tester" style="width:300px;height:250px;"></div>';
                   popup.setContent(popupContent)
+
+
                   marker.feature.properties = feature.properties
                   TESTER = document.getElementById('tester');
                   var height = feature.properties.heights[0];
-                  console.log(user_height)
-                  console.log(height)
                   Plotly.plot( TESTER, [{
                   x: feature.properties.data[user_height]['x'],
                   y: feature.properties.data[user_height]['y']}], {
@@ -529,7 +529,6 @@
                     layer.on('click', function (event) {
                       this.setStyle(GerBoundZoomLvlStyle);
                       region = event.sourceTarget;
-                      // console.log(region);
                       loadRegionPowerPlants(region, layer);
                     });
                     }
@@ -548,15 +547,6 @@
               // res PowerPlants in region boundaries
 
               function enablePowPlPopup(feature, layer) {
-                layer.on('mouseover', function () {
-                  this.setStyle(highlightStyleMouseOver);
-                });
-                layer.on('click', function () {
-                  this.setStyle(highlightStyle);
-                });
-                layer.on('mouseout', function () {
-                  this.setStyle(wdataStyle);
-                });
                   layer.bindPopup('Loading...');
 
                   layer.on('click', onPowerPlantDataPointClick);
@@ -567,7 +557,7 @@
               function createPowerPlantsPoints(powerplants){
                   var layer = new L.geoJSON(powerplants, {
                     onEachFeature: enablePowPlPopup,
-                    pointToLayer: createCircles
+                    pointToLayer: addPowerPlantMarker
                   });
                   if (regionPowerPlantgroup.getLayers().length === 0) {
                     regionPowerPlantgroup.addLayer(layer)
@@ -600,32 +590,10 @@
                   });
                 }
 
-              // add all power plants from url to map
-              function addPowerPlantToMap(){
-
-              }
-
-              $.ajax({
-                    url: ppr_location,
-                    dataType: 'json',
-                    async: true,
-                    success: function(powerplant){
-                        var layer = new L.geoJSON(powerplant, {
-                            onEachFeature: enablePowPlPopup,
-                            pointToLayer: createCircles
-                        });
-                        map.addLayer(layer)
-                        }
-                });
-
-
-
                 function onPowerPlantDataPointClick (event) {
                   var marker = event.sourceTarget;
-                  console.log(marker);
                   var leaflet_id = L.stamp(marker);
                   var pp_id = marker.feature.id;
-                  console.log(pp_id)
                   $.ajax({
                       type: 'POST',
                       url: ppr_content,
@@ -650,47 +618,47 @@
                     }
                     content = content + '</table>';
 
-                    console.log(marker);
-                    marker._popup.setContent(content);
+                    var popup = marker.getPopup();
+                    popup.setContent(content);
 
                     // is this working????
-                    addPowerPlantMarker(feature, marker);
+                    //addPowerPlantMarker(feature, marker);
 
                   }
                 }
 
               // add icon on to clicked circelmarker
-              function addPowerPlantMarker (feature, marker){
+              function addPowerPlantMarker(feature, latlng){
                 // ugly function body insert generic or something similar
                 if (feature.property.generation_subtype == "solar_roof_mounted") {
-                  return L.marker(marker._latlng, {icon: solarRoofIcon});
+                  return L.marker(latlng, {icon: solarRoofIcon}, myLayerStyle);
                 }
                 if (feature.properties.generation_subtype == "solar_ground_mounted") {
-                  return L.marker(marker._latlng, {icon: solarGroundIcon});
+                  return L.marker(latlng, {icon: solarGroundIcon}, myLayerStyle);
                 }
                 if (feature.property.generation_subtype == "solar") {
-                  return L.marker(marker._latlng, {icon: solarGroundIcon});
+                  return L.marker(latlng, {icon: solarGroundIcon}, myLayerStyle);
                 }
                 if (feature.properties.generation_subtype == "biomass") {
-                  return L.marker(marker._latlng, {icon: biomassIcon});
+                  return L.marker(latlng, {icon: biomassIcon}, myLayerStyle);
                 }
                 if (feature.properties.generation_subtype == "biogas") {
-                  return L.marker(marker._latlng, {icon: biomassIcon});
+                  return L.marker(latlng, {icon: biomassIcon}, myLayerStyle);
                 }
                 if (feature.properties.generation_subtype == "biogas_dry_fermentation") {
-                  return L.marker(marker._latlng, {icon: biomassIcon});
+                  return L.marker(latlng, {icon: biomassIcon}, myLayerStyle);
                 }
                 if (feature.properties.generation_subtype == "biofuel") {
-                  return L.marker(marker._latlng, {icon: biomassIcon});
+                  return L.marker(latlng, {icon: biomassIcon}, myLayerStyle);
                 }
                 if (feature.properties.generation_subtype == "wind_offshore") {
-                  return L.marker(marker._latlng, {icon: windOffIcon});
+                  return L.marker(latlng, {icon: windOffIcon}, myLayerStyle);
                 }
                 if (feature.properties.generation_subtype == "wind_onshore") {
-                  return L.marker(marker._latlng, {icon: windOnIcon});
+                  return L.marker(latlng, {icon: windOnIcon}, myLayerStyle);
                 }
                 if (feature.properties.generation_subtype == "hydro") {
-                  return L.marker(marker._latlng, {icon: hydroIcon});
+                  return L.marker(latlng, {icon: hydroIcon}, myLayerStyle);
                 }
                 if (feature.properties.generation_subtype == "geothermal") {
                   // insert icon not availabe -> add when available
