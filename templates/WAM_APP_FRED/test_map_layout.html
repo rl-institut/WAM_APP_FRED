@@ -650,8 +650,9 @@
                     }
                     content = content + '</table>';
 
+                    var popup = marker.getPopup();
                     console.log(marker);
-                    marker._popup.setContent(content);
+                    popup.setContent(content);
 
                     // is this working????
                     addPowerPlantMarker(feature, marker);

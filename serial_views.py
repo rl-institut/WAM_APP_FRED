@@ -179,21 +179,21 @@ def ppr_popup_view(request):
                     )
                 )
 
-            for record in oep_query:
-                region_property = dict(
-                    pp_id=record.powerplant_prop.id,
-                    # ToDo: How to convert from decimal
-                    electrical_capacity="",  # float(record.electrical_capacity),
-                    generation_type=record.powerplant_prop.generation_type,
-                    generation_subtype=record.powerplant_prop.generation_subtype,
-                    city=record.powerplant_prop.city,
-                    postcode=record.powerplant_prop.postcode,
-                    voltage_level=record.powerplant_prop.voltage_level_var,
-                    ego_subst_id=record.powerplant_prop.subst_id,
-                    scenario=record.powerplant_prop.scenario
-                )
-                feature_prop = Feature(id=record.powerplant_prop.id, property=region_property)
-                mypopup_content.append(feature_prop)
+            record = oep_query.first()
+            region_property = dict(
+                pp_id=record.powerplant_prop.id,
+                # ToDo: How to convert from decimal
+                electrical_capacity="",  # float(record.electrical_capacity),
+                generation_type=record.powerplant_prop.generation_type,
+                generation_subtype=record.powerplant_prop.generation_subtype,
+                city=record.powerplant_prop.city,
+                postcode=record.powerplant_prop.postcode,
+                voltage_level=record.powerplant_prop.voltage_level_var,
+                ego_subst_id=record.powerplant_prop.subst_id,
+                scenario=record.powerplant_prop.scenario
+            )
+            feature_prop = Feature(id=record.powerplant_prop.id, property=region_property)
+            mypopup_content = feature_prop
         else:
             region_property = dict(
                 pp_id=101,
@@ -207,7 +207,7 @@ def ppr_popup_view(request):
                 scenario='Test'
             )
             feature_prop = Feature(id=101, property=region_property)
-            mypopup_content.append(feature_prop)
+            mypopup_content = feature_prop
     elif request.method == 'GET':
         print(request.GET)
 
