@@ -105,6 +105,7 @@ def ppr_view(request):
                     'powerplant',
                     res_powerplant_tbl.id,
                     res_powerplant_tbl.generation_type,
+                    res_powerplant_tbl.generation_subtype,
                     res_powerplant_tbl.scenario
                 )
                 # create query
@@ -128,7 +129,10 @@ def ppr_view(request):
                     feature = Feature(
                         id=record.powerplant.id,
                         geometry=region_contains,
-                        property=''
+                        property=dict(
+                            generation_type=generation_type,
+                            generation_subtype=record.powerplant.generation_subtype
+                        )
                     )
                     myfeatures.append(feature)
             else:
