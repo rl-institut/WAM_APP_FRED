@@ -532,6 +532,8 @@
                 dataType: 'json',
                 async: true,
                 success: function(boundary){
+
+                  const active_panel = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
                   function onEachFeature(boundary, layer) {
                     layer.on('mouseover', function () {
                       if (this.clicked != true){
@@ -723,6 +725,8 @@
               function displayFeedinLib(data){
                 console.log('Feedinlib')
                 console.log(data)
+                var plot_div = document.getElementById('feedin-plot');
+                Plotly.plot(plot_div, [{x: data.timespan,y: data.values}], {margin: { t: 0 } });
               };
 
               function loadRegionFeedinlib(region, layer){
