@@ -186,8 +186,7 @@ def ppr_popup_view(request):
             record = oep_query.first()
             region_property = dict(
                 pp_id=record.powerplant_prop.id,
-                # ToDo: How to convert from decimal
-                electrical_capacity="",  # float(record.electrical_capacity),
+                electrical_capacity=record.powerplant_prop.electrical_capacity,
                 generation_type=record.powerplant_prop.generation_type,
                 generation_subtype=record.powerplant_prop.generation_subtype,
                 city=record.powerplant_prop.city,
