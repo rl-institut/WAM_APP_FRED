@@ -14,7 +14,8 @@ from sqlalchemy import (
     String as Str,
     Text,
     UniqueConstraint as UC,
-    Table)
+    Table,
+    Numeric)
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -154,6 +155,11 @@ def ppr_mapping(metadata):
         __table__ = Table('ego_dp_res_powerplant', metadata)
         # reflect the existing table with autoload from DB and add values as extend_existing
         Table('ego_dp_res_powerplant', metadata, extend_existing=True, autoload=True)
+
+        # Convert the type Decimal into float for python
+        for column in __table__.columns.values():
+            if isinstance(column.type, Numeric):
+                column.type.asdecimal = False
 
     # Add Table to dict
     classes["ResPowerPlant"] = ResPowerPlantRegister
