@@ -556,7 +556,6 @@
 
               function enablePowPlPopup(feature, layer) {
                   layer.bindPopup('Loading...');
-
                   layer.on('click', onPowerPlantDataPointClick);
               }
 
@@ -565,7 +564,7 @@
               function createPowerPlantsPoints(powerplants){
                   var layer = new L.geoJSON(powerplants, {
                     onEachFeature: enablePowPlPopup,
-                    pointToLayer: addPowerPlantMarker
+                    pointToLayer: createCircles // addPowerPlantMarker
                   });
                   var clusters = L.markerClusterGroup();
                   clusters.addLayer(layer);
@@ -640,35 +639,41 @@
               // add icon on to clicked circelmarker
               function addPowerPlantMarker(feature, latlng){
                 // ugly function body insert generic or something similar
-                if (feature.property.generation_subtype == "solar_roof_mounted") {
-                  return L.marker(latlng, {icon: solarRoofIcon}, myLayerStyle);
+                var marker = L.marker(latlng, myLayerStyle)
+
+                console.log(feature);
+                console.log(feature.property);
+                console.log(feature.property.generation_subtype);
+
+                if (feature.property.generation_subtype === "solar_roof_mounted") {
+                  marker.setIcon({icon: solarRoofIcon});
                 }
                 if (feature.properties.generation_subtype == "solar_ground_mounted") {
-                  return L.marker(latlng, {icon: solarGroundIcon}, myLayerStyle);
+                  marker.setIcon({icon: solarGroundIcon});
                 }
                 if (feature.property.generation_subtype == "solar") {
-                  return L.marker(latlng, {icon: solarGroundIcon}, myLayerStyle);
+                  marker.setIcon({icon: solarGroundIcon});
                 }
                 if (feature.properties.generation_subtype == "biomass") {
-                  return L.marker(latlng, {icon: biomassIcon}, myLayerStyle);
+                  marker.setIcon({icon: biomassIcon});
                 }
                 if (feature.properties.generation_subtype == "biogas") {
-                  return L.marker(latlng, {icon: biomassIcon}, myLayerStyle);
+                  marker.setIcon({icon: biomassIcon});
                 }
                 if (feature.properties.generation_subtype == "biogas_dry_fermentation") {
-                  return L.marker(latlng, {icon: biomassIcon}, myLayerStyle);
+                  marker.setIcon({icon: biomassIcon});
                 }
                 if (feature.properties.generation_subtype == "biofuel") {
-                  return L.marker(latlng, {icon: biomassIcon}, myLayerStyle);
+                  marker.setIcon({icon: biomassIcon});
                 }
                 if (feature.properties.generation_subtype == "wind_offshore") {
-                  return L.marker(latlng, {icon: windOffIcon}, myLayerStyle);
+                  marker.setIcon({icon: windOffIcon});
                 }
-                if (feature.properties.generation_subtype == "wind_onshore") {
-                  return L.marker(latlng, {icon: windOnIcon}, myLayerStyle);
+                if (feature.properties.generation_subtype === "wind_onshore") {
+                  marker.setIcon({icon: windOnIcon});
                 }
                 if (feature.properties.generation_subtype == "hydro") {
-                  return L.marker(latlng, {icon: hydroIcon}, myLayerStyle);
+                  marker.setIcon({icon: hydroIcon});
                 }
                 if (feature.properties.generation_subtype == "geothermal") {
                   // insert icon not availabe -> add when available
@@ -694,6 +699,7 @@
                 if (feature.properties.generation_subtype == "waste_wood") {
                   // insert icon not availabe -> add when available
                 }
+                return marker
               }
 
               //PowePlantRegister EndSection
