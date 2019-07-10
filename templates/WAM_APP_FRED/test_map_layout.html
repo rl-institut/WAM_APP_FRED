@@ -77,7 +77,7 @@
                         </a>
                       </li>
                       <li class="tabs-title">
-                        <a href="#panel-scenario">
+                        <a href="#panel-powerplants">
                           <img src="{% static 'WAM_APP_FRED/img/tab_icons/powerplants.svg' %}">
                           <h2 class="tabs-title__head">Power Plant Register</h2>
                         </a>
@@ -145,7 +145,7 @@
 
                               <a href="#" class="accordion-title accordion-title--100">Time Span</a>
                               <div class="accordion-content" data-tab-content >
-                                <div class="tabs-panel is-active" id="panel-energy-system">
+                                <div class="tabs-panel is-active" id="options-energy-system">
 
                                   <form id="wd_timespan">
 
@@ -179,6 +179,7 @@
 
                         <!-- Third panel content -->
                         <div class="tabs-panel" id="panel-feedinlib">
+                          test
                             <div id="feedin-plot" style="width:300px;height:250px;">
                             </div>
                         </div>
@@ -355,8 +356,6 @@
                 radius: 5
               };
               function createWDataPoint (feature, latlng) {
-                active = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
-                console.log(active.attr('id'));
                 return L.circleMarker(latlng, wdataStyle)
               };
 
@@ -486,7 +485,7 @@
               // return current location of the mouse-courser
               // access the original DOM even translate to L.LatLag instance
               // Rest-full return the value to the server with POST with jQuery
-              //map.on('click', onMapClick);
+              map.on('click', onMapClick);
 
 
             function addWeatherPoint(data) {
@@ -496,15 +495,24 @@
                 wdl.addData(data)
             }
 
+            function get_active_panel(){
+              var active_panel = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
+              active_panel = active_panel.attr('id');
+              return active_panel;
+            }
+
 	          function onMapClick(ev) {
-                  var latlng = map.mouseEventToLatLng(ev.originalEvent);
-                  $.ajax({
-                      type: 'POST',
-                      url: mouse_click_location,
-                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                      data: {'lat': latlng.lat, 'lon': latlng.lng},
-                      success: addWeatherPoint,
-                  });
+                  var active_panel = get_active_panel();
+                  if(active_panel == 'panel-energy-system'){
+                    var latlng = map.mouseEventToLatLng(ev.originalEvent);
+                    $.ajax({
+                        type: 'POST',
+                        url: mouse_click_location,
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        data: {'lat': latlng.lat, 'lon': latlng.lng},
+                        success: addWeatherPoint,
+                    });
+                  }
 	          };
 
 
@@ -532,8 +540,6 @@
                 dataType: 'json',
                 async: true,
                 success: function(boundary){
-
-                  const active_panel = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
                   function onEachFeature(boundary, layer) {
                     layer.on('mouseover', function () {
                       if (this.clicked != true){
@@ -547,12 +553,20 @@
                     });
                     // select region and request data
                     layer.on('click', function (event) {
-                      console.log(event)
+                      var active_panel = get_active_panel();
                       this.clicked = true;
                       this.setStyle(GerBoundZoomLvlStyle);
                       region = event.sourceTarget;
-                      //loadRegionPowerPlants(region, layer);
-                      loadRegionFeedinlib(region, layer);
+                      if(active_panel == 'panel-feedinlib')
+                      {
+                        loadRegionFeedinlib(region, layer);
+                      }
+
+                      if(active_panel == 'panel-powerplants')
+                      {
+                        loadRegionPowerPlants(region, layer);
+                      }
+
                     });
                     }
                   var layer = new L.geoJSON(boundary, {
