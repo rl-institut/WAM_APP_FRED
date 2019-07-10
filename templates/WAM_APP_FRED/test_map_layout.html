@@ -77,7 +77,7 @@
                         </a>
                       </li>
                       <li class="tabs-title">
-                        <a href="#panel-scenario">
+                        <a href="#panel-powerplants">
                           <img src="{% static 'WAM_APP_FRED/img/tab_icons/powerplants.svg' %}">
                           <h2 class="tabs-title__head">Power Plant Register</h2>
                         </a>
@@ -95,7 +95,7 @@
                       <div class="tabs-content" data-tabs-content="offcanvas-tabs" id="fred-tabs">
 
                         <!-- First panel content -->
-                        <div class="tabs-panel" id="panel-scenario">
+                        <div class="tabs-panel" id="panel-powerplants">
                           <h4>Power Plant Register</h4>
                           <p>Select a type of powerplant in this menu. When you click on the map, it will load all powerplants of that type within the selected state. Loading may take a while. Click on another state to load new data.</p>
                           <form>
@@ -145,7 +145,7 @@
 
                               <a href="#" class="accordion-title accordion-title--100">Time Span</a>
                               <div class="accordion-content" data-tab-content >
-                                <div class="tabs-panel is-active" id="panel-energy-system">
+                                <div class="tabs-panel is-active" id="options-energy-system">
 
                                   <form id="wd_timespan">
 
@@ -179,9 +179,10 @@
 
                         <!-- Third panel content -->
                         <div class="tabs-panel" id="panel-feedinlib">
-
+                          test
+                            <div id="feedin-plot" style="width:300px;height:250px;">
+                            </div>
                         </div>
-
                       </div>
 
                   </div>
@@ -340,6 +341,9 @@
             var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
             var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
 
+            var feedin_content = "{% url 'WAM_APP_FRED:Feedinlib'|add:'.data' %}";
+
+
             function map_init_basic (map, options) {
               var popup = L.popup();
 
@@ -352,8 +356,6 @@
                 radius: 5
               };
               function createWDataPoint (feature, latlng) {
-                active = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
-                console.log(active.attr('id'));
                 return L.circleMarker(latlng, wdataStyle)
               };
 
@@ -493,15 +495,24 @@
                 wdl.addData(data)
             }
 
+            function get_active_panel(){
+              var active_panel = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
+              active_panel = active_panel.attr('id');
+              return active_panel;
+            }
+
 	          function onMapClick(ev) {
-                  var latlng = map.mouseEventToLatLng(ev.originalEvent);
-                  $.ajax({
-                      type: 'POST',
-                      url: mouse_click_location,
-                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                      data: {'lat': latlng.lat, 'lon': latlng.lng},
-                      success: addWeatherPoint,
-                  });
+                  var active_panel = get_active_panel();
+                  if(active_panel == 'panel-energy-system'){
+                    var latlng = map.mouseEventToLatLng(ev.originalEvent);
+                    $.ajax({
+                        type: 'POST',
+                        url: mouse_click_location,
+                        headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        data: {'lat': latlng.lat, 'lon': latlng.lng},
+                        success: addWeatherPoint,
+                    });
+                  }
 	          };
 
 
@@ -542,11 +553,20 @@
                     });
                     // select region and request data
                     layer.on('click', function (event) {
-                      console.log(event)
+                      var active_panel = get_active_panel();
                       this.clicked = true;
                       this.setStyle(GerBoundZoomLvlStyle);
                       region = event.sourceTarget;
-                      loadRegionPowerPlants(region, layer);
+                      if(active_panel == 'panel-feedinlib')
+                      {
+                        loadRegionFeedinlib(region, layer);
+                      }
+
+                      if(active_panel == 'panel-powerplants')
+                      {
+                        loadRegionPowerPlants(region, layer);
+                      }
+
                     });
                     }
                   var layer = new L.geoJSON(boundary, {
@@ -713,6 +733,32 @@
 
               //PowePlantRegister EndSection
               ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+              ///// Feedinlib
+              //
+              function displayFeedinLib(data){
+                console.log('Feedinlib')
+                console.log(data)
+                var plot_div = document.getElementById('feedin-plot');
+                Plotly.plot(plot_div, [{x: data.timespan,y: data.values}], {margin: { t: 0 } });
+              };
+
+              function loadRegionFeedinlib(region, layer){
+                region_name = region.feature.properties.name;
+                $.ajax({
+                    url: feedin_content,
+                    type: 'POST',
+                    async: true,
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                      data: {
+                      'region_name': region_name,
+                      },
+                    success: displayFeedinLib
+                  });
+                };
+
+
+
             };
 
 

@@ -18,7 +18,7 @@ from .app_settings import LOCAL_TESTING, fred_config
 
 if not LOCAL_TESTING:
     import WAM_APP_FRED.oep_models as oep_models
-    from WAM_APP_FRED.oep_models import open_fred_classes
+    from WAM_APP_FRED.oep_models import open_fred_classes, open_fred_ts_classes
 
 HOUR = '1:00:00'
 HALF_HOUR = '0:30:00'
@@ -148,6 +148,37 @@ def ppr_view(request):
         print(request.GET)
 
     return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
+
+
+def district_feedin_series(request):
+    """
+    This function will return a json/geojson with pre calculated data for a single or multiple
+    district.
+    The data will include a feedin time series for each district.
+    :return:
+    """
+    myfeature = []
+    if request.method == 'POST':
+        openfred_ts_tbl = open_fred_ts_classes['OpenFredTimesSeries']
+        oep_query = Serializer.session.query(openfred_ts_tbl)
+
+        timespan = []
+        values = []
+        nut = ''
+        for record in oep_query:
+            timespan.append(record.time)
+            values.append(record.feedin)
+            nut = record.nut
+
+        myfeature = dict(
+            timespan=timespan,
+            values=values,
+            nut=nut,
+        )
+    elif request.method == 'GET':
+        print(request.GET)
+
+    return HttpResponse(dumps(myfeature), content_type="application/json")
 
 
 def ppr_popup_view(request):
