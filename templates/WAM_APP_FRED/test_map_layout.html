@@ -87,16 +87,16 @@
                         </a>
                       </li>
                     </ul>
-            
+
                   </div>
                   <div class="cell small-9 medium-cell-block-y tabs-content__wrapper">
                       <div class="tabs-content" data-tabs-content="offcanvas-tabs">
-    
+
                         <!-- First panel content -->
                         <div class="tabs-panel" id="panel-scenario">
                           <form>
                             <fieldset>
-                              <legend>Szenario auswählen 
+                              <legend>Szenario auswählen
                                 <i class ="icon ion-information-circled icon--small" title="Informationen zum Inhalt"></i>
                               </legend>
                               <div>
@@ -130,7 +130,7 @@
                             </fieldset>
                           </form>
                         </div>
-          
+
                         <!-- Second panel content -->
                         <div class="tabs-panel is-active" id="panel-energy-system">
 
@@ -141,27 +141,23 @@
                               <a href="#" class="accordion-title accordion-title--100">Time Span</a>
                               <div class="accordion-content" data-tab-content >
                                 <div class="tabs-panel is-active" id="panel-energy-system">
-                                  <form id="TimeSpan">
+                                  <form id="wd_timespan">
 
-                                    <label for="Start">Start</label>
-                                    <input id="Start">
-                                    <label for="Stop">Stop</label>
-                                    <input id="Stop">
+                                  <div>Start date
+                                  {{start_date}}
+                                    </div>
+                                  <div>End date
+                                  {{end_date}}
+                                  </div>
                                   </form>
                               </div>
                             </li>
                             <li class="accordion-item" data-accordion-item>
                               <a href="#" class="accordion-title accordion-title--100">Variable</a>
                               <div class="accordion-content" data-tab-content>
-                                <form id="Variable">
-
-                                  <label>Variable</label>
-                                  <select name="variable">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                  </select>
+                                <form>
+                                  {{variable}}
+                                  {{height}}
                                 </form>
                               </div>
                             </li>
@@ -174,50 +170,50 @@
                             </li>
                           </ul>
                         </div>
-          
+
                         <!-- Third panel content -->
                         <div class="tabs-panel" id="panel3v">
 
                         </div>
-          
+
                         <!-- Fourth panel content -->
                         <div class="tabs-panel" id="panel4v">
                           <p>This will show some graphs soon</p>
                           <img class="thumbnail" src="{% static 'stemp_abw/img/generic/rectangle-2.jpg' %}">
                         </div>
                       </div>
-    
+
                   </div>
                 </div>
               </div>
             </div>
-    
+
             <button class="close-button" aria-label="Close menu" type="button" data-close>
               <span aria-hidden="true">&times;</span>
             </button>
-    
+
           </div>
           <!-- OFF CANVAS END -->
-      
+
           <!-- CONTENT (MAP + FOOTER) START -->
           <main class="off-canvas-content" data-off-canvas-content>
             <div class="map-wrapper">
-              
+
               <button type="button" class="button open-offcanvas" data-toggle="offCanvas" title="Parameter">
                 <i class="icon ion-android-options"></i>
               </button>
 
               {% leaflet_map "map" callback="window.map_init_basic" settings_overrides=leaflet_config%}
-      
+
             </div>
           </main>
           <!-- CONTENT (MAP + FOOTER) END -->
-      
+
         </div>
-      
+
         <footer class="map-footer">
           <div class="grid-x">
-    
+
             <div class="cell medium-4 large-6">
               <ul class="map-footer__legal">
                 <li>
@@ -228,7 +224,7 @@
                 </li>
               </ul>
             </div>
-    
+
             <div class="cell medium-8 large-6">
               <ul class="map-footer__logo">
                 <li>
@@ -253,10 +249,10 @@
                 </li>
               </ul>
             </div>
-    
+
           </div>
         </footer>
-      
+
       </div>
 
     <script src="{% static 'WAM_APP_FRED/foundation/js/app.js' %}"></script>
@@ -269,7 +265,7 @@
                 iconAnchor:   [19, 72], // point of the icon which will correspond to marker's location
                 popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
             });
-            
+
             var solarRoofIcon = L.icon({
                 iconUrl: "{% static 'WAM_APP_FRED/img/Pin_solarenergy_roof_color_v2.svg' %}",
                 iconSize:     [36, 44], // size of the icon
@@ -303,7 +299,7 @@
                 iconAnchor:   [18, 44], // point of the icon which will correspond to marker's location
                 popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
             });
-      
+
             var highlightStyle = {
                   opacity: 0.7,
                   weight: 2,
@@ -327,7 +323,7 @@
               };
 
             // define a var which holds a GEOJSON from a URL provided by django
-          
+
             var mouse_click_location = "{% url 'WAM_APP_FRED:MouseClick'|add:'.data' %}";
             var weather_data_click_location = "{% url 'WAM_APP_FRED:WeatherPointClick'|add:'.data' %}";
 
@@ -335,7 +331,6 @@
 
             var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
             var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
-
 
             function map_init_basic (map, options) {
               var popup = L.popup();
@@ -356,16 +351,20 @@
                   var marker = wdl.getLayer(feature.properties.leaflet_id);
 
                   var popup = marker.getPopup();
+                  const user_height = $('#id_wd-height').val();
                   const variable = feature.properties.variable
-                  var popupContent = '<h4>' + variable +
+                  var popupContent = '<h4> Variable_id :' + variable +
+                  ' Height '+ user_height + ' m' +
                   '</h4></br><div id="tester" style="width:300px;height:250px;"></div>';
                   popup.setContent(popupContent)
                   marker.feature.properties = feature.properties
                   TESTER = document.getElementById('tester');
                   var height = feature.properties.heights[0];
+                  console.log(user_height)
+                  console.log(height)
                   Plotly.plot( TESTER, [{
-                  x: feature.properties.data[height]['x'],
-                  y: feature.properties.data[height]['y']}], {
+                  x: feature.properties.data[user_height]['x'],
+                  y: feature.properties.data[user_height]['y']}], {
                   margin: { t: 0 } } );
                   }
 
@@ -377,11 +376,13 @@
                   var latlng = marker.getLatLng();
                   var location_id = marker.feature.properties.id;
                   // this need to be linked to user choice
-                  var variable_id = 12;
 
-                  var start_time = '2002-01-31T23:00:00';
-                  var end_time = '2002-03-31T23:00:00';
+                  const start_year = $('#id_wd_timespan_start-year').val();
+                  const start_month = $('#id_wd_timespan_stop-month').val();
+                  const stop_year = $('#id_wd_timespan_stop-year').val();
+                  const stop_month = $('#id_wd_timespan_stop-month').val();
 
+                  const variable_id = $('select[id=id_wd-variable] option:selected').val();
                   if (marker.feature.properties.variable){
                     // do not fetch the data a second time
                     console.log('not fetching data a second time')
@@ -399,8 +400,10 @@
                         'leaflet_id': leaflet_id,
                         'location_id': location_id,
                         'variable_id': variable_id,
-                        'start_time': start_time,
-                        'end_time': end_time
+                        'start_month': start_month,
+                        'start_year': start_year,
+                        'end_month': stop_month,
+                        'end_year': stop_year
                         },
                         success: displayWeatherDataPoint,
                     });
@@ -524,7 +527,6 @@
                     });
                     // select region and request data
                     layer.on('click', function (event) {
-                      console.log(event)
                       this.setStyle(GerBoundZoomLvlStyle);
                       region = event.sourceTarget;
                       // console.log(region);
@@ -559,7 +561,7 @@
 
                   layer.on('click', onPowerPlantDataPointClick);
               }
-              
+
               var regionPowerPlantgroup = L.layerGroup().addTo(map);
 
               function createPowerPlantsPoints(powerplants){
@@ -580,7 +582,7 @@
 
 
               // request all power plants contained in selected region
-              // also include the generation_type option 
+              // also include the generation_type option
               function loadRegionPowerPlants(region, layer){
                 region_name = region.feature.properties.name;
                 generation_type = $("input[name=generation_type]:checked").val();
@@ -597,7 +599,7 @@
                     success: createPowerPlantsPoints
                   });
                 }
-              
+
               // add all power plants from url to map
               function addPowerPlantToMap(){
 
@@ -642,12 +644,12 @@
                   if (feature.property) {
                     var keys = Object.keys(feature.property);
                     var content = '<table class="selection_detail">';
-                    
+
                     for (let i = 0, len = keys.length; i < len; i++) {
                       content = content + '<tr><td align="right"><b>' + keys[i] + '</b>:</td><td>' + feature.property[keys[i]] + '</td></tr>'
                     }
                     content = content + '</table>';
-                    
+
                     console.log(marker);
                     marker._popup.setContent(content);
 
@@ -657,7 +659,7 @@
                   }
                 }
 
-              // add icon on to clicked circelmarker 
+              // add icon on to clicked circelmarker
               function addPowerPlantMarker (feature, marker){
                 // ugly function body insert generic or something similar
                 if (feature.property.generation_subtype == "solar_roof_mounted") {
@@ -677,10 +679,10 @@
                 }
                 if (feature.properties.generation_subtype == "biogas_dry_fermentation") {
                   return L.marker(marker._latlng, {icon: biomassIcon});
-                }              
+                }
                 if (feature.properties.generation_subtype == "biofuel") {
                   return L.marker(marker._latlng, {icon: biomassIcon});
-                }   
+                }
                 if (feature.properties.generation_subtype == "wind_offshore") {
                   return L.marker(marker._latlng, {icon: windOffIcon});
                 }
@@ -694,7 +696,7 @@
                   // insert icon not availabe -> add when available
                 }
                 if (feature.properties.generation_subtype == "gas") {
-                  // insert icon not availabe -> add when available  
+                  // insert icon not availabe -> add when available
                 }
                 if (feature.properties.generation_subtype == "biogas_from_grid") {
                   // insert icon not availabe -> add when available
@@ -713,7 +715,7 @@
                 }
                 if (feature.properties.generation_subtype == "waste_wood") {
                   // insert icon not availabe -> add when available
-                } 
+                }
               }
 
               //PowePlantRegister EndSection
