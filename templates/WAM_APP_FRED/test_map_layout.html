@@ -143,33 +143,21 @@
                                 <div class="tabs-panel is-active" id="panel-energy-system">
                                   <form id="wd_timespan">
 
-                                  <div id="wd_timespan_start">Start date
+                                  <div>Start date
                                   {{start_date}}
                                     </div>
-                                  <div id="wd_timespan_end">End date
+                                  <div>End date
                                   {{end_date}}
                                   </div>
-                                  <!--
-                                    <label for="Start">Start</label>
-                                    <input id="Start">
-                                    <label for="Stop">Stop</label>
-                                    <input id="Stop">
-                                  -->
                                   </form>
                               </div>
                             </li>
                             <li class="accordion-item" data-accordion-item>
                               <a href="#" class="accordion-title accordion-title--100">Variable</a>
                               <div class="accordion-content" data-tab-content>
-                                <form id="Variable">
-
-                                  <label>Variable</label>
-                                  <select name="variable">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                  </select>
+                                <form>
+                                  {{variable}}
+                                  {{height}}
                                 </form>
                               </div>
                             </li>
@@ -364,16 +352,18 @@
                   var marker = wdl.getLayer(feature.properties.leaflet_id);
 
                   var popup = marker.getPopup();
+                  const user_height = $('#id_wd-height').val();
                   const variable = feature.properties.variable
-                  var popupContent = '<h4>' + variable +
+                  var popupContent = '<h4> Variable_id :' + variable +
+                  ' Height '+ user_height + ' m' +
                   '</h4></br><div id="tester" style="width:300px;height:250px;"></div>';
                   popup.setContent(popupContent)
                   marker.feature.properties = feature.properties
                   TESTER = document.getElementById('tester');
                   var height = feature.properties.heights[0];
                   Plotly.plot( TESTER, [{
-                  x: feature.properties.data[height]['x'],
-                  y: feature.properties.data[height]['y']}], {
+                  x: feature.properties.data[user_height]['x'],
+                  y: feature.properties.data[user_height]['y']}], {
                   margin: { t: 0 } } );
                   }
 
@@ -385,13 +375,13 @@
                   var latlng = marker.getLatLng();
                   var location_id = marker.feature.properties.id;
                   // this need to be linked to user choice
-                  var variable_id = 12;
 
                   const start_year = $('#id_wd_timespan_start-year').val();
                   const start_month = $('#id_wd_timespan_stop-month').val();
                   const stop_year = $('#id_wd_timespan_stop-year').val();
                   const stop_month = $('#id_wd_timespan_stop-month').val();
 
+                  const variable_id = $('select[id=id_wd-variable] option:selected').val();
                   if (marker.feature.properties.variable){
                     // do not fetch the data a second time
                     console.log('not fetching data a second time')

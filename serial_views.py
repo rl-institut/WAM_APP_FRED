@@ -375,9 +375,9 @@ def wseries_fetch_data_single_point(request):
                 geometry=Point((lon, lat)),
                 properties=dict(
                     id=101,
-                    heights=["18.4"],
+                    heights=["10.0"],
                     data={
-                        18.4: {
+                        10.0: {
                             'x': ['2003-06-30T23:00:00',
                                   '2003-07-01T00:00:00',
                                   '2003-07-01T00:00:00',
@@ -387,7 +387,7 @@ def wseries_fetch_data_single_point(request):
                             'y': [1, 3, 9, 16, 25, 36]
                         }
                     },
-                    variable='test_var',
+                    variable=variable_id,
                     leaflet_id=leaflet_id,
                 )
             )
