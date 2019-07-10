@@ -83,7 +83,7 @@
                         </a>
                       </li>
                       <li class="tabs-title">
-                        <a href="#panel4v">
+                        <a href="#panel-feedinlib">
                           <img src="{% static 'WAM_APP_FRED/img/tab_icons/feedin.svg' %}">
                           <h2 class="tabs-title__head">Feedin-Time Series</h2>
                         </a>
@@ -92,7 +92,7 @@
 
                   </div>
                   <div class="cell small-9 medium-cell-block-y tabs-content__wrapper">
-                      <div class="tabs-content" data-tabs-content="offcanvas-tabs">
+                      <div class="tabs-content" data-tabs-content="offcanvas-tabs" id="fred-tabs">
 
                         <!-- First panel content -->
                         <div class="tabs-panel" id="panel-scenario">
@@ -178,16 +178,10 @@
                         </div>
 
                         <!-- Third panel content -->
-                        <div class="tabs-panel" id="panel3v">
+                        <div class="tabs-panel" id="panel-feedinlib">
 
                         </div>
 
-                        <!-- Fourth panel content -->
-                        <div class="tabs-panel" id="panel4v">
-                          <h4>Feedin-Time-Series</h4>
-                          <p>Click on the map to display the feedin to the electrical grid within a region.</p>
-                          <img class="thumbnail" src="{% static 'stemp_abw/img/generic/rectangle-2.jpg' %}">
-                        </div>
                       </div>
 
                   </div>
@@ -358,6 +352,8 @@
                 radius: 5
               };
               function createWDataPoint (feature, latlng) {
+                active = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
+                console.log(active.attr('id'));
                 return L.circleMarker(latlng, wdataStyle)
               };
 
