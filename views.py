@@ -17,8 +17,8 @@ def privacy(request):
 
 
 def webgui_test(request):
-    start_date = SelectDateTime()
-    end_date = SelectDateTime()
+    start_date = SelectDateTime(prefix='wd_timespan_start')
+    end_date = SelectDateTime(prefix='wd_timespan_stop')
     return render(
         request,
         'WAM_APP_FRED/test_map_layout.html',

@@ -288,8 +288,13 @@ def wseries_fetch_data_single_point(request):
         leaflet_id = int(request.POST.get('leaflet_id'))
         location_id = int(request.POST.get('location_id'))
         variable_id = int(request.POST.get('variable_id'))
-        start_time = str(request.POST.get('start_time'))
-        end_time = str(request.POST.get('end_time'))
+        start_year = str(request.POST.get('start_year'))
+        start_month = int(request.POST.get('start_month'))
+        end_year = int(request.POST.get('end_year'))
+        end_month = int(request.POST.get('end_month'))
+
+        start_time = '{}-{:02d}-01T00:00:00'.format(start_year, start_month)
+        end_time = '{}-{:02d}-01T00:00:00'.format(end_year, end_month)
 
         if not LOCAL_TESTING:
 
