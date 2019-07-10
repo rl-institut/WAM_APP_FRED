@@ -334,6 +334,9 @@
             var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
             var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
 
+            var feedin_content = "{% url 'WAM_APP_FRED:Feedinlib'|add:'.data' %}";
+
+
             function map_init_basic (map, options) {
               var popup = L.popup();
 
@@ -537,7 +540,8 @@
                       this.clicked = true;
                       this.setStyle(GerBoundZoomLvlStyle);
                       region = event.sourceTarget;
-                      loadRegionPowerPlants(region, layer);
+                      //loadRegionPowerPlants(region, layer);
+                      loadRegionFeedinlib(region, layer);
                     });
                     }
                   var layer = new L.geoJSON(boundary, {
@@ -698,6 +702,29 @@
 
               //PowePlantRegister EndSection
               ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+              ///// Feedinlib
+              //
+              function displayFeedinLib(data){
+                console.log('Feedinlib')
+              };
+
+              function loadRegionFeedinlib(region, layer){
+                region_name = region.feature.properties.name;
+                $.ajax({
+                    url: feedin_content,
+                    type: 'POST',
+                    async: true,
+                    headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                      data: {
+                      'region_name': region_name,
+                      },
+                    success: displayFeedinLib
+                  });
+                };
+
+
+
             };
 
 

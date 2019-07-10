@@ -151,7 +151,7 @@ def ppr_view(request):
 
 
 
-def district_feedin_series(self):
+def district_feedin_series(request):
     """
     This function will return a json/geojson with pre calculated data for a single or multiple
     district.
@@ -159,7 +159,14 @@ def district_feedin_series(self):
     :return:
     """
     myfeature = []
-    openfred_ts_tbl = oep_models.ts_mapping('OpenFredTimesSeries')
+    if request.method == 'POST':
+        # openfred_ts_tbl = oep_models.ts_mapping('OpenFredTimesSeries')
+
+        print('in there')
+
+
+    elif request.method == 'GET':
+        print(request.GET)
 
     #insert ajax postrequest data and query
     return HttpResponse(dumps(myfeature), content_type="application/json")
