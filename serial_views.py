@@ -18,7 +18,7 @@ from .app_settings import LOCAL_TESTING, fred_config
 
 if not LOCAL_TESTING:
     import WAM_APP_FRED.oep_models as oep_models
-    from WAM_APP_FRED.oep_models import open_fred_classes
+    from WAM_APP_FRED.oep_models import open_fred_classes, open_fred_ts_classes
 
 HOUR = '1:00:00'
 HALF_HOUR = '0:30:00'
@@ -160,9 +160,31 @@ def district_feedin_series(request):
     """
     myfeature = []
     if request.method == 'POST':
+        openfred_ts_tbl = open_fred_ts_classes['OpenFredTimesSeries']
+        oep_query = Serializer.session.query(openfred_ts_tbl)
+
+        timespan = []
+        values = []
+        for record in oep_query:
+            timespan.append(record.time)
+            values.append(record.feedin)
+            # props = dict(
+            #    id=record.id,
+            #    time=record.time,
+            #    feedin=record.feedin,
+            #    nut=record.nut,
+            #    technology=record.technology
+            # )
         # openfred_ts_tbl = oep_models.ts_mapping('OpenFredTimesSeries')
 
         print('in there')
+
+        myfeature = dict(
+            timespan=timespan,
+            values=values,
+            nut=record.nut,
+            technology=record.technology
+        )
 
 
     elif request.method == 'GET':
