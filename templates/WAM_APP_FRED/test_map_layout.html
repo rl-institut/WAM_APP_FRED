@@ -83,7 +83,7 @@
                         </a>
                       </li>
                       <li class="tabs-title">
-                        <a href="#panel-feedin">
+                        <a href="#panel-feedinlib">
                           <img src="{% static 'WAM_APP_FRED/img/tab_icons/feedin.svg' %}">
                           <h2 class="tabs-title__head">Feedin-Time Series</h2>
                         </a>
@@ -91,12 +91,10 @@
                     </ul>
 
                   </div>
-                  <div class="cell small-9 medium-cell-block-y tabs-content__wrapper"
-                       id="wd_options">
-                      <div class="tabs-content" data-tabs-content="offcanvas-tabs" id='fred-tabs'>
+                  <div class="cell small-9 medium-cell-block-y tabs-content__wrapper">
+                      <div class="tabs-content" data-tabs-content="offcanvas-tabs" id="fred-tabs">
 
-                        <!-- Second panel content -->
-
+                        <!-- First panel content -->
                         <div class="tabs-panel" id="panel-scenario">
                           <h4>Power Plant Register</h4>
                           <p>Select a type of powerplant in this menu. When you click on the map, it will load all powerplants of that type within the selected state. Loading may take a while. Click on another state to load new data.</p>
@@ -142,14 +140,13 @@
                           <h4>Weather Data</h4>
                           <p>Click on the map to load the closest weather data points. You can then click on one of the loaded points to to display the weather data over the selected time period for a given height and variable. The download can take some time, depending on how many data you required. </p>
 
-                        <!-- First panel content -->
-                        <div class="tabs-panel is-active" id="panel-energy-system">
                           <ul class="accordion" data-accordion>
                             <li class="accordion-item accordion-item--no-border is-active" data-accordion-item>
 
                               <a href="#" class="accordion-title accordion-title--100">Time Span</a>
                               <div class="accordion-content" data-tab-content >
-                                <div class="tabs-panel is-active" id="options-energy-system">
+                                <div class="tabs-panel is-active" id="panel-energy-system">
+
                                   <form id="wd_timespan">
 
                                   <div>Start date
@@ -181,10 +178,11 @@
                         </div>
 
                         <!-- Third panel content -->
-                        <div class="tabs-panel" id="panel-feedin">
-                          Something
+                        <div class="tabs-panel" id="panel-feedinlib">
+
                         </div>
-                    </div>
+
+                      </div>
 
                   </div>
                 </div>
@@ -356,7 +354,6 @@
               function createWDataPoint (feature, latlng) {
                 active = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
                 console.log(active.attr('id'));
-
                 return L.circleMarker(latlng, wdataStyle)
               };
 
@@ -649,7 +646,6 @@
                 }
 
               // add icon on to clicked circelmarker
-
               function addPowerPlantMarker(feature, latlng){
                 // ugly function body insert generic or something similar
                 var marker = L.marker(latlng, myLayerStyle)
@@ -712,9 +708,7 @@
                 if (feature.properties.generation_subtype == "waste_wood") {
                   // insert icon not availabe -> add when available
                 }
-
                 return marker
-
               }
 
               //PowePlantRegister EndSection
