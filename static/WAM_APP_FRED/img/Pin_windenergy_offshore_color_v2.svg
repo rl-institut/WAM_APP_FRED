@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg1574"
+   version="1.1"
+   viewBox="0 0 152.40823 182.45716"
+   height="182.45715mm"
+   width="152.40822mm"
+   sodipodi:docname="Pin_windenergy_offshore_color_v2.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1031"
+     id="namedview20"
+     showgrid="false"
+     inkscape:zoom="0.68677408"
+     inkscape:cx="105.76164"
+     inkscape:cy="366.68435"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:measure-start="0,0"
+     inkscape:measure-end="0,0"
+     showguides="false" />
+  <defs
+     id="defs1568" />
+  <metadata
+     id="metadata1571">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(214.90345,-54.276474)"
+     id="layer1">
+    <path
+       inkscape:connector-curvature="0"
+       id="path4560"
+       d="m -66.463966,130.48072 c 0,19.94726 -5.80083,33.94849 -17.73066,47.30323 -11.92983,13.35476 -48.866184,32.61238 -54.504714,54.98211 -6.0923,-22.34485 -42.25814,-41.60247 -54.26716,-54.96345 -12.00901,-13.36097 -17.9682,-27.37463 -17.9682,-47.32189 0,-39.894629 32.34087,-72.235496 72.23536,-72.235496 39.894494,0 72.235374,32.340857 72.235374,72.235496 z"
+       style="opacity:1;fill:#008080;fill-opacity:1;stroke:#ffffff;stroke-width:7.93750048;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill"
+       sodipodi:nodetypes="sscssss" />
+    <g
+       id="g835"
+       transform="translate(-120.29945)">
+      <g
+         style="fill:#ffffff;fill-opacity:1"
+         transform="matrix(0.24425149,0,0,0.24425149,-59.606053,100.85849)"
+         id="ic_x5F_12_Windenergieanlage_Offshore">
+        <path
+           style="fill:#ffffff;fill-opacity:1;stroke-width:1.51075935"
+           inkscape:connector-curvature="0"
+           d="m 178.63245,42.603454 6.95568,255.935086 h -32.56321 l 6.515,-256.932051 c 0.26911,-5.386659 4.76277,-9.53164 10.03718,-9.255206 5.26998,0.276432 9.3244,4.865512 9.05535,10.252171 z"
+           id="shape1-5" />
+        <g
+           style="fill:#ffffff;fill-opacity:1"
+           transform="translate(71.6701)"
+           id="group1-6">
+          <path
+             style="fill:#ffffff;fill-opacity:1;stroke-width:1.51075935"
+             inkscape:connector-curvature="0"
+             d="m 101.18282,46.598702 c 2.62268,-1.830436 3.36749,-5.312525 1.53796,-7.941503 -1.82681,-2.632005 -5.03189,-2.765348 -7.963518,-1.30615 0,0 -15.260785,7.533877 -22.068719,10.981113 -6.54038,3.315376 -25.789568,-6.756568 -40.456322,2.936583 -14.686394,9.703804 -79.922294,85.279085 -79.922294,85.279085 -2.024407,2.20314 -2.432613,4.84878 -0.60022,7.47327 1.832395,2.62751 5.208414,3.42293 7.830004,1.58796 z"
+             id="shape2-9" />
+          <path
+             style="fill:#ffffff;fill-opacity:1;stroke-width:1.51075935"
+             inkscape:connector-curvature="0"
+             d="m 100.45475,36.93952 c -2.883814,-1.356305 -6.249499,-0.263725 -7.601809,2.622186 -1.355317,2.885912 0.12499,5.717575 2.841631,7.524487 0,0 14.084728,9.429314 20.439728,13.588585 6.11102,3.998073 7.02957,25.625202 22.67756,33.467698 15.66598,7.849904 113.19848,26.580454 113.19848,26.580454 2.90973,0.65567 5.38586,-0.30594 6.73497,-3.19481 1.34759,-2.88887 0.34747,-6.19985 -2.53959,-7.55017 z"
+             id="shape3-8" />
+          <path
+             style="fill:#ffffff;fill-opacity:1;stroke-width:1.51075935"
+             inkscape:connector-curvature="0"
+             d="m 92.476686,42.211088 c 0.269716,3.184681 2.899176,5.562615 6.074188,5.290679 3.176526,-0.268915 4.886856,-2.976196 5.099266,-6.240947 0,0 1.11207,-16.971869 1.53553,-24.586097 0.40685,-7.3132825 18.6745,-18.9557982 17.63631,-36.488462 -1.0397,-17.555175 -33.616708,-111.726201 -33.616708,-111.726201 -0.889037,-2.85358 -2.962493,-4.52522 -6.138955,-4.24863 -3.174952,0.27658 -5.543745,2.80522 -5.269496,5.9898 z"
+             id="shape4-7" />
+        </g>
+        <g
+           style="fill:#ffffff;fill-opacity:1"
+           transform="translate(3.5239,225.057)"
+           id="group2-2" />
+      </g>
+      <path
+         d="m 22.671039,183.40987 c -3.974595,0 -7.858574,-1.86483 -10.175513,-4.72464 -2.292824,2.86013 -5.9441455,4.72464 -10.1402724,4.72464 -4.2414291,0 -7.9682929,-1.86483 -10.2852205,-4.72464 -2.2930761,2.86013 -5.9990051,4.72464 -10.1953951,4.72464 -4.240903,0 -7.995838,-1.86483 -10.31303,-4.72464 -2.292823,2.86013 -6.012519,4.72464 -10.208646,4.72464 -4.240913,0 -8.14927,-1.86483 -10.466461,-4.72464 -2.292824,2.85981 -5.852741,4.72464 -10.3573,4.72464 v -4.30762 c 4.504559,0 7.390659,-3.21943 8.902851,-7.09554 0.438275,-1.12335 1.517245,-5.02555 1.517245,-5.02555 0,0 1.066517,3.8948 1.480405,5.02555 1.286176,3.51229 4.537672,7.09554 8.909482,7.09554 4.370473,0 7.21946,-3.19169 8.76586,-7.09554 0.443823,-1.1214 1.448334,-5.02555 1.448334,-5.02555 0,0 0.984386,3.91028 1.446228,5.02555 1.62509,3.9245 4.520726,7.09554 8.892263,7.09554 4.370473,0 7.207818,-3.18075 8.7568496,-7.09554 0.4440859,-1.1214 1.4441024,-5.02555 1.4441024,-5.02555 0,0 0.9976273,3.9048 1.444376,5.02555 1.5143292,3.79836 4.5193893,7.09554 8.8911885,7.09554 4.3699467,0 7.1564108,-3.12298 8.7568505,-7.09554 0.450453,-1.11946 1.443576,-5.02555 1.443576,-5.02555 0,0 0.841564,3.90801 1.297575,5.02555 1.555137,3.81514 4.769794,7.09554 8.744399,7.09554 v 4.30762 z"
+         id="shape6-9"
+         style="fill:#ffffff;fill-opacity:1;stroke-width:0.29322994"
+         inkscape:connector-curvature="0" />
+    </g>
+  </g>
+</svg>

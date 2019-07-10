@@ -105,6 +105,7 @@ def ppr_view(request):
                     'powerplant',
                     res_powerplant_tbl.id,
                     res_powerplant_tbl.generation_type,
+                    res_powerplant_tbl.generation_subtype,
                     res_powerplant_tbl.scenario
                 )
                 # create query
@@ -128,7 +129,10 @@ def ppr_view(request):
                     feature = Feature(
                         id=record.powerplant.id,
                         geometry=region_contains,
-                        property=''
+                        property=dict(
+                            generation_type=generation_type,
+                            generation_subtype=record.powerplant.generation_subtype
+                        )
                     )
                     myfeatures.append(feature)
             else:
@@ -179,21 +183,20 @@ def ppr_popup_view(request):
                     )
                 )
 
-            for record in oep_query:
-                region_property = dict(
-                    pp_id=record.powerplant_prop.id,
-                    # ToDo: How to convert from decimal
-                    electrical_capacity="",  # float(record.electrical_capacity),
-                    generation_type=record.powerplant_prop.generation_type,
-                    generation_subtype=record.powerplant_prop.generation_subtype,
-                    city=record.powerplant_prop.city,
-                    postcode=record.powerplant_prop.postcode,
-                    voltage_level=record.powerplant_prop.voltage_level_var,
-                    ego_subst_id=record.powerplant_prop.subst_id,
-                    scenario=record.powerplant_prop.scenario
-                )
-                feature_prop = Feature(id=record.powerplant_prop.id, property=region_property)
-                mypopup_content.append(feature_prop)
+            record = oep_query.first()
+            region_property = dict(
+                pp_id=record.powerplant_prop.id,
+                electrical_capacity=record.powerplant_prop.electrical_capacity,
+                generation_type=record.powerplant_prop.generation_type,
+                generation_subtype=record.powerplant_prop.generation_subtype,
+                city=record.powerplant_prop.city,
+                postcode=record.powerplant_prop.postcode,
+                voltage_level=record.powerplant_prop.voltage_level_var,
+                ego_subst_id=record.powerplant_prop.subst_id,
+                scenario=record.powerplant_prop.scenario
+            )
+            feature_prop = Feature(id=record.powerplant_prop.id, property=region_property)
+            mypopup_content = feature_prop
         else:
             region_property = dict(
                 pp_id=101,
@@ -207,7 +210,7 @@ def ppr_popup_view(request):
                 scenario='Test'
             )
             feature_prop = Feature(id=101, property=region_property)
-            mypopup_content.append(feature_prop)
+            mypopup_content = feature_prop
     elif request.method == 'GET':
         print(request.GET)
 
@@ -288,8 +291,13 @@ def wseries_fetch_data_single_point(request):
         leaflet_id = int(request.POST.get('leaflet_id'))
         location_id = int(request.POST.get('location_id'))
         variable_id = int(request.POST.get('variable_id'))
-        start_time = str(request.POST.get('start_time'))
-        end_time = str(request.POST.get('end_time'))
+        start_year = str(request.POST.get('start_year'))
+        start_month = int(request.POST.get('start_month'))
+        end_year = int(request.POST.get('end_year'))
+        end_month = int(request.POST.get('end_month'))
+
+        start_time = '{}-{:02d}-01T00:00:00'.format(start_year, start_month)
+        end_time = '{}-{:02d}-01T00:00:00'.format(end_year, end_month)
 
         if not LOCAL_TESTING:
 
@@ -370,9 +378,9 @@ def wseries_fetch_data_single_point(request):
                 geometry=Point((lon, lat)),
                 properties=dict(
                     id=101,
-                    heights=["18.4"],
+                    heights=["10.0"],
                     data={
-                        18.4: {
+                        10.0: {
                             'x': ['2003-06-30T23:00:00',
                                   '2003-07-01T00:00:00',
                                   '2003-07-01T00:00:00',
@@ -382,7 +390,7 @@ def wseries_fetch_data_single_point(request):
                             'y': [1, 3, 9, 16, 25, 36]
                         }
                     },
-                    variable='test_var',
+                    variable=variable_id,
                     leaflet_id=leaflet_id,
                 )
             )

@@ -14,10 +14,12 @@
     <link rel="shortcut icon" type="image/png" href="{% static '/WAM_APP_FRED/img/fav/favicon.ico' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'stemp_abw/img/ionicons-2.0.1/css/ionicons.css' %}">
     <link rel="stylesheet" href="{% static 'WAM_APP_FRED/foundation/css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'WAM_APP_FRED/clusters/css/MarkerCluster.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
     {% leaflet_js %}
     {% leaflet_css %}
+    <script src="{% static 'WAM_APP_FRED/clusters/js/leaflet.markercluster-src.js' %}"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   </head>
   <body>
@@ -94,7 +96,10 @@
                       <div class="tabs-content" data-tabs-content="offcanvas-tabs" id='fred-tabs'>
 
                         <!-- Second panel content -->
+
                         <div class="tabs-panel" id="panel-scenario">
+                          <h4>Power Plant Register</h4>
+                          <p>Select a type of powerplant in this menu. When you click on the map, it will load all powerplants of that type within the selected state. Loading may take a while. Click on another state to load new data.</p>
                           <form>
                             <fieldset>
                               <legend>Szenario auswählen
@@ -132,10 +137,16 @@
                           </form>
                         </div>
 
+                        <!-- Second panel content -->
+                        <div class="tabs-panel is-active" id="panel-energy-system">
+                          <h4>Weather Data</h4>
+                          <p>Click on the map to load the closest weather data points. You can then click on one of the loaded points to to display the weather data over the selected time period for a given height and variable. The download can take some time, depending on how many data you required. </p>
+
                         <!-- First panel content -->
                         <div class="tabs-panel is-active" id="panel-energy-system">
                           <ul class="accordion" data-accordion>
                             <li class="accordion-item accordion-item--no-border is-active" data-accordion-item>
+
                               <a href="#" class="accordion-title accordion-title--100">Time Span</a>
                               <div class="accordion-content" data-tab-content >
                                 <div class="tabs-panel is-active" id="options-energy-system">
@@ -153,15 +164,9 @@
                             <li class="accordion-item" data-accordion-item>
                               <a href="#" class="accordion-title accordion-title--100">Variable</a>
                               <div class="accordion-content" data-tab-content>
-                                <form id="Variable">
-
-                                  <label>Variable</label>
-                                  <select name="variable">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                  </select>
+                                <form>
+                                  {{variable}}
+                                  {{height}}
                                 </form>
                               </div>
                             </li>
@@ -180,6 +185,7 @@
                           Something
                         </div>
                     </div>
+
                   </div>
                 </div>
               </div>
@@ -297,6 +303,13 @@
                 popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
             });
 
+            var powerPlantIcon = L.icon({
+                iconUrl: "{% static 'WAM_APP_FRED/img/powerplant.svg' %}",
+                iconSize:     [36, 44], // size of the icon
+                iconAnchor:   [18, 44], // point of the icon which will correspond to marker's location
+                popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
+            });
+
             var highlightStyle = {
                   opacity: 0.7,
                   weight: 2,
@@ -329,7 +342,6 @@
             var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
             var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
 
-
             function map_init_basic (map, options) {
               var popup = L.popup();
 
@@ -352,16 +364,20 @@
                   var marker = wdl.getLayer(feature.properties.leaflet_id);
 
                   var popup = marker.getPopup();
+                  const user_height = $('#id_wd-height').val();
                   const variable = feature.properties.variable
-                  var popupContent = '<h4>' + variable +
+                  var popupContent = '<h4> Variable_id :' + variable +
+                  ' Height '+ user_height + ' m' +
                   '</h4></br><div id="tester" style="width:300px;height:250px;"></div>';
                   popup.setContent(popupContent)
+
+
                   marker.feature.properties = feature.properties
                   TESTER = document.getElementById('tester');
                   var height = feature.properties.heights[0];
                   Plotly.plot( TESTER, [{
-                  x: feature.properties.data[height]['x'],
-                  y: feature.properties.data[height]['y']}], {
+                  x: feature.properties.data[user_height]['x'],
+                  y: feature.properties.data[user_height]['y']}], {
                   margin: { t: 0 } } );
                   }
 
@@ -373,11 +389,13 @@
                   var latlng = marker.getLatLng();
                   var location_id = marker.feature.properties.id;
                   // this need to be linked to user choice
-                  var variable_id = 12;
 
-                  var start_time = '2002-01-31T23:00:00';
-                  var end_time = '2002-03-31T23:00:00';
+                  const start_year = $('#id_wd_timespan_start-year').val();
+                  const start_month = $('#id_wd_timespan_stop-month').val();
+                  const stop_year = $('#id_wd_timespan_stop-year').val();
+                  const stop_month = $('#id_wd_timespan_stop-month').val();
 
+                  const variable_id = $('select[id=id_wd-variable] option:selected').val();
                   if (marker.feature.properties.variable){
                     // do not fetch the data a second time
                     console.log('not fetching data a second time')
@@ -395,8 +413,10 @@
                         'leaflet_id': leaflet_id,
                         'location_id': location_id,
                         'variable_id': variable_id,
-                        'start_time': start_time,
-                        'end_time': end_time
+                        'start_month': start_month,
+                        'start_year': start_year,
+                        'end_month': stop_month,
+                        'end_year': stop_year
                         },
                         success: displayWeatherDataPoint,
                     });
@@ -444,14 +464,15 @@
               // see http://leafletjs.com/reference-1.3.0.html#path for additional options
               let myLayerStyle = {
                 color: 'Orange',
-                radius: 5
+                radius: 5,
+                icon: powerPlantIcon
               };
 
 
 
               // add all of the GeoJSON data to the empty layer we created
               function createCircles (feature, latlng) {
-                return L.circleMarker(latlng, myLayerStyle)
+                return L.marker(latlng, myLayerStyle)
               }
 
 
@@ -492,16 +513,16 @@
               var GerBoundStyle = {
                 opacity: 0.7,
                 weight: 1,
-                fillOpacity: 0.7,
+                fillOpacity: 0.4,
                 color: "#000000",
-                fillColor: "#0BC11C",
+                fillColor: "#999999",
               };
 
               var GerBoundZoomLvlStyle = {
-                opacity: 0.7,
-                weight: 1,
+                opacity: 0.9,
+                weight: 5,
                 fillOpacity: 0.0,
-                color: "#000000",
+                color: "#ffffff",
                 fillColor: "#0BC11C",
               };
 
@@ -513,17 +534,21 @@
                 success: function(boundary){
                   function onEachFeature(boundary, layer) {
                     layer.on('mouseover', function () {
-                    this.setStyle(highlightStyleMouseOver);
+                      if (this.clicked != true){
+                        this.setStyle(highlightStyleMouseOver);
+                      }
                     });
                     layer.on('mouseout', function () {
-                      this.setStyle(GerBoundStyle);
+                      if (this.clicked != true){
+                        this.setStyle(GerBoundStyle);
+                      }
                     });
                     // select region and request data
                     layer.on('click', function (event) {
                       console.log(event)
+                      this.clicked = true;
                       this.setStyle(GerBoundZoomLvlStyle);
                       region = event.sourceTarget;
-                      // console.log(region);
                       loadRegionPowerPlants(region, layer);
                     });
                     }
@@ -542,17 +567,7 @@
               // res PowerPlants in region boundaries
 
               function enablePowPlPopup(feature, layer) {
-                layer.on('mouseover', function () {
-                  this.setStyle(highlightStyleMouseOver);
-                });
-                layer.on('click', function () {
-                  this.setStyle(highlightStyle);
-                });
-                layer.on('mouseout', function () {
-                  this.setStyle(wdataStyle);
-                });
                   layer.bindPopup('Loading...');
-
                   layer.on('click', onPowerPlantDataPointClick);
               }
 
@@ -561,14 +576,16 @@
               function createPowerPlantsPoints(powerplants){
                   var layer = new L.geoJSON(powerplants, {
                     onEachFeature: enablePowPlPopup,
-                    pointToLayer: createCircles
+                    pointToLayer: createCircles // addPowerPlantMarker
                   });
+                  var clusters = L.markerClusterGroup();
+                  clusters.addLayer(layer);
                   if (regionPowerPlantgroup.getLayers().length === 0) {
-                    regionPowerPlantgroup.addLayer(layer)
+                    regionPowerPlantgroup.addLayer(clusters)
                   }
                   else {
                     regionPowerPlantgroup.clearLayers();
-                    regionPowerPlantgroup.addLayer(layer)
+                    regionPowerPlantgroup.addLayer(clusters)
                   }
               }
 
@@ -594,32 +611,10 @@
                   });
                 }
 
-              // add all power plants from url to map
-              function addPowerPlantToMap(){
-
-              }
-
-              $.ajax({
-                    url: ppr_location,
-                    dataType: 'json',
-                    async: true,
-                    success: function(powerplant){
-                        var layer = new L.geoJSON(powerplant, {
-                            onEachFeature: enablePowPlPopup,
-                            pointToLayer: createCircles
-                        });
-                        map.addLayer(layer)
-                        }
-                });
-
-
-
                 function onPowerPlantDataPointClick (event) {
                   var marker = event.sourceTarget;
-                  console.log(marker);
                   var leaflet_id = L.stamp(marker);
                   var pp_id = marker.feature.id;
-                  console.log(pp_id)
                   $.ajax({
                       type: 'POST',
                       url: ppr_content,
@@ -644,47 +639,54 @@
                     }
                     content = content + '</table>';
 
-                    console.log(marker);
-                    marker._popup.setContent(content);
+                    var popup = marker.getPopup();
+                    popup.setContent(content);
 
                     // is this working????
-                    addPowerPlantMarker(feature, marker);
+                    //addPowerPlantMarker(feature, marker);
 
                   }
                 }
 
               // add icon on to clicked circelmarker
-              function addPowerPlantMarker (feature, marker){
+
+              function addPowerPlantMarker(feature, latlng){
                 // ugly function body insert generic or something similar
-                if (feature.property.generation_subtype == "solar_roof_mounted") {
-                  return L.marker(marker._latlng, {icon: solarRoofIcon});
+                var marker = L.marker(latlng, myLayerStyle)
+
+                console.log(feature);
+                console.log(feature.property);
+                console.log(feature.property.generation_subtype);
+
+                if (feature.property.generation_subtype === "solar_roof_mounted") {
+                  marker.setIcon({icon: solarRoofIcon});
                 }
                 if (feature.properties.generation_subtype == "solar_ground_mounted") {
-                  return L.marker(marker._latlng, {icon: solarGroundIcon});
+                  marker.setIcon({icon: solarGroundIcon});
                 }
                 if (feature.property.generation_subtype == "solar") {
-                  return L.marker(marker._latlng, {icon: solarGroundIcon});
+                  marker.setIcon({icon: solarGroundIcon});
                 }
                 if (feature.properties.generation_subtype == "biomass") {
-                  return L.marker(marker._latlng, {icon: biomassIcon});
+                  marker.setIcon({icon: biomassIcon});
                 }
                 if (feature.properties.generation_subtype == "biogas") {
-                  return L.marker(marker._latlng, {icon: biomassIcon});
+                  marker.setIcon({icon: biomassIcon});
                 }
                 if (feature.properties.generation_subtype == "biogas_dry_fermentation") {
-                  return L.marker(marker._latlng, {icon: biomassIcon});
+                  marker.setIcon({icon: biomassIcon});
                 }
                 if (feature.properties.generation_subtype == "biofuel") {
-                  return L.marker(marker._latlng, {icon: biomassIcon});
+                  marker.setIcon({icon: biomassIcon});
                 }
                 if (feature.properties.generation_subtype == "wind_offshore") {
-                  return L.marker(marker._latlng, {icon: windOffIcon});
+                  marker.setIcon({icon: windOffIcon});
                 }
-                if (feature.properties.generation_subtype == "wind_onshore") {
-                  return L.marker(marker._latlng, {icon: windOnIcon});
+                if (feature.properties.generation_subtype === "wind_onshore") {
+                  marker.setIcon({icon: windOnIcon});
                 }
                 if (feature.properties.generation_subtype == "hydro") {
-                  return L.marker(marker._latlng, {icon: hydroIcon});
+                  marker.setIcon({icon: hydroIcon});
                 }
                 if (feature.properties.generation_subtype == "geothermal") {
                   // insert icon not availabe -> add when available
@@ -710,6 +712,9 @@
                 if (feature.properties.generation_subtype == "waste_wood") {
                   // insert icon not availabe -> add when available
                 }
+
+                return marker
+
               }
 
               //PowePlantRegister EndSection
