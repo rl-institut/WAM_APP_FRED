@@ -183,6 +183,11 @@ def ts_mapping(metadata):
         # reflect the existing table with autoload from DB and add values as extend_existing
         Table('openfred_timeseries_ch', metadata,  extend_existing=True, autoload=True)
 
+        # Convert the type Decimal into float for python
+        for column in __table__.columns.values():
+            if isinstance(column.type, Numeric):
+                column.type.asdecimal = False
+
     classes['OpenFredTimesSeries'] = OpenFredTimesSeries
     return classes
 

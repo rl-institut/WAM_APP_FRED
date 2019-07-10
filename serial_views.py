@@ -183,7 +183,7 @@ def district_feedin_series(request):
             timespan=timespan,
             values=values,
             nut=record.nut,
-            technology=record.technology
+            # technology=record.technology
         )
 
 
