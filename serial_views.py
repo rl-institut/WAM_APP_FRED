@@ -165,22 +165,42 @@ def district_feedin_series(request):
     """
     myfeature = []
     if request.method == 'POST':
-        openfred_ts_tbl = open_fred_ts_classes['OpenFredTimesSeries']
-        oep_query = Serializer.session.query(openfred_ts_tbl)
+        if LOCAL_TESTING is False:
+            openfred_ts_tbl = open_fred_ts_classes['OpenFredTimesSeries']
+            oep_query = Serializer.session.query(openfred_ts_tbl)
 
-        timespan = []
-        values = []
-        nut = ''
-        for record in oep_query:
-            timespan.append(record.time)
-            values.append(record.feedin)
-            nut = record.nut
+            timespan = []
+            values = []
+            nut = ''
+            for record in oep_query:
+                timespan.append(record.time)
+                values.append(record.feedin)
+                nut = record.nut
 
-        myfeature = dict(
-            timespan=timespan,
-            values=values,
-            nut=nut,
-        )
+            myfeature = dict(
+                timespan=timespan,
+                values=values,
+                nut=nut,
+            )
+        else:
+            wkb = []
+            region_contains = loadswkb(str(wkb), True).centroid
+            myfeature = Feature(
+                id=101,
+                geometry=region_contains,
+                property=dict(
+                    timespan=[
+                        '2003-06-30T23:00:00',
+                        '2003-07-01T00:00:00',
+                        '2003-07-01T00:00:00',
+                        '2003-07-01T01:00:00',
+                        '2003-07-01T01:00:00',
+                        '2003-07-01T02:00:00'
+                    ],
+                    values=[1, 3, 9, 16, 25, 36],
+                    nut='Wind',
+                )
+            )
     elif request.method == 'GET':
         print(request.GET)
 
