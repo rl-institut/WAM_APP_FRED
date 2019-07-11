@@ -57,6 +57,19 @@ class Serializer(View):
     with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
         gj = geojson.load(g)
 
+    regions_wkbs = {}
+    regions_index = []
+    for i, f in enumerate(gj['features']):
+        region_id = f['properties']['name']
+        region_boundary = f['geometry']['coordinates']
+        boundary_geometry = geojson.MultiPolygon(region_boundary)
+        # create shapely geometry from geojson feature
+        _geom = shape(boundary_geometry)
+        # store this information in a dict
+        regions_wkbs[region_id] = from_shape(_geom, srid=4326)
+        # store the region index in a list
+        regions_index.append(region_id)
+
     def ger_boundaries_view(self):
 
         germany_boundaries = Serializer.gj
@@ -88,15 +101,8 @@ def ppr_view(request):
             # stores the current region boundary
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
-        wkbs = []
-        for f in Serializer.gj['features']:
-            if region_id in f['properties']['name']:
-                region_boundary = f['geometry']['coordinates']
-                boundary_geometry = MultiPolygon(region_boundary)
-                # create shapely geometry from geojson feature
-                _geom = shape(boundary_geometry)
-                wkbs.append(from_shape(_geom, srid=4326))
-
+        # select the shape of the region
+        wkbs = [Serializer.regions_wkbs[region_id]]
         # Query the DB with the given wkbelement as input
         for wkb in wkbs:
             if LOCAL_TESTING is False:
