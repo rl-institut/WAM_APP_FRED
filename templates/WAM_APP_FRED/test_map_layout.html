@@ -772,9 +772,12 @@
 
       ///// Feedinlib
       //
-      function displayFeedinLib(data) {
-        console.log('Feedinlib')
-        console.log(data)
+      function updateFeedinPopup(data, marker) {
+
+        var popup = marker.getPopup();
+        var popupContent = '<h4> Timeseries </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
+        popup.setContent(popupContent)
+
         var plot_div = document.getElementById('feedin-plot');
         Plotly.plot(plot_div, [{
           x: data.timespan,
@@ -787,6 +790,53 @@
       };
 
       function loadRegionFeedinlib(region, layer) {
+
+      function onFeedinPointClick(event) {
+
+        var marker = event.sourceTarget;
+        var leaflet_id = L.stamp(marker);
+        var popup = marker.getPopup();
+        var latlng = marker.getLatLng();
+        var region_id = marker.feature.id;
+        // this need to be linked to user choice
+
+        if (marker.feature.properties.timespan) {
+          // do not fetch the data a second time
+          console.log('not fetching data a second time')
+          updateFeedinPopup(marker.feature, marker)
+        } else {
+          // here make a call to django and dl the data for that point
+          $.ajax({
+            type: 'POST',
+            url: feedin_content,
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: {
+              'region_id': region_id,
+            },
+            success: function (data){
+              updateFeedinPopup(data, marker)
+            }
+          });
+        }
+      }
+
+
+      let feedinOptions = {
+        pointToLayer: createFeedinPopup,
+        onEachFeature: function(feature, layer) {
+
+          layer.bindPopup('Loading...');
+
+          layer.on('click', onFeedinPointClick);
+        }
+      };
+
+
+      var fdl = new L.geoJSON(null, feedinOptions);
+
+      fdl.addTo(map);
         region_name = region.feature.properties.name;
         $.ajax({
           url: feedin_content,
