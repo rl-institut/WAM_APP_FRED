@@ -193,8 +193,10 @@ def district_feedin_series(request):
     The data will include a feedin time series for each district.
     :return:
     """
-    myfeature = []
+    data = []
     if request.method == 'POST':
+        print('Popup content')
+        region_id = str(request.POST.get('region_id'))
         if LOCAL_TESTING is False:
             openfred_ts_tbl = open_fred_ts_classes['OpenFredTimesSeries']
             oep_query = Serializer.session.query(openfred_ts_tbl)
@@ -207,18 +209,15 @@ def district_feedin_series(request):
                 values.append(record.feedin)
                 nut = record.nut
 
-            myfeature = dict(
+            data = dict(
+                region_id=region_id,
                 timespan=timespan,
                 values=values,
                 nut=nut,
             )
         else:
-            wkb = []
-            region_contains = loadswkb(str(wkb), True).centroid
-            myfeature = Feature(
-                id=101,
-                geometry=region_contains,
-                property=dict(
+            data = dict(
+                    region_id=region_id,
                     timespan=[
                         '2003-06-30T23:00:00',
                         '2003-07-01T00:00:00',
@@ -230,11 +229,11 @@ def district_feedin_series(request):
                     values=[1, 3, 9, 16, 25, 36],
                     nut='Wind',
                 )
-            )
+
     elif request.method == 'GET':
         print(request.GET)
 
-    return HttpResponse(dumps(myfeature), content_type="application/json")
+    return HttpResponse(dumps(data), content_type="application/json")
 
 
 def ppr_popup_view(request):

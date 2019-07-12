@@ -573,7 +573,7 @@
               this.setStyle(GerBoundZoomLvlStyle);
               region = event.sourceTarget;
               if (active_panel == 'panel-feedinlib') {
-                loadRegionFeedinlib(region, layer);
+                loadRegionFeedin(region, layer);
               }
 
               if (active_panel == 'panel-powerplants') {
@@ -778,7 +778,7 @@
         var popupContent = '<h4> Timeseries </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
         popup.setContent(popupContent)
 
-        var plot_div = document.getElementById('feedin-plot');
+        plot_div = document.getElementById('feedin-plot');
         Plotly.plot(plot_div, [{
           x: data.timespan,
           y: data.values
@@ -789,7 +789,7 @@
         });
       };
 
-      function loadRegionFeedinlib(region, layer) {
+
 
       function onFeedinPointClick(event) {
 
@@ -837,9 +837,24 @@
       var fdl = new L.geoJSON(null, feedinOptions);
 
       fdl.addTo(map);
+
+      function addFeedinPoint(feature){
+        // Clear the GeoJSON layer
+        fdl.clearLayers()
+        // Add GeoJSON data in the layer
+        fdl.addData(feature)
+      }
+
+
+      function createFeedinPopup(feature, latlng) {
+        return L.circleMarker(latlng, wdataStyle)
+      }
+
+
+      function loadRegionFeedin(region, layer) {
         region_name = region.feature.properties.name;
         $.ajax({
-          url: feedin_content,
+          url: feedin_location,
           type: 'POST',
           async: true,
           headers: {
@@ -848,9 +863,10 @@
           data: {
             'region_name': region_name,
           },
-          success: displayFeedinLib
+          success: addFeedinPoint
         });
       };
+
 
 
 
