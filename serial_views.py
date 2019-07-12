@@ -156,6 +156,36 @@ def ppr_view(request):
     return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
 
 
+
+def feedin_view(request):
+    """
+    
+    """
+
+    myfeatures = []
+
+    if request.method == 'POST':
+        region_id = str(request.POST.get('region_name'))
+        # select the shape of the region
+        wkbs = [Serializer.regions_wkbs[region_id]]
+        # Query the DB with the given wkbelement as input
+        for wkb in wkbs:
+
+            region_contains = loadswkb(str(wkb), True).centroid
+            feature = Feature(
+                id=region_id,
+                geometry=region_contains,
+                property=''
+            )
+            myfeatures.append(feature)
+
+    elif request.method == 'GET':
+        print(request.GET)
+
+    return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
+
+
+
 def district_feedin_series(request):
     """
     This function will return a json/geojson with pre calculated data for a single or multiple

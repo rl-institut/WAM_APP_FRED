@@ -344,7 +344,8 @@
     var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
     var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
 
-    var feedin_content = "{% url 'WAM_APP_FRED:Feedinlib'|add:'.data' %}";
+    var feedin_location = "{% url 'WAM_APP_FRED:FeedinlibLocation'|add:'.data' %}";
+    var feedin_content = "{% url 'WAM_APP_FRED:FeedinlibPopup'|add:'.data' %}";
 
 
     function map_init_basic(map, options) {
