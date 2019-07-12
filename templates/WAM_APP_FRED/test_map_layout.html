@@ -264,6 +264,22 @@
   <script src="{% static 'WAM_APP_FRED/foundation/js/app.js' %}"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script type="text/javascript">
+
+  
+    function get_active_panel() {
+      var active_panel = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
+      active_panel = active_panel.attr('id');
+      return active_panel;
+    }
+
+
+    document.getElementById("offcanvas-tabs").addEventListener(
+      "click",
+      function(event) {
+        console.log(event.target);
+        console.log(get_active_panel());
+      });
+
     var biomassIcon = L.icon({
       iconUrl: "{% static 'WAM_APP_FRED/img/Pin_biomass_color_v2.svg' %}",
       iconSize: [38, 95], // size of the icon
@@ -503,12 +519,6 @@
         wdl.clearLayers()
         // Add GeoJSON data in the layer
         wdl.addData(data)
-      }
-
-      function get_active_panel() {
-        var active_panel = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
-        active_panel = active_panel.attr('id');
-        return active_panel;
       }
 
       function onMapClick(ev) {
