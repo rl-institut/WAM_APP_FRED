@@ -450,8 +450,8 @@ def wseries_fetch_data_single_point(request):
 
                 if isinstance(t_res, str):
                     dt = datetime.timedelta(minutes=TIME_STEPS[t_res])
-                else: 
-                    dt =t_res
+                else:
+                    dt = t_res
 
                 idx = 0
                 while cur_date <= end_d - dt:
