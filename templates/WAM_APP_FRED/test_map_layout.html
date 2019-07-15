@@ -22,6 +22,8 @@
   {% leaflet_css %}
   <script src="{% static 'WAM_APP_FRED/clusters/js/leaflet.markercluster-src.js' %}"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.Spin/1.1.0/leaflet.spin.js"></script>
 </head>
 
 <body>
@@ -629,7 +631,8 @@
       function loadRegionPowerPlants(region, layer) {
         region_name = region.feature.properties.name;
         generation_type = $("input[name=generation_type]:checked").val();
-
+        //set the spinner
+        map.spin(true);
         $.ajax({
           url: ppr_location,
           type: 'POST',
@@ -642,10 +645,16 @@
             'generation_type': generation_type
           },
           success: createPowerPlantsPoints
+
+        }).done(function(){
+          //remove spinner when done loading
+          map.spin(false);
         });
       }
-
+      
+      
       function onPowerPlantDataPointClick(event) {
+        map.spin(true)
         var marker = event.sourceTarget;
         var leaflet_id = L.stamp(marker);
         var pp_id = marker.feature.id;
@@ -662,6 +671,8 @@
           success: function(thispopupcontent) {
             displayPowerPlantDataPoint(thispopupcontent, marker)
           }
+        }).done(function(){
+          map.spin(false)
         });
       }
 
