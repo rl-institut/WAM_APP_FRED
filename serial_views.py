@@ -6,7 +6,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Bundle
 import sqlahelper as sah
 import geojson
-from geojson import Point, MultiPolygon, Feature, FeatureCollection, dumps
+from geojson import Point, Feature, FeatureCollection, dumps
 from geoalchemy2.shape import from_shape
 from geoalchemy2.elements import WKTElement
 from shapely.geometry import shape
@@ -156,10 +156,9 @@ def ppr_view(request):
     return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
 
 
-
 def feedin_view(request):
     """
-    
+        Returns a geojson point with feedin-information over time.
     """
 
     myfeatures = []
@@ -183,7 +182,6 @@ def feedin_view(request):
         print(request.GET)
 
     return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
-
 
 
 def district_feedin_series(request):
@@ -217,18 +215,18 @@ def district_feedin_series(request):
             )
         else:
             data = dict(
-                    region_id=region_id,
-                    timespan=[
-                        '2003-06-30T23:00:00',
-                        '2003-07-01T00:00:00',
-                        '2003-07-01T00:00:00',
-                        '2003-07-01T01:00:00',
-                        '2003-07-01T01:00:00',
-                        '2003-07-01T02:00:00'
-                    ],
-                    values=[1, 3, 9, 16, 25, 36],
-                    nut='Wind',
-                )
+                region_id=region_id,
+                timespan=[
+                    '2003-06-30T23:00:00',
+                    '2003-07-01T00:00:00',
+                    '2003-07-01T00:00:00',
+                    '2003-07-01T01:00:00',
+                    '2003-07-01T01:00:00',
+                    '2003-07-01T02:00:00'
+                ],
+                values=[1, 3, 9, 16, 25, 36],
+                nut='Wind',
+            )
 
     elif request.method == 'GET':
         print(request.GET)
