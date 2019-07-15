@@ -6,7 +6,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Bundle
 import sqlahelper as sah
 import geojson
-from geojson import Point, MultiPolygon, Feature, FeatureCollection, dumps
+from geojson import Point, Feature, FeatureCollection, dumps
 from geoalchemy2.shape import from_shape
 from geoalchemy2.elements import WKTElement
 from shapely.geometry import shape
@@ -18,7 +18,7 @@ from .app_settings import LOCAL_TESTING, fred_config
 
 if not LOCAL_TESTING:
     import WAM_APP_FRED.oep_models as oep_models
-    from WAM_APP_FRED.oep_models import open_fred_classes
+    from WAM_APP_FRED.oep_models import open_fred_classes, open_fred_ts_classes
 
 HOUR = '1:00:00'
 HALF_HOUR = '0:30:00'
@@ -57,6 +57,19 @@ class Serializer(View):
     with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
         gj = geojson.load(g)
 
+    regions_wkbs = {}
+    regions_index = []
+    for i, f in enumerate(gj['features']):
+        region_id = f['properties']['name']
+        region_boundary = f['geometry']['coordinates']
+        boundary_geometry = geojson.MultiPolygon(region_boundary)
+        # create shapely geometry from geojson feature
+        _geom = shape(boundary_geometry)
+        # store this information in a dict
+        regions_wkbs[region_id] = from_shape(_geom, srid=4326)
+        # store the region index in a list
+        regions_index.append(region_id)
+
     def ger_boundaries_view(self):
 
         germany_boundaries = Serializer.gj
@@ -88,15 +101,8 @@ def ppr_view(request):
             # stores the current region boundary
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
-        wkbs = []
-        for f in Serializer.gj['features']:
-            if region_id in f['properties']['name']:
-                region_boundary = f['geometry']['coordinates']
-                boundary_geometry = MultiPolygon(region_boundary)
-                # create shapely geometry from geojson feature
-                _geom = shape(boundary_geometry)
-                wkbs.append(from_shape(_geom, srid=4326))
-
+        # select the shape of the region
+        wkbs = [Serializer.regions_wkbs[region_id]]
         # Query the DB with the given wkbelement as input
         for wkb in wkbs:
             if LOCAL_TESTING is False:
@@ -148,6 +154,84 @@ def ppr_view(request):
         print(request.GET)
 
     return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
+
+
+def feedin_view(request):
+    """
+        Returns a geojson point with feedin-information over time.
+    """
+
+    myfeatures = []
+
+    if request.method == 'POST':
+        region_id = str(request.POST.get('region_name'))
+        # select the shape of the region
+        wkbs = [Serializer.regions_wkbs[region_id]]
+        # Query the DB with the given wkbelement as input
+        for wkb in wkbs:
+
+            region_contains = loadswkb(str(wkb), True).centroid
+            feature = Feature(
+                id=region_id,
+                geometry=region_contains,
+                property=''
+            )
+            myfeatures.append(feature)
+
+    elif request.method == 'GET':
+        print(request.GET)
+
+    return HttpResponse(dumps(FeatureCollection(myfeatures)), content_type="application/json")
+
+
+def district_feedin_series(request):
+    """
+    This function will return a json/geojson with pre calculated data for a single or multiple
+    district.
+    The data will include a feedin time series for each district.
+    :return:
+    """
+    data = []
+    if request.method == 'POST':
+        print('Popup content')
+        region_id = str(request.POST.get('region_id'))
+        if LOCAL_TESTING is False:
+            openfred_ts_tbl = open_fred_ts_classes['OpenFredTimesSeries']
+            oep_query = Serializer.session.query(openfred_ts_tbl)
+
+            timespan = []
+            values = []
+            nut = ''
+            for record in oep_query:
+                timespan.append(record.time)
+                values.append(record.feedin)
+                nut = record.nut
+
+            data = dict(
+                region_id=region_id,
+                timespan=timespan,
+                values=values,
+                nut=nut,
+            )
+        else:
+            data = dict(
+                region_id=region_id,
+                timespan=[
+                    '2003-06-30T23:00:00',
+                    '2003-07-01T00:00:00',
+                    '2003-07-01T00:00:00',
+                    '2003-07-01T01:00:00',
+                    '2003-07-01T01:00:00',
+                    '2003-07-01T02:00:00'
+                ],
+                values=[1, 3, 9, 16, 25, 36],
+                nut='Wind',
+            )
+
+    elif request.method == 'GET':
+        print(request.GET)
+
+    return HttpResponse(dumps(data), content_type="application/json")
 
 
 def ppr_popup_view(request):

@@ -4,7 +4,9 @@ from WAM_APP_FRED.serial_views import (
     wseries_get_single_point,
     wseries_fetch_data_single_point,
     ppr_view,
-    ppr_popup_view
+    ppr_popup_view,
+    district_feedin_series,
+    feedin_view
 )
 from . import views
 
@@ -24,6 +26,7 @@ urlpatterns = [
     ),
     path('GerBoundary.data/', Serializer.ger_boundaries_view, name='GerBoundary.data'),
     path('PowerPlantRegister.data/', ppr_view, name='PowerPlantRegister.data'),
-    path('PowerPlantPopup.data/', ppr_popup_view, name='PowerPlantPopup.data')
-
+    path('PowerPlantPopup.data/', ppr_popup_view, name='PowerPlantPopup.data'),
+    path('FeedinlibPopup.data/', district_feedin_series, name='FeedinlibPopup.data'),
+    path('FeedinlibLocation.data/', feedin_view, name='FeedinlibLocation.data')
 ]
