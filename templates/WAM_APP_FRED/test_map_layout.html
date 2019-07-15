@@ -401,7 +401,6 @@
       }
 
       function onWeatherDataPointClick(event) {
-
         var marker = event.sourceTarget;
         var leaflet_id = L.stamp(marker);
         var popup = marker.getPopup();
@@ -420,6 +419,7 @@
           console.log('not fetching data a second time')
           displayWeatherDataPoint(marker.feature)
         } else {
+          map.spin(true)
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
@@ -439,7 +439,9 @@
               'end_year': stop_year
             },
             success: displayWeatherDataPoint,
-          });
+          }).done(function(){
+          map.spin(false)
+        });
         }
       }
 
@@ -519,6 +521,7 @@
       function onMapClick(ev) {
         var active_panel = get_active_panel();
         if (active_panel == 'panel-energy-system') {
+          map.spin(true)
           var latlng = map.mouseEventToLatLng(ev.originalEvent);
           $.ajax({
             type: 'POST',
@@ -531,7 +534,9 @@
               'lon': latlng.lng
             },
             success: addWeatherPoint,
-          });
+          }).done(function(){
+          map.spin(false)
+        });
         }
       };
 
@@ -819,6 +824,7 @@
           console.log('not fetching data a second time')
           updateFeedinPopup(marker.feature, marker)
         } else {
+          map.spin(true)
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
@@ -832,7 +838,9 @@
             success: function (data){
               updateFeedinPopup(data, marker)
             }
-          });
+          }).done(function(){
+          map.spin(false)
+        });
         }
       }
 
@@ -866,6 +874,7 @@
 
 
       function loadRegionFeedin(region, layer) {
+        map.spin(true)
         region_name = region.feature.properties.name;
         $.ajax({
           url: feedin_location,
@@ -878,6 +887,8 @@
             'region_name': region_name,
           },
           success: addFeedinPoint
+        }).done(function(){
+          map.spin(false)
         });
       };
 
