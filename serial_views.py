@@ -174,17 +174,18 @@ def feedin_view(request):
     myfeatures = []
 
     if request.method == 'POST':
-        region_id = str(request.POST.get('region_name'))
+        landkreis_props = {k:request.POST.get(k) for k in ['id', 'gen', 'bez', 'nuts']}
+        lk_id = landkreis_props['nuts']
         # select the shape of the region
-        wkbs = [Serializer.regions_wkbs[region_id]]
+        wkbs = [Serializer.landkreis_wkbs[lk_id]]
         # Query the DB with the given wkbelement as input
         for wkb in wkbs:
 
-            region_contains = loadswkb(str(wkb), True).centroid
+            lk_contains = loadswkb(str(wkb), True).centroid
             feature = Feature(
-                id=region_id,
-                geometry=region_contains,
-                property=''
+                landkreis_id=lk_id,
+                geometry=lk_contains,
+                properties=landkreis_props
             )
             myfeatures.append(feature)
 
@@ -203,8 +204,8 @@ def district_feedin_series(request):
     """
     data = []
     if request.method == 'POST':
-        print('Popup content')
-        region_id = str(request.POST.get('region_id'))
+        landkreis_props = {k: request.POST.get(k) for k in ['id', 'gen', 'bez', 'nuts']}
+        lk_id = landkreis_props['nuts']
         if LOCAL_TESTING is False:
             openfred_ts_tbl = open_fred_ts_classes['OpenFredTimesSeries']
             oep_query = Serializer.session.query(openfred_ts_tbl)
@@ -218,14 +219,15 @@ def district_feedin_series(request):
                 nut = record.nut
 
             data = dict(
-                region_id=region_id,
+                landkreis_id=lk_id ,
                 timespan=timespan,
                 values=values,
                 nut=nut,
+                properties=landkreis_props
             )
         else:
             data = dict(
-                region_id=region_id,
+                landkreis_id=lk_id,
                 timespan=[
                     '2003-06-30T23:00:00',
                     '2003-07-01T00:00:00',
@@ -236,6 +238,7 @@ def district_feedin_series(request):
                 ],
                 values=[1, 3, 9, 16, 25, 36],
                 nut='Wind',
+                properties=landkreis_props
             )
 
     elif request.method == 'GET':

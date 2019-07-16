@@ -840,7 +840,9 @@
       function updateFeedinPopup(data, marker) {
 
         var popup = marker.getPopup();
-        var popupContent = '<h4> Timeseries </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
+        const name = data.properties.gen
+        const lk_id = data.landkreis_id
+        var popupContent = '<h4> ' + name + ' ('+ lk_id +') </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
         popup.setContent(popupContent)
 
         plot_div = document.getElementById('feedin-plot');
@@ -862,7 +864,7 @@
         var leaflet_id = L.stamp(marker);
         var popup = marker.getPopup();
         var latlng = marker.getLatLng();
-        var region_id = marker.feature.id;
+        var landkreis_props = marker.feature.properties;
         // this need to be linked to user choice
 
         if (marker.feature.properties.timespan) {
@@ -878,9 +880,8 @@
             headers: {
               'X-CSRFToken': '{{ csrf_token }}'
             },
-            data: {
-              'region_id': region_id,
-            },
+            data:
+            landkreis_props,
             success: function(data) {
               updateFeedinPopup(data, marker)
             }
@@ -922,9 +923,9 @@
       }
 
 
-      function loadRegionFeedin(region, layer) {
+      function loadRegionFeedin(landkreis, layer) {
         map.spin(true)
-        region_name = region.feature.properties.name;
+        landkreis_props = landkreis.feature.properties;
         $.ajax({
           url: feedin_location,
           type: 'POST',
@@ -932,9 +933,7 @@
           headers: {
             'X-CSRFToken': '{{ csrf_token }}'
           },
-          data: {
-            'region_name': region_name,
-          },
+          data: landkreis_props,
           success: addFeedinPoint
         }).done(function() {
           map.spin(false)
