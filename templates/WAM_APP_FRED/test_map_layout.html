@@ -350,6 +350,7 @@
     var weather_data_click_location = "{% url 'WAM_APP_FRED:WeatherPointClick'|add:'.data' %}";
 
     var ger_boundaries = "{% url 'WAM_APP_FRED:GerBoundary'|add:'.data' %}";
+    var ger_landkreis = "{% url 'WAM_APP_FRED:GerLandkreis'|add:'.data' %}";
 
     var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
     var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
@@ -600,6 +601,50 @@
           map.addLayer(layer)
         }
       });
+
+            // Germany region boundaries
+      $.ajax({
+        url: ger_landkreis,
+        dataType: 'json',
+        async: true,
+        success: function(boundary) {
+          function onEachFeature(boundary, layer) {
+            layer.on('mouseover', function() {
+              if (this.clicked != true) {
+                this.setStyle(highlightStyleMouseOver);
+              }
+            });
+            layer.on('mouseout', function() {
+              if (this.clicked != true) {
+                this.setStyle(GerBoundStyle);
+              }
+            });
+            // select region and request data
+            layer.on('click', function(event) {
+              var active_panel = get_active_panel();
+              this.clicked = true;
+              this.setStyle(GerBoundZoomLvlStyle);
+              region = event.sourceTarget;
+              if (active_panel == 'panel-feedinlib') {
+                loadRegionFeedin(region, layer);
+              }
+
+              if (active_panel == 'panel-powerplants') {
+                loadRegionPowerPlants(region, layer);
+              }
+
+            });
+          }
+          var layer = new L.geoJSON(boundary, {
+            onEachFeature: onEachFeature,
+            style: function(feature, latlng) {
+              return GerBoundStyle;
+            }
+          })
+          map.addLayer(layer)
+        }
+      });
+
 
       //PowePlantRegister StartSection
       ///////////////////////////////////////////////////////////////////////////////////////////////////////
