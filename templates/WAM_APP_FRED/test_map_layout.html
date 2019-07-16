@@ -854,7 +854,6 @@
         onEachFeature: function(feature, layer) {
 
           layer.bindPopup('Loading...');
-
           layer.on('click', onFeedinPointClick);
         }
       };
@@ -866,9 +865,13 @@
 
       function addFeedinPoint(feature){
         // Clear the GeoJSON layer
-        fdl.clearLayers()
+        fdl.clearLayers();
         // Add GeoJSON data in the layer
-        fdl.addData(feature)
+        fdl.addData(feature);
+        // Simulate a click on the marker
+        marker = fdl.getLayers()[0];
+        marker.fire('click');
+
       }
 
 
