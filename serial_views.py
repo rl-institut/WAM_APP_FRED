@@ -432,11 +432,27 @@ def wseries_fetch_data_single_point(request):
                 # in steps depending on the resolution. It is easier to rebuild it than to
                 # parse it as it is inputed as intervals of datetime values
                 temp_values = record.Series.values
-                start_d = parser.parse(record.Series.timespan.start)
-                end_d = parser.parse(record.Series.timespan.stop)
+                start_d = record.Series.timespan.start
+
+                if isinstance(start_d, str):
+                    start_d = parser.parse(start_d)
+
+                end_d = record.Series.timespan.stop
+
+                if isinstance(end_d, str):
+                    end_d = parser.parse(end_d)
+
                 cur_date = start_d
                 t_res = record.Series.timespan.resolution
-                dt = datetime.timedelta(minutes=TIME_STEPS[t_res])
+
+                if t_res == datetime.timedelta(0):
+                    t_res += datetime.timedelta(hours=1)
+
+                if isinstance(t_res, str):
+                    dt = datetime.timedelta(minutes=TIME_STEPS[t_res])
+                else:
+                    dt = t_res
+
                 idx = 0
                 while cur_date <= end_d - dt:
                     values.append(temp_values[idx])
