@@ -180,7 +180,7 @@
                   <div class="tabs-panel" id="panel-feedinlib">
                     <p>
                       Select a variable and a time span, then click on a region highlighted on the map. The data will be displayed on a graph inside a popup.
-                       Currently the plot in the popup window 
+                      Currently the plot in the popup window
                       shows data received from a test data set.
                     </p>
                     <!--<div id="feedin-plot" style="width:300px;height:250px;">
@@ -263,8 +263,6 @@
   <script src="{% static 'WAM_APP_FRED/foundation/js/app.js' %}"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script type="text/javascript">
-
-  
     function get_active_panel() {
       var active_panel = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
       active_panel = active_panel.attr('id');
@@ -439,9 +437,9 @@
               'end_year': stop_year
             },
             success: displayWeatherDataPoint,
-          }).done(function(){
-          map.spin(false)
-        });
+          }).done(function() {
+            map.spin(false)
+          });
         }
       }
 
@@ -534,9 +532,9 @@
               'lon': latlng.lng
             },
             success: addWeatherPoint,
-          }).done(function(){
-          map.spin(false)
-        });
+          }).done(function() {
+            map.spin(false)
+          });
         }
       };
 
@@ -699,13 +697,13 @@
           },
           success: createPowerPlantsPoints
 
-        }).done(function(){
+        }).done(function() {
           //remove spinner when done loading
           map.spin(false);
         });
       }
-      
-      
+
+
       function onPowerPlantDataPointClick(event) {
         map.spin(true)
         var marker = event.sourceTarget;
@@ -724,7 +722,7 @@
           success: function(thispopupcontent) {
             displayPowerPlantDataPoint(thispopupcontent, marker)
           }
-        }).done(function(){
+        }).done(function() {
           map.spin(false)
         });
       }
@@ -883,12 +881,12 @@
             data: {
               'region_id': region_id,
             },
-            success: function (data){
+            success: function(data) {
               updateFeedinPopup(data, marker)
             }
-          }).done(function(){
-          map.spin(false)
-        });
+          }).done(function() {
+            map.spin(false)
+          });
         }
       }
 
@@ -907,7 +905,7 @@
 
       fdl.addTo(map);
 
-      function addFeedinPoint(feature){
+      function addFeedinPoint(feature) {
         // Clear the GeoJSON layer
         fdl.clearLayers();
         // Add GeoJSON data in the layer
@@ -938,28 +936,30 @@
             'region_name': region_name,
           },
           success: addFeedinPoint
-        }).done(function(){
+        }).done(function() {
           map.spin(false)
         });
       };
 
 
 
-    document.getElementById("offcanvas-tabs").addEventListener(
-      "click",
-      function(event) {
-        console.log(event.target);
-        activePanel = get_active_panel();
-        console.log(activePanel);
-        if (activePanel == 'panel-energy-system'){
-          map.removeLayer(fdl);
-          map.addLayer(wdl);
-        }
-        if (activePanel == 'panel-feedinlib'){
-          map.removeLayer(wdl);
-          map.addLayer(fdl);
-        }
-      });
+      document.getElementById("offcanvas-tabs").addEventListener(
+        "click",
+        function(event) {
+          console.log(event.target);
+          activePanel = get_active_panel();
+          console.log(activePanel);
+          if (activePanel == 'panel-energy-system') {
+            map.removeLayer(fdl);
+            //map.removeLayer(lkl);
+            map.addLayer(wdl);
+          }
+          if (activePanel == 'panel-feedinlib') {
+            map.removeLayer(wdl);
+            //map.addLayer(lkl):
+            map.addLayer(fdl);
+          }
+        });
 
 
 
