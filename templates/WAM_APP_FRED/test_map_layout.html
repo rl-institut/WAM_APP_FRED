@@ -602,46 +602,50 @@
         }
       });
 
-            // Germany region boundaries
+
+
+
+
+      let landkreisOptions = {
+        onEachFeature: function(boundary, layer) {
+          layer.on('mouseover', function() {
+            if (this.clicked != true) {
+              this.setStyle(highlightStyleMouseOver);
+            }
+          });
+          layer.on('mouseout', function() {
+            if (this.clicked != true) {
+              this.setStyle(GerBoundStyle);
+            }
+          });
+          // select region and request data
+          layer.on('click', function(event) {
+            var active_panel = get_active_panel();
+            this.clicked = true;
+            this.setStyle(GerBoundZoomLvlStyle);
+            region = event.sourceTarget;
+            if (active_panel == 'panel-feedinlib') {
+              loadRegionFeedin(region, layer);
+            }
+
+          });
+        },
+        style: function(feature, latlng) {
+          return GerBoundStyle;
+        }
+      }
+
+      // Landkreis layer
+      var lkl = new L.geoJSON(null, landkreisOptions)
+      map.addLayer(lkl)
+
+      // Germany region boundaries
       $.ajax({
         url: ger_landkreis,
         dataType: 'json',
         async: true,
-        success: function(boundary) {
-          function onEachFeature(boundary, layer) {
-            layer.on('mouseover', function() {
-              if (this.clicked != true) {
-                this.setStyle(highlightStyleMouseOver);
-              }
-            });
-            layer.on('mouseout', function() {
-              if (this.clicked != true) {
-                this.setStyle(GerBoundStyle);
-              }
-            });
-            // select region and request data
-            layer.on('click', function(event) {
-              var active_panel = get_active_panel();
-              this.clicked = true;
-              this.setStyle(GerBoundZoomLvlStyle);
-              region = event.sourceTarget;
-              if (active_panel == 'panel-feedinlib') {
-                loadRegionFeedin(region, layer);
-              }
-
-              if (active_panel == 'panel-powerplants') {
-                loadRegionPowerPlants(region, layer);
-              }
-
-            });
-          }
-          var layer = new L.geoJSON(boundary, {
-            onEachFeature: onEachFeature,
-            style: function(feature, latlng) {
-              return GerBoundStyle;
-            }
-          })
-          map.addLayer(layer)
+        success: function(landkreis_data) {
+          lkl.addData(landkreis_data)
         }
       });
 
