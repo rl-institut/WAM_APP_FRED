@@ -272,12 +272,7 @@
     }
 
 
-    document.getElementById("offcanvas-tabs").addEventListener(
-      "click",
-      function(event) {
-        console.log(event.target);
-        console.log(get_active_panel());
-      });
+
 
     var biomassIcon = L.icon({
       iconUrl: "{% static 'WAM_APP_FRED/img/Pin_biomass_color_v2.svg' %}",
@@ -898,6 +893,24 @@
           map.spin(false)
         });
       };
+
+
+
+    document.getElementById("offcanvas-tabs").addEventListener(
+      "click",
+      function(event) {
+        console.log(event.target);
+        activePanel = get_active_panel();
+        console.log(activePanel);
+        if (activePanel == 'panel-energy-system'){
+          map.removeLayer(fdl);
+          map.addLayer(wdl);
+        }
+        if (activePanel == 'panel-feedinlib'){
+          map.removeLayer(wdl);
+          map.addLayer(fdl);
+        }
+      });
 
 
 
