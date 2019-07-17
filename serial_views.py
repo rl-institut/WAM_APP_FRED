@@ -70,6 +70,7 @@ class Serializer(View):
         # store the region index in a list
         regions_index.append(region_id)
 
+
     # load the landkreis
     with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/Germany_NUTS3_simplified.geojson', encoding='UTF-8') as g:
         glk = geojson.load(g)
@@ -131,51 +132,54 @@ def ppr_view(request):
         # select the shape of the region
         wkbs = [Serializer.regions_wkbs[region_id]]
         # Query the DB with the given wkbelement as input
-        for wkb in wkbs:
-            if LOCAL_TESTING is False:
-                # define the table columns for query
-                tbl_cols = Bundle(
-                    'powerplant',
-                    res_powerplant_tbl.id,
-                    res_powerplant_tbl.generation_type,
-                    res_powerplant_tbl.generation_subtype,
-                    res_powerplant_tbl.scenario
-                )
-                # create query
-                # ToDo: Is there a way to apply ST_Transform to Bundle
-                oep_query = Serializer.session.query(
-                    res_powerplant_tbl.rea_geom_new.ST_Transform(4326),
-                    tbl_cols
-                ) \
-                    .filter(
-                        and_(
-                            # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
-                            res_powerplant_tbl.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
-                            tbl_cols.c.scenario == EGO_DP_SCENARIO,
-                            tbl_cols.c.generation_type == generation_type
-                        )
-                    ).limit(1000)
-
-                for record in oep_query:
-                    # region_contains = loadswkb(str(record.powerplant.rea_geom_new), True)
-                    region_contains = loadswkb(str(record[0]), True)
-                    feature = Feature(
-                        id=record.powerplant.id,
-                        geometry=region_contains,
-                        property=dict(
-                            generation_type=generation_type,
-                            generation_subtype=record.powerplant.generation_subtype
-                        )
+        wkb = wkbs[0]
+        if LOCAL_TESTING is False:
+            # define the table columns for query
+            tbl_cols = Bundle(
+                'powerplant',
+                res_powerplant_tbl.id,
+                res_powerplant_tbl.generation_type,
+                res_powerplant_tbl.generation_subtype,
+                res_powerplant_tbl.scenario
+            )
+            # create query
+            # ToDo: Is there a way to apply ST_Transform to Bundle
+            oep_query = Serializer.session.query(
+                res_powerplant_tbl.rea_geom_new.ST_Transform(4326),
+                tbl_cols
+            ) \
+                .filter(
+                    and_(
+                        # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
+                        res_powerplant_tbl.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
+                        tbl_cols.c.scenario == EGO_DP_SCENARIO,
+                        tbl_cols.c.generation_type == generation_type
                     )
-                    myfeatures.append(feature)
-            else:
-                region_contains = loadswkb(str(wkb), True).centroid
+                ).limit(1000)
+
+            for record in oep_query:
+                # region_contains = loadswkb(str(record.powerplant.rea_geom_new), True)
+                region_contains = loadswkb(str(record[0]), True)
                 feature = Feature(
-                    id=101,
+                    id=record.powerplant.id,
                     geometry=region_contains,
-                    property=''
+                    property=dict(
+                        generation_type=generation_type,
+                        generation_subtype=record.powerplant.generation_subtype
+                    )
                 )
                 myfeatures.append(feature)
+        else:
+
+
+
+            region_contains = loadswkb(str(wkb), True).centroid
+            feature = Feature(
+                id=101,
+                geometry=region_contains,
+                property=''
+            )
+            myfeatures.append(feature)
 
     elif request.method == 'GET':
         print(request.GET)
