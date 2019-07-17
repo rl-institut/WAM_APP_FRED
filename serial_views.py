@@ -87,6 +87,9 @@ class Serializer(View):
         # store the region index in a list
         landkreis_index.append(lk_id)
 
+    # load the map ot the landkreis for each region
+    with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/Germany_NUTS3_simplified.geojson', encoding='UTF-8') as g:
+        gj_to_lk = geojson.load(g)
 
     def ger_boundaries_view(self):
 
