@@ -71,9 +71,11 @@ class Serializer(View):
         # store the region index in a list
         regions_index.append(region_id)
 
-
     # load the landkreis
-    with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/Germany_NUTS3_simplified.geojson', encoding='UTF-8') as g:
+    with open(
+        'WAM_APP_FRED/static/WAM_APP_FRED/geodata/Germany_NUTS3_simplified.geojson',
+        encoding='UTF-8'
+    ) as g:
         glk = geojson.load(g)
 
     landkreis_wkbs = {}
@@ -90,9 +92,11 @@ class Serializer(View):
         landkreis_index.append(lk_id)
 
     # load the map ot the landkreis for each region
-    with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/landkreis_map_to_region.json', encoding='UTF-8') as g:
+    with open(
+        'WAM_APP_FRED/static/WAM_APP_FRED/geodata/landkreis_map_to_region.json',
+        encoding='UTF-8'
+    ) as g:
         gj_to_lk = json.load(g)
-
 
     def ger_boundaries_view(self):
 
@@ -130,11 +134,6 @@ def ppr_view(request):
         if LOCAL_TESTING is False:
             # stores the current region boundary
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
-
-        # select the shape of the region
-        wkbs = [Serializer.regions_wkbs[region_id]]
-        # Query the DB with the given wkbelement as input
-        wkb = wkbs[0]
 
         landkreis_ids = Serializer.gj_to_lk[region_id]
 
@@ -207,7 +206,7 @@ def feedin_view(request):
     myfeatures = []
 
     if request.method == 'POST':
-        landkreis_props = {k:request.POST.get(k) for k in ['id', 'gen', 'bez', 'nuts']}
+        landkreis_props = {k: request.POST.get(k) for k in ['id', 'gen', 'bez', 'nuts']}
         lk_id = landkreis_props['nuts']
         # select the shape of the region
         wkbs = [Serializer.landkreis_wkbs[lk_id]]
@@ -252,7 +251,7 @@ def district_feedin_series(request):
                 nut = record.nut
 
             data = dict(
-                landkreis_id=lk_id ,
+                landkreis_id=lk_id,
                 timespan=timespan,
                 values=values,
                 nut=nut,
