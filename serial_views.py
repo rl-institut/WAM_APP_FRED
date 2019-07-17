@@ -5,6 +5,7 @@ from django.views import View
 from sqlalchemy import and_
 from sqlalchemy.orm import Bundle
 import sqlahelper as sah
+import json
 import geojson
 from geojson import Point, Feature, FeatureCollection, dumps
 from geoalchemy2.shape import from_shape
@@ -89,8 +90,9 @@ class Serializer(View):
         landkreis_index.append(lk_id)
 
     # load the map ot the landkreis for each region
-    with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/Germany_NUTS3_simplified.geojson', encoding='UTF-8') as g:
-        gj_to_lk = geojson.load(g)
+    with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/landkreis_map_to_region.json', encoding='UTF-8') as g:
+        gj_to_lk = json.load(g)
+
 
     def ger_boundaries_view(self):
 
