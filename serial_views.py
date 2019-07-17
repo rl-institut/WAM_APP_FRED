@@ -135,11 +135,15 @@ def ppr_view(request):
         wkbs = [Serializer.regions_wkbs[region_id]]
         # Query the DB with the given wkbelement as input
         wkb = wkbs[0]
+
+        landkreis_ids = Serializer.gj_to_lk[region_id]
+
         if LOCAL_TESTING is False:
             # define the table columns for query
             tbl_cols = Bundle(
                 'powerplant',
                 res_powerplant_tbl.id,
+                res_powerplant_tbl.nuts,  # added
                 res_powerplant_tbl.generation_type,
                 res_powerplant_tbl.generation_subtype,
                 res_powerplant_tbl.scenario
@@ -147,41 +151,47 @@ def ppr_view(request):
             # create query
             # ToDo: Is there a way to apply ST_Transform to Bundle
             oep_query = Serializer.session.query(
-                res_powerplant_tbl.rea_geom_new.ST_Transform(4326),
+                res_powerplant_tbl.rea_geom_new,
                 tbl_cols
             ) \
                 .filter(
                     and_(
                         # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
-                        res_powerplant_tbl.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
+                        tbl_cols.c.nuts.in_(landkreis_ids),  # added
                         tbl_cols.c.scenario == EGO_DP_SCENARIO,
                         tbl_cols.c.generation_type == generation_type
                     )
                 ).limit(1000)
 
             for record in oep_query:
-                # region_contains = loadswkb(str(record.powerplant.rea_geom_new), True)
+                # TODO
+                # this might need to be translated to 4326!!!
                 region_contains = loadswkb(str(record[0]), True)
                 feature = Feature(
                     id=record.powerplant.id,
                     geometry=region_contains,
                     property=dict(
+                        region_id=region_id,
                         generation_type=generation_type,
                         generation_subtype=record.powerplant.generation_subtype
                     )
                 )
                 myfeatures.append(feature)
         else:
+            for lk_id in landkreis_ids:
+                lk_wkb = Serializer.landkreis_wkbs[lk_id]
+                landkreis_center = loadswkb(str(lk_wkb), True).centroid
 
-
-
-            region_contains = loadswkb(str(wkb), True).centroid
-            feature = Feature(
-                id=101,
-                geometry=region_contains,
-                property=''
-            )
-            myfeatures.append(feature)
+                feature = Feature(
+                    id=lk_id,
+                    geometry=landkreis_center,
+                    property=dict(
+                        region_id=region_id,
+                        generation_type=generation_type,
+                        generation_subtype='',
+                    )
+                )
+                myfeatures.append(feature)
 
     elif request.method == 'GET':
         print(request.GET)
