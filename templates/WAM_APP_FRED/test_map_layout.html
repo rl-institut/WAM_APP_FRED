@@ -417,7 +417,8 @@
           console.log('not fetching data a second time')
           displayWeatherDataPoint(marker.feature)
         } else {
-          map.spin(true)
+          if (map.spin)
+          {map.spin(true)}
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
@@ -438,7 +439,8 @@
             },
             success: displayWeatherDataPoint,
           }).done(function() {
-            map.spin(false)
+            if (map.spin)
+            {map.spin(false)}
           });
         }
       }
@@ -519,7 +521,8 @@
       function onMapClick(ev) {
         var active_panel = get_active_panel();
         if (active_panel == 'panel-energy-system') {
-          map.spin(true)
+          if (map.spin)
+          {map.spin(true)}
           var latlng = map.mouseEventToLatLng(ev.originalEvent);
           $.ajax({
             type: 'POST',
@@ -533,7 +536,8 @@
             },
             success: addWeatherPoint,
           }).done(function() {
-            map.spin(false)
+            if (map.spin)
+            {map.spin(false)}
           });
         }
       };
@@ -683,7 +687,8 @@
         region_name = region.feature.properties.name;
         generation_type = $("input[name=generation_type]:checked").val();
         //set the spinner
-        map.spin(true);
+        if (map.spin)
+        {map.spin(true)}
         $.ajax({
           url: ppr_location,
           type: 'POST',
@@ -699,13 +704,15 @@
 
         }).done(function() {
           //remove spinner when done loading
-          map.spin(false);
+          if (map.spin)
+          {map.spin(false)}
         });
       }
 
 
       function onPowerPlantDataPointClick(event) {
-        map.spin(true)
+        if (map.spin)
+        {map.spin(true)}
         var marker = event.sourceTarget;
         var leaflet_id = L.stamp(marker);
         var pp_id = marker.feature.id;
@@ -723,7 +730,8 @@
             displayPowerPlantDataPoint(thispopupcontent, marker)
           }
         }).done(function() {
-          map.spin(false)
+          if (map.spin)
+          {map.spin(false)}
         });
       }
 
@@ -872,7 +880,8 @@
           console.log('not fetching data a second time')
           updateFeedinPopup(marker.feature, marker)
         } else {
-          map.spin(true)
+          if (map.spin)
+          {map.spin(true)}
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
@@ -886,7 +895,8 @@
               updateFeedinPopup(data, marker)
             }
           }).done(function() {
-            map.spin(false)
+            if (map.spin)
+            {map.spin(false)}
           });
         }
       }
@@ -924,7 +934,8 @@
 
 
       function loadRegionFeedin(landkreis, layer) {
-        map.spin(true)
+        if (map.spin)
+        {map.spin(true)}
         landkreis_props = landkreis.feature.properties;
         $.ajax({
           url: feedin_location,
@@ -936,7 +947,8 @@
           data: landkreis_props,
           success: addFeedinPoint
         }).done(function() {
-          map.spin(false)
+          if (map.spin)
+          {map.spin(false)}
         });
       };
 
