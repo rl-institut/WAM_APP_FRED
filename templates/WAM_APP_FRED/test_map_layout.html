@@ -605,10 +605,6 @@
         }
       });
 
-
-
-
-
       let landkreisOptions = {
         onEachFeature: function(boundary, layer) {
           layer.on('mouseover', function() {
@@ -628,6 +624,7 @@
             this.setStyle(GerBoundZoomLvlStyle);
             region = event.sourceTarget;
             if (active_panel == 'panel-feedinlib') {
+              console.log('load_region');
               loadRegionFeedin(region, layer);
             }
 
@@ -760,10 +757,6 @@
         // ugly function body insert generic or something similar
         var marker = L.marker(latlng, myLayerStyle)
 
-        console.log(feature);
-        console.log(feature.property);
-        console.log(feature.property.generation_subtype);
-
         if (feature.property.generation_subtype === "solar_roof_mounted") {
           marker.setIcon({
             icon: solarRoofIcon
@@ -876,6 +869,7 @@
         var landkreis_props = marker.feature.properties;
         // this need to be linked to user choice
 
+
         if (marker.feature.properties.timespan) {
           // do not fetch the data a second time
           console.log('not fetching data a second time')
@@ -906,7 +900,6 @@
       let feedinOptions = {
         pointToLayer: createFeedinPopup,
         onEachFeature: function(feature, layer) {
-
           layer.bindPopup('Loading...');
           layer.on('click', onFeedinPointClick);
         }
@@ -914,7 +907,6 @@
 
 
       var fdl = new L.geoJSON(null, feedinOptions);
-
       fdl.addTo(map);
 
       function addFeedinPoint(feature) {
@@ -958,18 +950,25 @@
       document.getElementById("offcanvas-tabs").addEventListener(
         "click",
         function(event) {
-          console.log(event.target);
           activePanel = get_active_panel();
-          console.log(activePanel);
           if (activePanel == 'panel-energy-system') {
+            console.log(map.hasLayer(ppl));
             map.removeLayer(fdl);
-            //map.removeLayer(lkl);
+            map.removeLayer(ppl);
+            console.log(map.hasLayer(ppl));
+            console.log(map);
             map.addLayer(wdl);
           }
           if (activePanel == 'panel-feedinlib') {
             map.removeLayer(wdl);
-            //map.addLayer(lkl):
+            map.removeLayer(ppl);
             map.addLayer(fdl);
+          }
+
+          if (activePanel == 'panel-powerplants'){
+            map.removeLayer(wdl);
+            map.removeLayer(fdl);
+            map.addLayer(ppl);
           }
         });
 
