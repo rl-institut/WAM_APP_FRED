@@ -143,6 +143,7 @@ def ppr_view(request):
                 'powerplant',
                 res_powerplant_tbl.id,
                 res_powerplant_tbl.nuts,  # added
+                res_powerplant_tbl.version,
                 res_powerplant_tbl.generation_type,
                 res_powerplant_tbl.generation_subtype,
                 res_powerplant_tbl.scenario
@@ -157,6 +158,7 @@ def ppr_view(request):
                     and_(
                         # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
                         tbl_cols.c.nuts.in_(landkreis_ids),  # added
+                        tbl_cols.c.version == EGO_DP_VERSION,
                         tbl_cols.c.scenario == EGO_DP_SCENARIO,
                         tbl_cols.c.generation_type == generation_type
                     )
@@ -308,6 +310,8 @@ def ppr_popup_view(request):
                 .filter(
                     and_(
                         tbl_cols_property.c.version == EGO_DP_VERSION,
+                        tbl_cols_property.c.scenario == EGO_DP_SCENARIO,
+                        tbl_cols.c.scenario == EGO_DP_SCENARIO,
                         tbl_cols_property.c.id == pp_id
                     )
                 )
