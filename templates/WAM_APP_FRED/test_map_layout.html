@@ -590,10 +590,9 @@
           return GerBoundStyle;
         }
       }
-
-      // Landkreis layer
-      var ppl = new L.geoJSON(null, powerplantOptions);
-      map.addLayer(ppl);
+      //Region layer
+      var rel = new L.geoJSON(null, powerplantOptions);
+      //map.addLayer(rel);
 
       // Germany region boundaries
       $.ajax({
@@ -601,7 +600,7 @@
         dataType: 'json',
         async: true,
         success: function(region_data) {
-          ppl.addData(region_data)
+          rel.addData(region_data)
         }
       });
 
@@ -637,7 +636,7 @@
 
       // Landkreis layer
       var lkl = new L.geoJSON(null, landkreisOptions)
-      map.addLayer(lkl)
+      //map.addLayer(lkl)
 
       // Germany region boundaries
       $.ajax({
@@ -907,7 +906,7 @@
 
 
       var fdl = new L.geoJSON(null, feedinOptions);
-      fdl.addTo(map);
+      //fdl.addTo(map);
 
       function addFeedinPoint(feature) {
         // Clear the GeoJSON layer
@@ -952,13 +951,13 @@
         function(event) {
           activePanel = get_active_panel();
           if (activePanel == 'panel-energy-system') {
-            if (map.hasLayer(ppl)){map.removeLayer(ppl)}
+            if (map.hasLayer(rel)){map.removeLayer(rel)}
             if (map.hasLayer(fdl)){map.removeLayer(fdl)}
             if (map.hasLayer(lkl)){map.removeLayer(lkl)}
             if (!map.hasLayer(wdl)){map.addLayer(wdl)}
           }
           if (activePanel == 'panel-feedinlib') {
-            if (map.hasLayer(ppl)){map.removeLayer(ppl)}
+            if (map.hasLayer(rel)){map.removeLayer(rel)}
             if (map.hasLayer(wdl)){map.removeLayer(wdl)}
             if (!map.hasLayer(fdl)){map.addLayer(fdl)}
             if (!map.hasLayer(lkl)){map.addLayer(lkl)}
@@ -967,7 +966,8 @@
           if (activePanel == 'panel-powerplants'){
             if (map.hasLayer(wdl)){map.removeLayer(wdl)}
             if (map.hasLayer(fdl)){map.removeLayer(fdl)}
-            if (!map.hasLayer(ppl)){map.addLayer(ppl)}
+            if (map.hasLayer(lkl)){map.removeLayer(lkl)}
+            if (!map.hasLayer(rel)){map.addLayer(rel)}
           }
         });
 
