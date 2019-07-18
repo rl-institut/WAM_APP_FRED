@@ -136,7 +136,7 @@ def ppr_view(request):
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
         landkreis_ids = Serializer.gj_to_lk[region_id]
-
+        print(landkreis_ids)
         if LOCAL_TESTING is False:
             # define the table columns for query
             tbl_cols = Bundle(
@@ -162,7 +162,7 @@ def ppr_view(request):
                         tbl_cols.c.scenario == EGO_DP_SCENARIO,
                         tbl_cols.c.generation_type == generation_type
                     )
-                ).limit(1000)
+                ).limit(10)
 
             for record in oep_query:
                 # TODO
@@ -177,6 +177,7 @@ def ppr_view(request):
                         generation_subtype=record.powerplant.generation_subtype
                     )
                 )
+                print(record.powerplant.id)
                 myfeatures.append(feature)
         else:
             for lk_id in landkreis_ids:
@@ -311,7 +312,6 @@ def ppr_popup_view(request):
                     and_(
                         tbl_cols_property.c.version == EGO_DP_VERSION,
                         tbl_cols_property.c.scenario == EGO_DP_SCENARIO,
-                        tbl_cols.c.scenario == EGO_DP_SCENARIO,
                         tbl_cols_property.c.id == pp_id
                     )
                 )

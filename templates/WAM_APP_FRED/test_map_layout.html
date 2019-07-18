@@ -562,7 +562,7 @@
       };
 
 
-      let powerplantOptions = {
+      let regionsOptions = {
         onEachFeature: function(boundary, layer) {
           layer.on('mouseover', function() {
             if (this.clicked != true) {
@@ -591,7 +591,7 @@
         }
       }
       //Region layer
-      var rel = new L.geoJSON(null, powerplantOptions);
+      var rel = new L.geoJSON(null, regionsOptions);
       //map.addLayer(rel);
 
       // Germany region boundaries
@@ -653,30 +653,36 @@
       ///////////////////////////////////////////////////////////////////////////////////////////////////////
       // res PowerPlants in region boundaries
 
-      function enablePowPlPopup(feature, layer) {
-        layer.bindPopup('Loading...');
-        layer.on('click', onPowerPlantDataPointClick);
-      }
-
       var regionPowerPlantgroup = L.layerGroup().addTo(map);
 
-      function createPowerPlantsPoints(powerplants) {
-        var layer = new L.geoJSON(powerplants, {
-          onEachFeature: enablePowPlPopup,
-          pointToLayer: createCircles // addPowerPlantMarker
-        });
+      let powerplantOptions = {
+        pointToLayer: createCircles,
+        onEachFeature: function(feature, layer) {
+          layer.bindPopup('Loading...');
+          layer.on('click', onFeedinPointClick);
+        }
+      };
+
+      var ppl = new L.geoJSON(null, powerplantOptions);
+      ppl.addTo(map);
+
+      function addPowerPlantsPoints(feature) {
+        console.log(feature);
+        // Clear the GeoJSON layer
+        ppl.clearLayers();
+        // Add GeoJSON data in the layer
+        ppl.addData(feature);
+
         var clusters = L.markerClusterGroup();
-        clusters.addLayer(layer);
+        clusters.addLayer(ppl);
         if (regionPowerPlantgroup.getLayers().length === 0) {
           regionPowerPlantgroup.addLayer(clusters)
         } else {
           regionPowerPlantgroup.clearLayers();
           regionPowerPlantgroup.addLayer(clusters)
         }
+
       }
-
-
-
 
       // request all power plants contained in selected region
       // also include the generation_type option
@@ -697,7 +703,7 @@
             'region_name': region_name,
             'generation_type': generation_type
           },
-          success: createPowerPlantsPoints
+          success: addPowerPlantsPoints
 
         }).done(function() {
           //remove spinner when done loading
