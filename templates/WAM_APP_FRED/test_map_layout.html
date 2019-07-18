@@ -952,23 +952,22 @@
         function(event) {
           activePanel = get_active_panel();
           if (activePanel == 'panel-energy-system') {
-            console.log(map.hasLayer(ppl));
-            map.removeLayer(fdl);
-            map.removeLayer(ppl);
-            console.log(map.hasLayer(ppl));
-            console.log(map);
-            map.addLayer(wdl);
+            if (map.hasLayer(ppl)){map.removeLayer(ppl)}
+            if (map.hasLayer(fdl)){map.removeLayer(fdl)}
+            if (map.hasLayer(lkl)){map.removeLayer(lkl)}
+            if (!map.hasLayer(wdl)){map.addLayer(wdl)}
           }
           if (activePanel == 'panel-feedinlib') {
-            map.removeLayer(wdl);
-            map.removeLayer(ppl);
-            map.addLayer(fdl);
+            if (map.hasLayer(ppl)){map.removeLayer(ppl)}
+            if (map.hasLayer(wdl)){map.removeLayer(wdl)}
+            if (!map.hasLayer(fdl)){map.addLayer(fdl)}
+            if (!map.hasLayer(lkl)){map.addLayer(lkl)}
           }
 
           if (activePanel == 'panel-powerplants'){
-            map.removeLayer(wdl);
-            map.removeLayer(fdl);
-            map.addLayer(ppl);
+            if (map.hasLayer(wdl)){map.removeLayer(wdl)}
+            if (map.hasLayer(fdl)){map.removeLayer(fdl)}
+            if (!map.hasLayer(ppl)){map.addLayer(ppl)}
           }
         });
 
