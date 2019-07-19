@@ -976,7 +976,33 @@
         });
 
 
+      function feedinControlChanged(event) {
+        marker = fdl.getLayers()[0];
+        // if yes, then resimulate a userlick on the marker to update the popup
+        // TODO : if the selections are the same (i.e. if user simply clicked on
+        // the div, don't fire the click (could compare the marker.feature.properties
+        // with the actual values from the forms using theirs id. (need to write the values
+        // of the start and end data as well as technology selection in the properties of
+        // the marker (this could be done in serial_views.py or in createFeedinPopup)
+        if (marker) {
+          marker.fire('click');
+        }
+      }
 
+      fd_controls = [
+        "id_fd_timespan_start-year",
+        "id_fd_timespan_start-month",
+        "id_fd_timespan_end-year",
+        "id_fd_timespan_end-month",
+        "id_fd-technology"
+      ]
+
+      for (const element of fd_controls) {
+        document.getElementById(element).addEventListener(
+          "change",
+          feedinControlChanged
+        );
+      }
 
     };
   </script>
