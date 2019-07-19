@@ -1,5 +1,6 @@
 # serialize data for all models
 import datetime
+import json
 from django.http import HttpResponse
 from django.views import View
 from sqlalchemy import and_
@@ -90,6 +91,13 @@ class Serializer(View):
         # store the region index in a list
         landkreis_index.append(lk_id)
 
+    # load the map ot the landkreis for each region
+    with open(
+            'WAM_APP_FRED/static/WAM_APP_FRED/geodata/landkreis_map_to_region.json',
+            encoding='UTF-8'
+    ) as g:
+        gj_to_lk = json.load(g)
+
     def ger_boundaries_view(self):
 
         germany_boundaries = Serializer.gj
@@ -127,52 +135,61 @@ def ppr_view(request):
             # stores the current region boundary
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
-        # select the shape of the region
-        wkbs = [Serializer.regions_wkbs[region_id]]
-        # Query the DB with the given wkbelement as input
-        for wkb in wkbs:
-            if LOCAL_TESTING is False:
-                # define the table columns for query
-                tbl_cols = Bundle(
-                    'powerplant',
-                    res_powerplant_tbl.id,
-                    res_powerplant_tbl.generation_type,
-                    res_powerplant_tbl.generation_subtype,
-                    res_powerplant_tbl.scenario
-                )
-                # create query
-                # ToDo: Is there a way to apply ST_Transform to Bundle
-                oep_query = Serializer.session.query(
-                    res_powerplant_tbl.rea_geom_new.ST_Transform(4326),
-                    tbl_cols
-                ) \
-                    .filter(
-                        and_(
-                            # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
-                            res_powerplant_tbl.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
-                            tbl_cols.c.scenario == EGO_DP_SCENARIO,
-                            tbl_cols.c.generation_type == generation_type
-                        )
-                    ).limit(1000)
-
-                for record in oep_query:
-                    # region_contains = loadswkb(str(record.powerplant.rea_geom_new), True)
-                    region_contains = loadswkb(str(record[0]), True)
-                    feature = Feature(
-                        id=record.powerplant.id,
-                        geometry=region_contains,
-                        property=dict(
-                            generation_type=generation_type,
-                            generation_subtype=record.powerplant.generation_subtype
-                        )
+        landkreis_ids = Serializer.gj_to_lk[region_id]
+        if LOCAL_TESTING is False:
+            # define the table columns for query
+            tbl_cols = Bundle(
+                'powerplant',
+                res_powerplant_tbl.id,
+                res_powerplant_tbl.nuts,  # added
+                res_powerplant_tbl.version,
+                res_powerplant_tbl.generation_type,
+                res_powerplant_tbl.generation_subtype,
+                res_powerplant_tbl.scenario
+            )
+            # create query
+            # ToDo: Is there a way to apply ST_Transform to Bundle
+            oep_query = Serializer.session.query(
+                res_powerplant_tbl.rea_geom_new,
+                tbl_cols
+            ) \
+                .filter(
+                    and_(
+                        # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
+                        tbl_cols.c.nuts.in_(landkreis_ids),  # added
+                        tbl_cols.c.version == EGO_DP_VERSION,
+                        tbl_cols.c.scenario == EGO_DP_SCENARIO,
+                        tbl_cols.c.generation_type == generation_type
                     )
-                    myfeatures.append(feature)
-            else:
-                region_contains = loadswkb(str(wkb), True).centroid
+                ).limit(1000)
+
+            for record in oep_query:
+                # TODO
+                # this might need to be translated to 4326!!!
+                region_contains = loadswkb(str(record[0]), True)
                 feature = Feature(
-                    id=101,
+                    id=record.powerplant.id,
                     geometry=region_contains,
-                    property=''
+                    property=dict(
+                        region_id=region_id,
+                        generation_type=generation_type,
+                        generation_subtype=record.powerplant.generation_subtype
+                    )
+                )
+                myfeatures.append(feature)
+        else:
+            for lk_id in landkreis_ids:
+                lk_wkb = Serializer.landkreis_wkbs[lk_id]
+                landkreis_center = loadswkb(str(lk_wkb), True).centroid
+
+                feature = Feature(
+                    id=lk_id,
+                    geometry=landkreis_center,
+                    property=dict(
+                        region_id=region_id,
+                        generation_type=generation_type,
+                        generation_subtype='',
+                    )
                 )
                 myfeatures.append(feature)
 
@@ -292,6 +309,7 @@ def ppr_popup_view(request):
                 .filter(
                     and_(
                         tbl_cols_property.c.version == EGO_DP_VERSION,
+                        tbl_cols_property.c.scenario == EGO_DP_SCENARIO,
                         tbl_cols_property.c.id == pp_id
                     )
                 )
