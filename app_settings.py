@@ -1,8 +1,9 @@
 import os
-from sqlalchemy import create_engine
-import sqlahelper
 import oedialect  # noqa pylint: disable=unused-import
 from configobj import ConfigObj
+from sqlalchemy import create_engine
+import sqlahelper
+
 
 from wam import settings  # pylint: disable=import-error
 

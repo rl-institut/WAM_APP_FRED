@@ -180,7 +180,7 @@
                   <div class="tabs-panel" id="panel-feedinlib">
                     <p>
                       Select a variable and a time span, then click on a region highlighted on the map. The data will be displayed on a graph inside a popup.
-                       Currently the plot in the popup window 
+                      Currently the plot in the popup window
                       shows data received from a test data set.
                     </p>
                     <!--<div id="feedin-plot" style="width:300px;height:250px;">
@@ -263,8 +263,6 @@
   <script src="{% static 'WAM_APP_FRED/foundation/js/app.js' %}"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script type="text/javascript">
-
-  
     function get_active_panel() {
       var active_panel = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
       active_panel = active_panel.attr('id');
@@ -706,7 +704,7 @@
           },
           success: addPowerPlantsPoints
 
-        }).done(function(){
+        }).done(function() {
           //remove spinner when done loading
           if (map.spin)
           {map.spin(false)}
@@ -755,10 +753,6 @@
       function addPowerPlantMarker(feature, latlng) {
         // ugly function body insert generic or something similar
         var marker = L.marker(latlng, myLayerStyle)
-
-        console.log(feature);
-        console.log(feature.property);
-        console.log(feature.property.generation_subtype);
 
         if (feature.property.generation_subtype === "solar_roof_mounted") {
           marker.setIcon({
