@@ -635,19 +635,16 @@
             this.setStyle(GerBoundZoomLvlStyle);
             region = event.sourceTarget;
             if (active_panel == 'panel-feedinlib') {
-              console.log('load_region');
-              loadRegionFeedin(region, layer);
+              loadLandkreisFeedin(region, layer);
             }
 
           });
         }
       }
-
       // Landkreis layer
       var lkl = new L.geoJSON(null, landkreisOptions)
-      //map.addLayer(lkl)
 
-      // Germany region boundaries
+      // fetch Germany landkreis geojsons
       $.ajax({
         url: ger_landkreis,
         dataType: 'json',
