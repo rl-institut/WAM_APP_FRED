@@ -567,36 +567,47 @@
         fillColor: "#0BC11C",
       };
 
-      // Germany region boundaries
+      // these will apply to geojson object added to the
+      // rel layer (region layer)
+      let regionsOptions = {
+        style: function(feature, latlng) {
+          return GerBoundStyle;
+        },
+        onEachFeature: function(boundary, layer) {
+          layer.on('mouseover', function() {
+            if (this.clicked != true) {
+              this.setStyle(highlightStyleMouseOver);
+            }
+          });
+          layer.on('mouseout', function() {
+            if (this.clicked != true) {
+              this.setStyle(GerBoundStyle);
+            }
+          });
+          // select region and request data
+          layer.on('click', function(event) {
+            var active_panel = get_active_panel();
+            this.clicked = true;
+            this.setStyle(GerBoundZoomLvlStyle);
+            region = event.sourceTarget;
+            if (active_panel == 'panel-powerplants') {
+              loadRegionPowerPlants(region, layer);
+            }
+          });
+        }
+      }
+      //Region layer
+      var rel = new L.geoJSON(null, regionsOptions);
+
+      // fetch Germany region geojsons
       $.ajax({
         url: ger_boundaries,
         dataType: 'json',
         async: true,
-        success: function(boundary) {
-          function onEachFeature(boundary, layer) {
-            layer.on('mouseover', function() {
-              if (this.clicked != true) {
-                this.setStyle(highlightStyleMouseOver);
-              }
-            });
-            layer.on('mouseout', function() {
-              if (this.clicked != true) {
-                this.setStyle(GerBoundStyle);
-              }
-            });
-            // select region and request data
-            layer.on('click', function(event) {
-              var active_panel = get_active_panel();
-              this.clicked = true;
-              this.setStyle(GerBoundZoomLvlStyle);
-              region = event.sourceTarget;
-              if (active_panel == 'panel-feedinlib') {
-                loadRegionFeedin(region, layer);
-              }
-
-              if (active_panel == 'panel-powerplants') {
-                loadRegionPowerPlants(region, layer);
-              }
+        success: function(region_data) {
+          rel.addData(region_data)
+        }
+      });
 
             });
           }
