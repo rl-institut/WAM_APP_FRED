@@ -102,11 +102,11 @@ class Serializer(View):
         ) as g:
             gj_to_lk = json.load(g)
 
-            for i, f in enumerate(gj_to_lk['features']):
-                if ppr_region in f['properties']['region']:
-                    nuts_1_temp = f['properties']['nuts_1']
-                    if nuts_1_temp not in nuts_1:
-                        nuts_1.append(nuts_1_temp)
+        for i, f in enumerate(gj_to_lk['features']):
+            if ppr_region in f['properties']['region']:
+                nuts_1_temp = f['properties']['nuts_1']
+                if nuts_1_temp not in nuts_1:
+                    nuts_1.append(nuts_1_temp)
 
         return nuts_1
 
