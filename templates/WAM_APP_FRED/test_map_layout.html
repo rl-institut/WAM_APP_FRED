@@ -355,6 +355,7 @@
     var weather_data_click_location = "{% url 'WAM_APP_FRED:WeatherPointClick'|add:'.data' %}";
 
     var ger_boundaries = "{% url 'WAM_APP_FRED:GerBoundary'|add:'.data' %}";
+    var ger_landkreis = "{% url 'WAM_APP_FRED:GerLandkreis'|add:'.data' %}";
 
     var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
     var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
@@ -609,17 +610,53 @@
         }
       });
 
-            });
-          }
-          var layer = new L.geoJSON(boundary, {
-            onEachFeature: onEachFeature,
-            style: function(feature, latlng) {
-              return GerBoundStyle;
+
+      // these will apply to geojson object added to the
+      // lkl layer (landkreis layer)
+      let landkreisOptions = {
+        style: function(feature, latlng) {
+          return GerBoundStyle;
+        },
+        onEachFeature: function(boundary, layer) {
+          layer.on('mouseover', function() {
+            if (this.clicked != true) {
+              this.setStyle(highlightStyleMouseOver);
             }
-          })
-          map.addLayer(layer)
+          });
+          layer.on('mouseout', function() {
+            if (this.clicked != true) {
+              this.setStyle(GerBoundStyle);
+            }
+          });
+          // select region and request data
+          layer.on('click', function(event) {
+            var active_panel = get_active_panel();
+            this.clicked = true;
+            this.setStyle(GerBoundZoomLvlStyle);
+            region = event.sourceTarget;
+            if (active_panel == 'panel-feedinlib') {
+              console.log('load_region');
+              loadRegionFeedin(region, layer);
+            }
+
+          });
+        }
+      }
+
+      // Landkreis layer
+      var lkl = new L.geoJSON(null, landkreisOptions)
+      //map.addLayer(lkl)
+
+      // Germany region boundaries
+      $.ajax({
+        url: ger_landkreis,
+        dataType: 'json',
+        async: true,
+        success: function(landkreis_data) {
+          lkl.addData(landkreis_data)
         }
       });
+
 
       //PowePlantRegister StartSection
       ///////////////////////////////////////////////////////////////////////////////////////////////////////
