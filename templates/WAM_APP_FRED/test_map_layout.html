@@ -272,12 +272,7 @@
     }
 
 
-    document.getElementById("offcanvas-tabs").addEventListener(
-      "click",
-      function(event) {
-        console.log(event.target);
-        console.log(get_active_panel());
-      });
+
 
     var biomassIcon = L.icon({
       iconUrl: "{% static 'WAM_APP_FRED/img/Pin_biomass_color_v2.svg' %}",
@@ -943,6 +938,33 @@
           {map.spin(false)}
         });
       };
+
+
+
+      document.getElementById("offcanvas-tabs").addEventListener(
+        "click",
+        function(event) {
+          activePanel = get_active_panel();
+          if (activePanel == 'panel-energy-system') {
+            if (map.hasLayer(rel)){map.removeLayer(rel)}
+            if (map.hasLayer(fdl)){map.removeLayer(fdl)}
+            if (map.hasLayer(lkl)){map.removeLayer(lkl)}
+            if (!map.hasLayer(wdl)){map.addLayer(wdl)}
+          }
+          if (activePanel == 'panel-feedinlib') {
+            if (map.hasLayer(rel)){map.removeLayer(rel)}
+            if (map.hasLayer(wdl)){map.removeLayer(wdl)}
+            if (!map.hasLayer(fdl)){map.addLayer(fdl)}
+            if (!map.hasLayer(lkl)){map.addLayer(lkl)}
+          }
+
+          if (activePanel == 'panel-powerplants'){
+            if (map.hasLayer(wdl)){map.removeLayer(wdl)}
+            if (map.hasLayer(fdl)){map.removeLayer(fdl)}
+            if (map.hasLayer(lkl)){map.removeLayer(lkl)}
+            if (!map.hasLayer(rel)){map.addLayer(rel)}
+          }
+        });
 
 
 
