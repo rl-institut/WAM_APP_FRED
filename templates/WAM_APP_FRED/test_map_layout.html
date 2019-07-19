@@ -849,9 +849,10 @@
       ///// Feedinlib
       //
       function updateFeedinPopup(data, marker) {
-
         var popup = marker.getPopup();
-        var popupContent = '<h4> Timeseries </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
+        const name = data.properties.gen
+        const lk_id = data.landkreis_id
+        var popupContent = '<h4> ' + name + ' ('+ lk_id +') </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
         popup.setContent(popupContent)
 
         plot_div = document.getElementById('feedin-plot');
@@ -868,14 +869,13 @@
 
 
       function onFeedinPointClick(event) {
-
         var marker = event.sourceTarget;
         var leaflet_id = L.stamp(marker);
         var popup = marker.getPopup();
         var latlng = marker.getLatLng();
-        var region_id = marker.feature.id;
-        // this need to be linked to user choice
-
+        var landkreis_props = marker.feature.properties;
+        // TODO : this need to be linked to user choice for wd_timespan
+        //
         if (marker.feature.properties.timespan) {
           // do not fetch the data a second time
           console.log('not fetching data a second time')
@@ -887,13 +887,9 @@
           $.ajax({
             type: 'POST',
             url: feedin_content,
-            headers: {
-              'X-CSRFToken': '{{ csrf_token }}'
-            },
-            data: {
-              'region_id': region_id,
-            },
-            success: function (data){
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            data: landkreis_props,
+            success: function(data) {
               updateFeedinPopup(data, marker)
             }
           }).done(function() {
@@ -903,27 +899,27 @@
         }
       }
 
-
+      // these will apply to geojson object added to the
+      // fdl layer (feedinlib layer)
       let feedinOptions = {
         pointToLayer: createFeedinPopup,
         onEachFeature: function(feature, layer) {
-
           layer.bindPopup('Loading...');
-
           layer.on('click', onFeedinPointClick);
         }
       };
 
-
+      // Layer containing the markers created by user click for feedinlib
       var fdl = new L.geoJSON(null, feedinOptions);
 
-      fdl.addTo(map);
-
-      function addFeedinPoint(feature){
+      function addFeedinPoint(feature) {
         // Clear the GeoJSON layer
-        fdl.clearLayers()
+        fdl.clearLayers();
         // Add GeoJSON data in the layer
-        fdl.addData(feature)
+        fdl.addData(feature);
+        // Simulate a click on the marker
+        marker = fdl.getLayers()[0];
+        marker.fire('click');
       }
 
 
@@ -932,20 +928,16 @@
       }
 
 
-      function loadRegionFeedin(region, layer) {
-        region_name = region.feature.properties.name;
+      function loadLandkreisFeedin(landkreis, layer) {
         if (map.spin)
         {map.spin(true)}
+        landkreis_props = landkreis.feature.properties;
         $.ajax({
           url: feedin_location,
           type: 'POST',
           async: true,
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-          },
-          data: {
-            'region_name': region_name,
-          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          data: landkreis_props,
           success: addFeedinPoint
         }).done(function() {
           if (map.spin)
