@@ -110,7 +110,6 @@ class Serializer(View):
 
         return nuts_1
 
-
     def ger_boundaries_view(self):
 
         germany_boundaries = Serializer.gj
@@ -148,7 +147,6 @@ def ppr_view(request):
             # stores the current region boundary
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
-        # landkreis_ids = Serializer.gj_to_lk[region_id]
         ser = Serializer()
         landkreis_ids = ser.nuts_1_for_region(region_id)
         if LOCAL_TESTING is False:
