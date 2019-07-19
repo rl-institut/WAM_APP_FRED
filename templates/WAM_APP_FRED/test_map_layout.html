@@ -423,7 +423,8 @@
           console.log('not fetching data a second time')
           displayWeatherDataPoint(marker.feature)
         } else {
-          map.spin(true)
+          if (map.spin)
+          {map.spin(true)}
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
@@ -443,9 +444,10 @@
               'end_year': stop_year
             },
             success: displayWeatherDataPoint,
-          }).done(function(){
-          map.spin(false)
-        });
+          }).done(function() {
+            if (map.spin)
+            {map.spin(false)}
+          });
         }
       }
 
@@ -525,7 +527,8 @@
       function onMapClick(ev) {
         var active_panel = get_active_panel();
         if (active_panel == 'panel-energy-system') {
-          map.spin(true)
+          if (map.spin)
+          {map.spin(true)}
           var latlng = map.mouseEventToLatLng(ev.originalEvent);
           $.ajax({
             type: 'POST',
@@ -538,9 +541,10 @@
               'lon': latlng.lng
             },
             success: addWeatherPoint,
-          }).done(function(){
-          map.spin(false)
-        });
+          }).done(function() {
+            if (map.spin)
+            {map.spin(false)}
+          });
         }
       };
 
@@ -641,7 +645,8 @@
         region_name = region.feature.properties.name;
         generation_type = $("input[name=generation_type]:checked").val();
         //set the spinner
-        map.spin(true);
+        if (map.spin)
+        {map.spin(true)}
         $.ajax({
           url: ppr_location,
           type: 'POST',
@@ -657,13 +662,15 @@
 
         }).done(function(){
           //remove spinner when done loading
-          map.spin(false);
+          if (map.spin)
+          {map.spin(false)}
         });
       }
-      
-      
+
+
       function onPowerPlantDataPointClick(event) {
-        map.spin(true)
+        if (map.spin)
+        {map.spin(true)}
         var marker = event.sourceTarget;
         var leaflet_id = L.stamp(marker);
         var pp_id = marker.feature.id;
@@ -680,8 +687,9 @@
           success: function(thispopupcontent) {
             displayPowerPlantDataPoint(thispopupcontent, marker)
           }
-        }).done(function(){
-          map.spin(false)
+        }).done(function() {
+          if (map.spin)
+          {map.spin(false)}
         });
       }
 
@@ -828,7 +836,8 @@
           console.log('not fetching data a second time')
           updateFeedinPopup(marker.feature, marker)
         } else {
-          map.spin(true)
+          if (map.spin)
+          {map.spin(true)}
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
@@ -842,9 +851,10 @@
             success: function (data){
               updateFeedinPopup(data, marker)
             }
-          }).done(function(){
-          map.spin(false)
-        });
+          }).done(function() {
+            if (map.spin)
+            {map.spin(false)}
+          });
         }
       }
 
@@ -878,8 +888,9 @@
 
 
       function loadRegionFeedin(region, layer) {
-        map.spin(true)
         region_name = region.feature.properties.name;
+        if (map.spin)
+        {map.spin(true)}
         $.ajax({
           url: feedin_location,
           type: 'POST',
@@ -891,8 +902,9 @@
             'region_name': region_name,
           },
           success: addFeedinPoint
-        }).done(function(){
-          map.spin(false)
+        }).done(function() {
+          if (map.spin)
+          {map.spin(false)}
         });
       };
 
