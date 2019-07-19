@@ -637,7 +637,6 @@
             if (active_panel == 'panel-feedinlib') {
               loadLandkreisFeedin(region, layer);
             }
-
           });
         }
       }
@@ -659,30 +658,39 @@
       ///////////////////////////////////////////////////////////////////////////////////////////////////////
       // res PowerPlants in region boundaries
 
-      function enablePowPlPopup(feature, layer) {
-        layer.bindPopup('Loading...');
-        layer.on('click', onPowerPlantDataPointClick);
-      }
+      // these will apply to geojson object added to the
+      // ppl layer (powerplant layer)
+      let powerplantOptions = {
+        pointToLayer: createCircles,
+        onEachFeature: function(feature, layer) {
+          layer.bindPopup('Loading...');
+          layer.on('click', onFeedinPointClick);
+        }
+      };
 
+      // Layer containing the clusters of markers
       var regionPowerPlantgroup = L.layerGroup().addTo(map);
 
-      function createPowerPlantsPoints(powerplants) {
-        var layer = new L.geoJSON(powerplants, {
-          onEachFeature: enablePowPlPopup,
-          pointToLayer: createCircles // addPowerPlantMarker
-        });
+      // Layer containing the markers created by user click for powerplant
+      var ppl = new L.geoJSON(null, powerplantOptions);
+      ppl.addTo(map);
+
+      function addPowerPlantsPoints(feature) {
+        // Clear the GeoJSON layer
+        ppl.clearLayers();
+        // Add GeoJSON data in the layer
+        ppl.addData(feature);
+        // Create clusters with the markers
         var clusters = L.markerClusterGroup();
-        clusters.addLayer(layer);
+        clusters.addLayer(ppl);
         if (regionPowerPlantgroup.getLayers().length === 0) {
           regionPowerPlantgroup.addLayer(clusters)
         } else {
           regionPowerPlantgroup.clearLayers();
           regionPowerPlantgroup.addLayer(clusters)
         }
+
       }
-
-
-
 
       // request all power plants contained in selected region
       // also include the generation_type option
@@ -696,14 +704,12 @@
           url: ppr_location,
           type: 'POST',
           async: true,
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
           data: {
             'region_name': region_name,
             'generation_type': generation_type
           },
-          success: createPowerPlantsPoints
+          success: addPowerPlantsPoints
 
         }).done(function(){
           //remove spinner when done loading
@@ -712,33 +718,7 @@
         });
       }
 
-
-      function onPowerPlantDataPointClick(event) {
-        if (map.spin)
-        {map.spin(true)}
-        var marker = event.sourceTarget;
-        var leaflet_id = L.stamp(marker);
-        var pp_id = marker.feature.id;
-        $.ajax({
-          type: 'POST',
-          url: ppr_content,
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-          },
-          data: {
-            'leaflet_id': leaflet_id,
-            'pp_id': pp_id
-          },
-          success: function(thispopupcontent) {
-            displayPowerPlantDataPoint(thispopupcontent, marker)
-          }
-        }).done(function() {
-          if (map.spin)
-          {map.spin(false)}
-        });
-      }
-
-      function displayPowerPlantDataPoint(feature, marker) {
+      function updatePowerplantPopup(feature, marker) {
         if (feature.property) {
           var keys = Object.keys(feature.property);
           var content = '<table class="selection_detail">';
@@ -750,11 +730,30 @@
 
           var popup = marker.getPopup();
           popup.setContent(content);
-
-          // is this working????
-          //addPowerPlantMarker(feature, marker);
-
         }
+      }
+
+      function onPowerPlantDataPointClick(event) {
+        if (map.spin)
+        {map.spin(true)}
+        var marker = event.sourceTarget;
+        var leaflet_id = L.stamp(marker);
+        var pp_id = marker.feature.id;
+        $.ajax({
+          type: 'POST',
+          url: ppr_content,
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          data: {
+            'leaflet_id': leaflet_id,
+            'pp_id': pp_id
+          },
+          success: function(thispopupcontent) {
+            updatePowerplantPopup(thispopupcontent, marker)
+          }
+        }).done(function() {
+          if (map.spin)
+          {map.spin(false)}
+        });
       }
 
       // add icon on to clicked circelmarker
