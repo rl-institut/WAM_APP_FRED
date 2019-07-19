@@ -91,12 +91,25 @@ class Serializer(View):
         # store the region index in a list
         landkreis_index.append(lk_id)
 
-    # load the map ot the landkreis for each region
-    with open(
-            'WAM_APP_FRED/static/WAM_APP_FRED/geodata/landkreis_map_to_region.json',
-            encoding='UTF-8'
-    ) as g:
-        gj_to_lk = json.load(g)
+    def nuts_1_for_region(self, ppr_region):
+
+        nuts_1 = []
+        # load the map ot the landkreis for each region
+        with open(
+                # 'WAM_APP_FRED/static/WAM_APP_FRED/geodata/landkreis_map_to_region.json',
+                'WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany_nuts_3.geojson',
+                encoding='UTF-8'
+        ) as g:
+            gj_to_lk = json.load(g)
+
+            for i, f in enumerate(gj_to_lk['features']):
+                if ppr_region in f['properties']['region']:
+                    nuts_1_temp = f['properties']['nuts_1']
+                    if nuts_1_temp not in nuts_1:
+                        nuts_1.append(nuts_1_temp)
+
+        return nuts_1
+
 
     def ger_boundaries_view(self):
 
@@ -135,7 +148,9 @@ def ppr_view(request):
             # stores the current region boundary
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
-        landkreis_ids = Serializer.gj_to_lk[region_id]
+        # landkreis_ids = Serializer.gj_to_lk[region_id]
+        ser = Serializer()
+        landkreis_ids = ser.nuts_1_for_region(region_id)
         if LOCAL_TESTING is False:
             # define the table columns for query
             tbl_cols = Bundle(
@@ -162,7 +177,6 @@ def ppr_view(request):
                         tbl_cols.c.generation_type == generation_type
                     )
                 ).limit(1000)
-
             for record in oep_query:
                 # TODO
                 # this might need to be translated to 4326!!!
