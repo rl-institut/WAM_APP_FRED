@@ -180,7 +180,7 @@
                   <div class="tabs-panel" id="panel-feedinlib">
                     <p>
                       Select a variable and a time span, then click on a region highlighted on the map. The data will be displayed on a graph inside a popup.
-                       Currently the plot in the popup window 
+                      Currently the plot in the popup window
                       shows data received from a test data set.
                     </p>
                     <!--<div id="feedin-plot" style="width:300px;height:250px;">
@@ -263,8 +263,6 @@
   <script src="{% static 'WAM_APP_FRED/foundation/js/app.js' %}"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script type="text/javascript">
-
-  
     function get_active_panel() {
       var active_panel = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
       active_panel = active_panel.attr('id');
@@ -272,12 +270,7 @@
     }
 
 
-    document.getElementById("offcanvas-tabs").addEventListener(
-      "click",
-      function(event) {
-        console.log(event.target);
-        console.log(get_active_panel());
-      });
+
 
     var biomassIcon = L.icon({
       iconUrl: "{% static 'WAM_APP_FRED/img/Pin_biomass_color_v2.svg' %}",
@@ -355,6 +348,7 @@
     var weather_data_click_location = "{% url 'WAM_APP_FRED:WeatherPointClick'|add:'.data' %}";
 
     var ger_boundaries = "{% url 'WAM_APP_FRED:GerBoundary'|add:'.data' %}";
+    var ger_landkreis = "{% url 'WAM_APP_FRED:GerLandkreis'|add:'.data' %}";
 
     var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
     var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
@@ -423,7 +417,8 @@
           console.log('not fetching data a second time')
           displayWeatherDataPoint(marker.feature)
         } else {
-          map.spin(true)
+          if (map.spin)
+          {map.spin(true)}
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
@@ -443,9 +438,10 @@
               'end_year': stop_year
             },
             success: displayWeatherDataPoint,
-          }).done(function(){
-          map.spin(false)
-        });
+          }).done(function() {
+            if (map.spin)
+            {map.spin(false)}
+          });
         }
       }
 
@@ -525,7 +521,8 @@
       function onMapClick(ev) {
         var active_panel = get_active_panel();
         if (active_panel == 'panel-energy-system') {
-          map.spin(true)
+          if (map.spin)
+          {map.spin(true)}
           var latlng = map.mouseEventToLatLng(ev.originalEvent);
           $.ajax({
             type: 'POST',
@@ -538,9 +535,10 @@
               'lon': latlng.lng
             },
             success: addWeatherPoint,
-          }).done(function(){
-          map.spin(false)
-        });
+          }).done(function() {
+            if (map.spin)
+            {map.spin(false)}
+          });
         }
       };
 
@@ -563,129 +561,157 @@
         fillColor: "#0BC11C",
       };
 
-      // Germany region boundaries
+      // these will apply to geojson object added to the
+      // rel layer (region layer)
+      let regionsOptions = {
+        style: function(feature, latlng) {
+          return GerBoundStyle;
+        },
+        onEachFeature: function(boundary, layer) {
+          layer.on('mouseover', function() {
+            if (this.clicked != true) {
+              this.setStyle(highlightStyleMouseOver);
+            }
+          });
+          layer.on('mouseout', function() {
+            if (this.clicked != true) {
+              this.setStyle(GerBoundStyle);
+            }
+          });
+          // select region and request data
+          layer.on('click', function(event) {
+            var active_panel = get_active_panel();
+            this.clicked = true;
+            this.setStyle(GerBoundZoomLvlStyle);
+            region = event.sourceTarget;
+            if (active_panel == 'panel-powerplants') {
+              loadRegionPowerPlants(region, layer);
+            }
+          });
+        }
+      }
+      //Region layer
+      var rel = new L.geoJSON(null, regionsOptions);
+
+      // fetch Germany region geojsons
       $.ajax({
         url: ger_boundaries,
         dataType: 'json',
         async: true,
-        success: function(boundary) {
-          function onEachFeature(boundary, layer) {
-            layer.on('mouseover', function() {
-              if (this.clicked != true) {
-                this.setStyle(highlightStyleMouseOver);
-              }
-            });
-            layer.on('mouseout', function() {
-              if (this.clicked != true) {
-                this.setStyle(GerBoundStyle);
-              }
-            });
-            // select region and request data
-            layer.on('click', function(event) {
-              var active_panel = get_active_panel();
-              this.clicked = true;
-              this.setStyle(GerBoundZoomLvlStyle);
-              region = event.sourceTarget;
-              if (active_panel == 'panel-feedinlib') {
-                loadRegionFeedin(region, layer);
-              }
-
-              if (active_panel == 'panel-powerplants') {
-                loadRegionPowerPlants(region, layer);
-              }
-
-            });
-          }
-          var layer = new L.geoJSON(boundary, {
-            onEachFeature: onEachFeature,
-            style: function(feature, latlng) {
-              return GerBoundStyle;
-            }
-          })
-          map.addLayer(layer)
+        success: function(region_data) {
+          rel.addData(region_data)
         }
       });
+
+
+      // these will apply to geojson object added to the
+      // lkl layer (landkreis layer)
+      let landkreisOptions = {
+        style: function(feature, latlng) {
+          return GerBoundStyle;
+        },
+        onEachFeature: function(boundary, layer) {
+          layer.on('mouseover', function() {
+            if (this.clicked != true) {
+              this.setStyle(highlightStyleMouseOver);
+            }
+          });
+          layer.on('mouseout', function() {
+            if (this.clicked != true) {
+              this.setStyle(GerBoundStyle);
+            }
+          });
+          // select region and request data
+          layer.on('click', function(event) {
+            var active_panel = get_active_panel();
+            this.clicked = true;
+            this.setStyle(GerBoundZoomLvlStyle);
+            region = event.sourceTarget;
+            if (active_panel == 'panel-feedinlib') {
+              loadLandkreisFeedin(region, layer);
+            }
+          });
+        }
+      }
+      // Landkreis layer
+      var lkl = new L.geoJSON(null, landkreisOptions)
+
+      // fetch Germany landkreis geojsons
+      $.ajax({
+        url: ger_landkreis,
+        dataType: 'json',
+        async: true,
+        success: function(landkreis_data) {
+          lkl.addData(landkreis_data)
+        }
+      });
+
 
       //PowePlantRegister StartSection
       ///////////////////////////////////////////////////////////////////////////////////////////////////////
       // res PowerPlants in region boundaries
 
-      function enablePowPlPopup(feature, layer) {
-        layer.bindPopup('Loading...');
-        layer.on('click', onPowerPlantDataPointClick);
-      }
+      // these will apply to geojson object added to the
+      // ppl layer (powerplant layer)
+      let powerplantOptions = {
+        pointToLayer: createCircles,
+        onEachFeature: function(feature, layer) {
+          layer.bindPopup('Loading...');
+          layer.on('click', onPowerPlantDataPointClick);
+        }
+      };
 
+      // Layer containing the clusters of markers
       var regionPowerPlantgroup = L.layerGroup().addTo(map);
 
-      function createPowerPlantsPoints(powerplants) {
-        var layer = new L.geoJSON(powerplants, {
-          onEachFeature: enablePowPlPopup,
-          pointToLayer: createCircles // addPowerPlantMarker
-        });
+      // Layer containing the markers created by user click for powerplant
+      var ppl = new L.geoJSON(null, powerplantOptions);
+      ppl.addTo(map);
+
+      function addPowerPlantsPoints(feature) {
+        // Clear the GeoJSON layer
+        ppl.clearLayers();
+        // Add GeoJSON data in the layer
+        ppl.addData(feature);
+        // Create clusters with the markers
         var clusters = L.markerClusterGroup();
-        clusters.addLayer(layer);
+        clusters.addLayer(ppl);
         if (regionPowerPlantgroup.getLayers().length === 0) {
           regionPowerPlantgroup.addLayer(clusters)
         } else {
           regionPowerPlantgroup.clearLayers();
           regionPowerPlantgroup.addLayer(clusters)
         }
+
       }
-
-
-
 
       // request all power plants contained in selected region
       // also include the generation_type option
       function loadRegionPowerPlants(region, layer) {
-        region_name = region.feature.properties.name;
+        region_name = region.feature.properties.region;
         generation_type = $("input[name=generation_type]:checked").val();
         //set the spinner
-        map.spin(true);
+        if (map.spin)
+        {map.spin(true)}
         $.ajax({
           url: ppr_location,
           type: 'POST',
           async: true,
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
           data: {
             'region_name': region_name,
             'generation_type': generation_type
           },
-          success: createPowerPlantsPoints
+          success: addPowerPlantsPoints
 
-        }).done(function(){
+        }).done(function() {
           //remove spinner when done loading
-          map.spin(false);
-        });
-      }
-      
-      
-      function onPowerPlantDataPointClick(event) {
-        map.spin(true)
-        var marker = event.sourceTarget;
-        var leaflet_id = L.stamp(marker);
-        var pp_id = marker.feature.id;
-        $.ajax({
-          type: 'POST',
-          url: ppr_content,
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-          },
-          data: {
-            'leaflet_id': leaflet_id,
-            'pp_id': pp_id
-          },
-          success: function(thispopupcontent) {
-            displayPowerPlantDataPoint(thispopupcontent, marker)
-          }
-        }).done(function(){
-          map.spin(false)
+          if (map.spin)
+          {map.spin(false)}
         });
       }
 
-      function displayPowerPlantDataPoint(feature, marker) {
+      function updatePowerplantPopup(feature, marker) {
         if (feature.property) {
           var keys = Object.keys(feature.property);
           var content = '<table class="selection_detail">';
@@ -697,21 +723,36 @@
 
           var popup = marker.getPopup();
           popup.setContent(content);
-
-          // is this working????
-          //addPowerPlantMarker(feature, marker);
-
         }
+      }
+
+      function onPowerPlantDataPointClick(event) {
+        if (map.spin)
+        {map.spin(true)}
+        var marker = event.sourceTarget;
+        var leaflet_id = L.stamp(marker);
+        var pp_id = marker.feature.id;
+        $.ajax({
+          type: 'POST',
+          url: ppr_content,
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          data: {
+            'leaflet_id': leaflet_id,
+            'pp_id': pp_id
+          },
+          success: function(thispopupcontent) {
+            updatePowerplantPopup(thispopupcontent, marker)
+          }
+        }).done(function() {
+          if (map.spin)
+          {map.spin(false)}
+        });
       }
 
       // add icon on to clicked circelmarker
       function addPowerPlantMarker(feature, latlng) {
         // ugly function body insert generic or something similar
         var marker = L.marker(latlng, myLayerStyle)
-
-        console.log(feature);
-        console.log(feature.property);
-        console.log(feature.property.generation_subtype);
 
         if (feature.property.generation_subtype === "solar_roof_mounted") {
           marker.setIcon({
@@ -796,9 +837,10 @@
       ///// Feedinlib
       //
       function updateFeedinPopup(data, marker) {
-
         var popup = marker.getPopup();
-        var popupContent = '<h4> Timeseries </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
+        const name = data.properties.gen
+        const lk_id = data.landkreis_id
+        var popupContent = '<h4> ' + name + ' ('+ lk_id +') </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
         popup.setContent(popupContent)
 
         plot_div = document.getElementById('feedin-plot');
@@ -815,60 +857,57 @@
 
 
       function onFeedinPointClick(event) {
-
         var marker = event.sourceTarget;
         var leaflet_id = L.stamp(marker);
         var popup = marker.getPopup();
         var latlng = marker.getLatLng();
-        var region_id = marker.feature.id;
-        // this need to be linked to user choice
-
+        var landkreis_props = marker.feature.properties;
+        // TODO : this need to be linked to user choice for wd_timespan
+        //
         if (marker.feature.properties.timespan) {
           // do not fetch the data a second time
           console.log('not fetching data a second time')
           updateFeedinPopup(marker.feature, marker)
         } else {
-          map.spin(true)
+          if (map.spin)
+          {map.spin(true)}
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
             url: feedin_content,
-            headers: {
-              'X-CSRFToken': '{{ csrf_token }}'
-            },
-            data: {
-              'region_id': region_id,
-            },
-            success: function (data){
+            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            data: landkreis_props,
+            success: function(data) {
               updateFeedinPopup(data, marker)
             }
-          }).done(function(){
-          map.spin(false)
-        });
+          }).done(function() {
+            if (map.spin)
+            {map.spin(false)}
+          });
         }
       }
 
-
+      // these will apply to geojson object added to the
+      // fdl layer (feedinlib layer)
       let feedinOptions = {
         pointToLayer: createFeedinPopup,
         onEachFeature: function(feature, layer) {
-
           layer.bindPopup('Loading...');
-
           layer.on('click', onFeedinPointClick);
         }
       };
 
-
+      // Layer containing the markers created by user click for feedinlib
       var fdl = new L.geoJSON(null, feedinOptions);
 
-      fdl.addTo(map);
-
-      function addFeedinPoint(feature){
+      function addFeedinPoint(feature) {
         // Clear the GeoJSON layer
-        fdl.clearLayers()
+        fdl.clearLayers();
         // Add GeoJSON data in the layer
-        fdl.addData(feature)
+        fdl.addData(feature);
+        // Simulate a click on the marker
+        marker = fdl.getLayers()[0];
+        marker.fire('click');
       }
 
 
@@ -877,24 +916,49 @@
       }
 
 
-      function loadRegionFeedin(region, layer) {
-        map.spin(true)
-        region_name = region.feature.properties.name;
+      function loadLandkreisFeedin(landkreis, layer) {
+        if (map.spin)
+        {map.spin(true)}
+        landkreis_props = landkreis.feature.properties;
         $.ajax({
           url: feedin_location,
           type: 'POST',
           async: true,
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-          },
-          data: {
-            'region_name': region_name,
-          },
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          data: landkreis_props,
           success: addFeedinPoint
-        }).done(function(){
-          map.spin(false)
+        }).done(function() {
+          if (map.spin)
+          {map.spin(false)}
         });
       };
+
+
+
+      document.getElementById("offcanvas-tabs").addEventListener(
+        "click",
+        function(event) {
+          activePanel = get_active_panel();
+          if (activePanel == 'panel-energy-system') {
+            if (map.hasLayer(rel)){map.removeLayer(rel)}
+            if (map.hasLayer(fdl)){map.removeLayer(fdl)}
+            if (map.hasLayer(lkl)){map.removeLayer(lkl)}
+            if (!map.hasLayer(wdl)){map.addLayer(wdl)}
+          }
+          if (activePanel == 'panel-feedinlib') {
+            if (map.hasLayer(rel)){map.removeLayer(rel)}
+            if (map.hasLayer(wdl)){map.removeLayer(wdl)}
+            if (!map.hasLayer(fdl)){map.addLayer(fdl)}
+            if (!map.hasLayer(lkl)){map.addLayer(lkl)}
+          }
+
+          if (activePanel == 'panel-powerplants'){
+            if (map.hasLayer(wdl)){map.removeLayer(wdl)}
+            if (map.hasLayer(fdl)){map.removeLayer(fdl)}
+            if (map.hasLayer(lkl)){map.removeLayer(lkl)}
+            if (!map.hasLayer(rel)){map.addLayer(rel)}
+          }
+        });
 
 
 
