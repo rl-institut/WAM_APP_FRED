@@ -1,6 +1,5 @@
 # serialize data for all models
 import datetime
-import json
 from django.http import HttpResponse
 from django.views import View
 from sqlalchemy import and_
@@ -55,32 +54,38 @@ class Serializer(View):
 
     # list that stores all query results that are defined as feature object
     myfeatures = []
-    with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
-        gj = geojson.load(g)
+
+    # load the regions
+    with open(
+            'WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany_nuts_1.geojson',
+            encoding='UTF-8'
+    ) as g:
+        ger_regions = geojson.load(g)
 
     regions_wkbs = {}
-    regions_index = []
-    for i, f in enumerate(gj['features']):
-        region_id = f['properties']['name']
+    regions_nuts = {}
+    for f in ger_regions['features']:
+        region_id = f['properties']['region']
         region_boundary = f['geometry']['coordinates']
         boundary_geometry = geojson.MultiPolygon(region_boundary)
         # create shapely geometry from geojson feature
         _geom = shape(boundary_geometry)
         # store this information in a dict
         regions_wkbs[region_id] = from_shape(_geom, srid=4326)
-        # store the region index in a list
-        regions_index.append(region_id)
+        regions_nuts[region_id] = f['properties']['nuts_1']
 
     # load the landkreis
     with open(
-            'WAM_APP_FRED/static/WAM_APP_FRED/geodata/Germany_NUTS3_simplified.geojson',
+            'WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany_nuts_3.geojson',
             encoding='UTF-8'
     ) as g:
-        glk = geojson.load(g)
+        ger_landkreis = geojson.load(g)
 
     landkreis_wkbs = {}
-    landkreis_index = []
-    for i, f in enumerate(glk['features']):
+    landkreis_names = {}
+    regions_to_landkreis = {}
+
+    for f in ger_landkreis['features']:
         lk_id = f['properties']['nuts']
         lk_boundary = f['geometry']['coordinates']
         boundary_geometry = geojson.MultiPolygon(lk_boundary)
@@ -112,13 +117,13 @@ class Serializer(View):
 
     def ger_boundaries_view(self):
 
-        germany_boundaries = Serializer.gj
+        germany_boundaries = Serializer.ger_regions
 
         return HttpResponse(dumps(germany_boundaries), content_type="application/json")
 
     def ger_landkreis_view(self):
 
-        germany_landkreis = Serializer.glk
+        germany_landkreis = Serializer.ger_landkreis
 
         return HttpResponse(dumps(germany_landkreis), content_type="application/json")
 
