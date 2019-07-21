@@ -1,6 +1,5 @@
 # serialize data for all models
 import datetime
-import json
 from django.http import HttpResponse
 from django.views import View
 from sqlalchemy import and_
@@ -36,6 +35,7 @@ TIME_STEPS = {
 # provide newest dataprocessing id
 EGO_DP_VERSION = fred_config['WAM_APP_FRED']['EGO_DP_VERSION']
 EGO_DP_SCENARIO = fred_config['WAM_APP_FRED']['SCENARIO']
+OEP_ACCESS = fred_config['WAM_APP_FRED']['OEP_ACCESS']
 
 
 class Serializer(View):
@@ -55,32 +55,38 @@ class Serializer(View):
 
     # list that stores all query results that are defined as feature object
     myfeatures = []
-    with open('WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany.geojson', encoding='UTF-8') as g:
-        gj = geojson.load(g)
+
+    # load the regions
+    with open(
+            'WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany_nuts_1.geojson',
+            encoding='UTF-8'
+    ) as g:
+        ger_regions = geojson.load(g)
 
     regions_wkbs = {}
-    regions_index = []
-    for i, f in enumerate(gj['features']):
-        region_id = f['properties']['name']
+    regions_nuts = {}
+    for f in ger_regions['features']:
+        region_id = f['properties']['region']
         region_boundary = f['geometry']['coordinates']
         boundary_geometry = geojson.MultiPolygon(region_boundary)
         # create shapely geometry from geojson feature
         _geom = shape(boundary_geometry)
         # store this information in a dict
         regions_wkbs[region_id] = from_shape(_geom, srid=4326)
-        # store the region index in a list
-        regions_index.append(region_id)
+        regions_nuts[region_id] = f['properties']['nuts_1']
 
     # load the landkreis
     with open(
-            'WAM_APP_FRED/static/WAM_APP_FRED/geodata/Germany_NUTS3_simplified.geojson',
+            'WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany_nuts_3.geojson',
             encoding='UTF-8'
     ) as g:
-        glk = geojson.load(g)
+        ger_landkreis = geojson.load(g)
 
     landkreis_wkbs = {}
-    landkreis_index = []
-    for i, f in enumerate(glk['features']):
+    landkreis_names = {}
+    regions_to_landkreis = {}
+
+    for f in ger_landkreis['features']:
         lk_id = f['properties']['nuts']
         lk_boundary = f['geometry']['coordinates']
         boundary_geometry = geojson.MultiPolygon(lk_boundary)
@@ -89,24 +95,27 @@ class Serializer(View):
         # store this information in a dict
         landkreis_wkbs[lk_id] = from_shape(_geom, srid=4326)
         # store the region index in a list
-        landkreis_index.append(lk_id)
+        landkreis_names[lk_id] = f['properties']['gen']
 
-    # load the map ot the landkreis for each region
-    with open(
-            'WAM_APP_FRED/static/WAM_APP_FRED/geodata/landkreis_map_to_region.json',
-            encoding='UTF-8'
-    ) as g:
-        gj_to_lk = json.load(g)
+        # create a mapping between the region nuts and the lankreis included in it
+        # region is is always the first 3 letters of the nuts code
+        region_id = lk_id[0:3]
+        # add the region id as a key
+        if region_id not in regions_to_landkreis.keys():
+            regions_to_landkreis[region_id] = []
+        # append the landkreis id to the list under region id
+        if lk_id not in regions_to_landkreis[region_id]:
+            regions_to_landkreis[region_id].append(lk_id)
 
     def ger_boundaries_view(self):
 
-        germany_boundaries = Serializer.gj
+        germany_boundaries = Serializer.ger_regions
 
         return HttpResponse(dumps(germany_boundaries), content_type="application/json")
 
     def ger_landkreis_view(self):
 
-        germany_landkreis = Serializer.glk
+        germany_landkreis = Serializer.ger_landkreis
 
         return HttpResponse(dumps(germany_landkreis), content_type="application/json")
 
@@ -129,13 +138,13 @@ def ppr_view(request):
     myfeatures = []
 
     if request.method == 'POST':
-        region_id = str(request.POST.get('region_name'))
+        region_name = str(request.POST.get('region_name'))
         generation_type = str(request.POST.get('generation_type'))
         if LOCAL_TESTING is False:
             # stores the current region boundary
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
-        landkreis_ids = Serializer.gj_to_lk[region_id]
+        region_nut = Serializer.regions_nuts[region_name]
         if LOCAL_TESTING is False:
             # define the table columns for query
             tbl_cols = Bundle(
@@ -148,22 +157,32 @@ def ppr_view(request):
                 res_powerplant_tbl.scenario
             )
             # create query
-            # ToDo: Is there a way to apply ST_Transform to Bundle
+            if OEP_ACCESS == 'OEP_DIALECT':
+                # TODO find a way to convert the column rea_geom_new to srid 4326
+                geom = res_powerplant_tbl.geom
+                cond_geom = tbl_cols.c.nuts.in_([region_nut])
+            elif OEP_ACCESS == 'OEP':
+                geom = res_powerplant_tbl.rea_geom_new
+                wkb = Serializer.regions_wkbs[region_name]
+                cond_geom = tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb)
+
             oep_query = Serializer.session.query(
-                res_powerplant_tbl.rea_geom_new,
+                geom,
                 tbl_cols
             ) \
                 .filter(
                     and_(
-                        # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
-                        tbl_cols.c.nuts.in_(landkreis_ids),  # added
+                        cond_geom,
                         tbl_cols.c.version == EGO_DP_VERSION,
                         tbl_cols.c.scenario == EGO_DP_SCENARIO,
                         tbl_cols.c.generation_type == generation_type
                     )
-                ).limit(1000)
+                )
 
-            for record in oep_query:
+            print('There are ', oep_query.count(), ' powerplants in the data base')
+
+            # TODO find a way not to limit the query
+            for record in oep_query.limit(1000):
                 # TODO
                 # this might need to be translated to 4326!!!
                 region_contains = loadswkb(str(record[0]), True)
@@ -171,13 +190,15 @@ def ppr_view(request):
                     id=record.powerplant.id,
                     geometry=region_contains,
                     property=dict(
-                        region_id=region_id,
+                        region_nut=region_nut,
+                        region_name=region_name,
                         generation_type=generation_type,
                         generation_subtype=record.powerplant.generation_subtype
                     )
                 )
                 myfeatures.append(feature)
         else:
+            landkreis_ids = Serializer.regions_to_landkreis[region_nut]
             for lk_id in landkreis_ids:
                 lk_wkb = Serializer.landkreis_wkbs[lk_id]
                 landkreis_center = loadswkb(str(lk_wkb), True).centroid
@@ -186,7 +207,8 @@ def ppr_view(request):
                     id=lk_id,
                     geometry=landkreis_center,
                     property=dict(
-                        region_id=region_id,
+                        region_nut=region_nut,
+                        region_name=region_name,
                         generation_type=generation_type,
                         generation_subtype='',
                     )

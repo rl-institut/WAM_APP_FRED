@@ -672,7 +672,7 @@
         pointToLayer: createCircles,
         onEachFeature: function(feature, layer) {
           layer.bindPopup('Loading...');
-          layer.on('click', onFeedinPointClick);
+          layer.on('click', onPowerPlantDataPointClick);
         }
       };
 
@@ -703,7 +703,7 @@
       // request all power plants contained in selected region
       // also include the generation_type option
       function loadRegionPowerPlants(region, layer) {
-        region_name = region.feature.properties.name;
+        region_name = region.feature.properties.region;
         generation_type = $("input[name=generation_type]:checked").val();
         //set the spinner
         if (map.spin)
