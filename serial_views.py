@@ -94,26 +94,17 @@ class Serializer(View):
         # store this information in a dict
         landkreis_wkbs[lk_id] = from_shape(_geom, srid=4326)
         # store the region index in a list
-        landkreis_index.append(lk_id)
+        landkreis_names[lk_id] = f['properties']['gen']
 
-    def nuts_1_for_region(self, ppr_region):
-
-        nuts_1 = []
-        # load the map ot the landkreis for each region
-        with open(
-                # 'WAM_APP_FRED/static/WAM_APP_FRED/geodata/landkreis_map_to_region.json',
-                'WAM_APP_FRED/static/WAM_APP_FRED/geodata/germany_nuts_3.geojson',
-                encoding='UTF-8'
-        ) as g:
-            gj_to_lk = json.load(g)
-
-        for i, f in enumerate(gj_to_lk['features']):
-            if ppr_region in f['properties']['region']:
-                nuts_1_temp = f['properties']['nuts_1']
-                if nuts_1_temp not in nuts_1:
-                    nuts_1.append(nuts_1_temp)
-
-        return nuts_1
+        # create a mapping between the region nuts and the lankreis included in it
+        # region is is always the first 3 letters of the nuts code
+        region_id = lk_id[0:3]
+        # add the region id as a key
+        if region_id not in regions_to_landkreis.keys():
+            regions_to_landkreis[region_id] = []
+        # append the landkreis id to the list under region id
+        if lk_id not in regions_to_landkreis[region_id]:
+            regions_to_landkreis[region_id].append(lk_id)
 
     def ger_boundaries_view(self):
 
@@ -152,8 +143,7 @@ def ppr_view(request):
             # stores the current region boundary
             res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
-        ser = Serializer()
-        landkreis_ids = ser.nuts_1_for_region(region_id)
+        region_nut = Serializer.regions_nuts[region_name]
         if LOCAL_TESTING is False:
             # define the table columns for query
             tbl_cols = Bundle(
