@@ -35,6 +35,7 @@ TIME_STEPS = {
 # provide newest dataprocessing id
 EGO_DP_VERSION = fred_config['WAM_APP_FRED']['EGO_DP_VERSION']
 EGO_DP_SCENARIO = fred_config['WAM_APP_FRED']['SCENARIO']
+OEP_ACCESS = fred_config['WAM_APP_FRED']['OEP_ACCESS']
 
 
 class Serializer(View):
@@ -137,7 +138,7 @@ def ppr_view(request):
     myfeatures = []
 
     if request.method == 'POST':
-        region_id = str(request.POST.get('region_name'))
+        region_name = str(request.POST.get('region_name'))
         generation_type = str(request.POST.get('generation_type'))
         if LOCAL_TESTING is False:
             # stores the current region boundary
@@ -156,21 +157,32 @@ def ppr_view(request):
                 res_powerplant_tbl.scenario
             )
             # create query
-            # ToDo: Is there a way to apply ST_Transform to Bundle
+            if OEP_ACCESS == 'OEP_DIALECT':
+                #TODO find a way to convert the column rea_geom_new to srid 4326
+                geom = res_powerplant_tbl.geom
+                cond_geom = tbl_cols.c.nuts.in_([region_nut])
+            elif OEP_ACCESS == 'OEP':
+                geom = res_powerplant_tbl.rea_geom_new
+                wkb = Serializer.regions_wkbs[region_name]
+                cond_geom = tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb)
+
             oep_query = Serializer.session.query(
-                res_powerplant_tbl.rea_geom_new,
+                geom,
                 tbl_cols
             ) \
                 .filter(
                     and_(
-                        # tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb),
-                        tbl_cols.c.nuts.in_(landkreis_ids),  # added
+                        cond_geom,
                         tbl_cols.c.version == EGO_DP_VERSION,
                         tbl_cols.c.scenario == EGO_DP_SCENARIO,
                         tbl_cols.c.generation_type == generation_type
                     )
-                ).limit(1000)
-            for record in oep_query:
+                )
+
+            print('There are ', oep_query.count(), ' powerplants in the data base')
+
+            # TODO find a way not to limit the query
+            for record in oep_query.limit(1000):
                 # TODO
                 # this might need to be translated to 4326!!!
                 region_contains = loadswkb(str(record[0]), True)
@@ -178,13 +190,15 @@ def ppr_view(request):
                     id=record.powerplant.id,
                     geometry=region_contains,
                     property=dict(
-                        region_id=region_id,
+                        region_nut=region_nut,
+                        region_name=region_name,
                         generation_type=generation_type,
                         generation_subtype=record.powerplant.generation_subtype
                     )
                 )
                 myfeatures.append(feature)
         else:
+            landkreis_ids = Serializer.regions_to_landkreis[region_nut]
             for lk_id in landkreis_ids:
                 lk_wkb = Serializer.landkreis_wkbs[lk_id]
                 landkreis_center = loadswkb(str(lk_wkb), True).centroid
@@ -193,7 +207,8 @@ def ppr_view(request):
                     id=lk_id,
                     geometry=landkreis_center,
                     property=dict(
-                        region_id=region_id,
+                        region_nut=region_nut,
+                        region_name=region_name,
                         generation_type=generation_type,
                         generation_subtype='',
                     )
