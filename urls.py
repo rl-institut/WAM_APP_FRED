@@ -25,6 +25,7 @@ urlpatterns = [
         name='WeatherPointClick.data'
     ),
     path('GerBoundary.data/', Serializer.ger_boundaries_view, name='GerBoundary.data'),
+    path('GerLandkreis.data/', Serializer.ger_landkreis_view, name='GerLandkreis.data'),
     path('PowerPlantRegister.data/', ppr_view, name='PowerPlantRegister.data'),
     path('PowerPlantPopup.data/', ppr_popup_view, name='PowerPlantPopup.data'),
     path('FeedinlibPopup.data/', district_feedin_series, name='FeedinlibPopup.data'),
