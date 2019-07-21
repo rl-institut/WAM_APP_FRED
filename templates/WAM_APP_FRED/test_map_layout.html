@@ -731,7 +731,7 @@
           var keys = Object.keys(feature.property);
           var content = '<table class="selection_detail">';
 
-          for (let i = 0, len = keys.length; i < len; i++) {
+          for (let i = 1, len = keys.length; i < len; i++) {
             content = content + '<tr><td align="right"><b>' + keys[i] + '</b>:</td><td>' + feature.property[keys[i]] + '</td></tr>'
           }
           content = content + '</table>';
