@@ -158,7 +158,7 @@ def ppr_view(request):
             )
             # create query
             if OEP_ACCESS == 'OEP_DIALECT':
-                #TODO find a way to convert the column rea_geom_new to srid 4326
+                # TODO find a way to convert the column rea_geom_new to srid 4326
                 geom = res_powerplant_tbl.geom
                 cond_geom = tbl_cols.c.nuts.in_([region_nut])
             elif OEP_ACCESS == 'OEP':
