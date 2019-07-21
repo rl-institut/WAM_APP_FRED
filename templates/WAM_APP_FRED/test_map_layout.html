@@ -433,8 +433,9 @@
           console.log('not fetching data a second time')
           displayWeatherDataPoint(marker.feature)
         } else {
-          if (map.spin)
-          {map.spin(true)}
+          if (map.spin) {
+            map.spin(true)
+          }
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
@@ -455,8 +456,9 @@
             },
             success: displayWeatherDataPoint,
           }).done(function() {
-            if (map.spin)
-            {map.spin(false)}
+            if (map.spin) {
+              map.spin(false)
+            }
           });
         }
       }
@@ -537,8 +539,9 @@
       function onMapClick(ev) {
         var active_panel = get_active_panel();
         if (active_panel == 'panel-energy-system') {
-          if (map.spin)
-          {map.spin(true)}
+          if (map.spin) {
+            map.spin(true)
+          }
           var latlng = map.mouseEventToLatLng(ev.originalEvent);
           $.ajax({
             type: 'POST',
@@ -552,8 +555,9 @@
             },
             success: addWeatherPoint,
           }).done(function() {
-            if (map.spin)
-            {map.spin(false)}
+            if (map.spin) {
+              map.spin(false)
+            }
           });
         }
       };
@@ -707,13 +711,16 @@
         region_name = region.feature.properties.region;
         generation_type = $("input[name=generation_type]:checked").val();
         //set the spinner
-        if (map.spin)
-        {map.spin(true)}
+        if (map.spin) {
+          map.spin(true)
+        }
         $.ajax({
           url: ppr_location,
           type: 'POST',
           async: true,
-          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
           data: {
             'region_name': region_name,
             'generation_type': generation_type
@@ -722,8 +729,9 @@
 
         }).done(function() {
           //remove spinner when done loading
-          if (map.spin)
-          {map.spin(false)}
+          if (map.spin) {
+            map.spin(false)
+          }
         });
       }
 
@@ -743,15 +751,18 @@
       }
 
       function onPowerPlantDataPointClick(event) {
-        if (map.spin)
-        {map.spin(true)}
+        if (map.spin) {
+          map.spin(true)
+        }
         var marker = event.sourceTarget;
         var leaflet_id = L.stamp(marker);
         var pp_id = marker.feature.id;
         $.ajax({
           type: 'POST',
           url: ppr_content,
-          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
           data: {
             'leaflet_id': leaflet_id,
             'pp_id': pp_id
@@ -760,8 +771,9 @@
             updatePowerplantPopup(thispopupcontent, marker)
           }
         }).done(function() {
-          if (map.spin)
-          {map.spin(false)}
+          if (map.spin) {
+            map.spin(false)
+          }
         });
       }
 
@@ -856,7 +868,7 @@
         var popup = marker.getPopup();
         const name = data.properties.gen
         const lk_id = data.landkreis_id
-        var popupContent = '<h4> ' + name + ' ('+ lk_id +') </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
+        var popupContent = '<h4> ' + name + ' (' + lk_id + ') </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
         popup.setContent(popupContent)
 
         plot_div = document.getElementById('feedin-plot');
@@ -885,20 +897,24 @@
           console.log('not fetching data a second time')
           updateFeedinPopup(marker.feature, marker)
         } else {
-          if (map.spin)
-          {map.spin(true)}
+          if (map.spin) {
+            map.spin(true)
+          }
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
             url: feedin_content,
-            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
             data: landkreis_props,
             success: function(data) {
               updateFeedinPopup(data, marker)
             }
           }).done(function() {
-            if (map.spin)
-            {map.spin(false)}
+            if (map.spin) {
+              map.spin(false)
+            }
           });
         }
       }
@@ -933,19 +949,23 @@
 
 
       function loadLandkreisFeedin(landkreis, layer) {
-        if (map.spin)
-        {map.spin(true)}
+        if (map.spin) {
+          map.spin(true)
+        }
         landkreis_props = landkreis.feature.properties;
         $.ajax({
           url: feedin_location,
           type: 'POST',
           async: true,
-          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
           data: landkreis_props,
           success: addFeedinPoint
         }).done(function() {
-          if (map.spin)
-          {map.spin(false)}
+          if (map.spin) {
+            map.spin(false)
+          }
         });
       };
 
@@ -956,26 +976,56 @@
         function(event) {
           activePanel = get_active_panel();
           if (activePanel == 'panel-energy-system') {
-            if (map.hasLayer(rel)){map.removeLayer(rel)}
-            if (map.hasLayer(fdl)){map.removeLayer(fdl)}
-            if (map.hasLayer(lkl)){map.removeLayer(lkl)}
-            if (map.hasLayer(ppl)){map.removeLayer(ppl)}
-            if (!map.hasLayer(wdl)){map.addLayer(wdl)}
+            if (map.hasLayer(rel)) {
+              map.removeLayer(rel)
+            }
+            if (map.hasLayer(fdl)) {
+              map.removeLayer(fdl)
+            }
+            if (map.hasLayer(lkl)) {
+              map.removeLayer(lkl)
+            }
+            if (map.hasLayer(ppl)) {
+              map.removeLayer(ppl)
+            }
+            if (!map.hasLayer(wdl)) {
+              map.addLayer(wdl)
+            }
           }
           if (activePanel == 'panel-feedinlib') {
-            if (map.hasLayer(rel)){map.removeLayer(rel)}
-            if (map.hasLayer(wdl)){map.removeLayer(wdl)}
-            if (map.hasLayer(ppl)){map.removeLayer(ppl)}
-            if (!map.hasLayer(fdl)){map.addLayer(fdl)}
-            if (!map.hasLayer(lkl)){map.addLayer(lkl)}
+            if (map.hasLayer(rel)) {
+              map.removeLayer(rel)
+            }
+            if (map.hasLayer(wdl)) {
+              map.removeLayer(wdl)
+            }
+            if (map.hasLayer(ppl)) {
+              map.removeLayer(ppl)
+            }
+            if (!map.hasLayer(fdl)) {
+              map.addLayer(fdl)
+            }
+            if (!map.hasLayer(lkl)) {
+              map.addLayer(lkl)
+            }
           }
 
-          if (activePanel == 'panel-powerplants'){
-            if (map.hasLayer(wdl)){map.removeLayer(wdl)}
-            if (map.hasLayer(fdl)){map.removeLayer(fdl)}
-            if (map.hasLayer(lkl)){map.removeLayer(lkl)}
-            if (!map.hasLayer(rel)){map.addLayer(rel)}
-            if (!map.hasLayer(ppl)){map.addLayer(ppl)}
+          if (activePanel == 'panel-powerplants') {
+            if (map.hasLayer(wdl)) {
+              map.removeLayer(wdl)
+            }
+            if (map.hasLayer(fdl)) {
+              map.removeLayer(fdl)
+            }
+            if (map.hasLayer(lkl)) {
+              map.removeLayer(lkl)
+            }
+            if (!map.hasLayer(rel)) {
+              map.addLayer(rel)
+            }
+            if (!map.hasLayer(ppl)) {
+              map.addLayer(ppl)
+            }
           }
         });
 
