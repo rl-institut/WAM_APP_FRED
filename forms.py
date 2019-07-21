@@ -53,6 +53,7 @@ class SelectTechnology(forms.Form):
         return self.name
     idn = forms.HiddenInput()
 
+
 class SelectHeight(forms.Form):
     height = forms.ChoiceField(choices=HEIGHT_CHOICES)
 
