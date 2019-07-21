@@ -393,6 +393,7 @@
 
         var popup = marker.getPopup();
         const user_height = $('#id_wd-height').val();
+        console.log(feature.properties.data)
         const variable = feature.properties.variable
         var popupContent = '<h4> Variable_id :' + variable +
           ' Height ' + user_height + ' m' +
@@ -958,11 +959,13 @@
             if (map.hasLayer(rel)){map.removeLayer(rel)}
             if (map.hasLayer(fdl)){map.removeLayer(fdl)}
             if (map.hasLayer(lkl)){map.removeLayer(lkl)}
+            if (map.hasLayer(ppl)){map.removeLayer(ppl)}
             if (!map.hasLayer(wdl)){map.addLayer(wdl)}
           }
           if (activePanel == 'panel-feedinlib') {
             if (map.hasLayer(rel)){map.removeLayer(rel)}
             if (map.hasLayer(wdl)){map.removeLayer(wdl)}
+            if (map.hasLayer(ppl)){map.removeLayer(ppl)}
             if (!map.hasLayer(fdl)){map.addLayer(fdl)}
             if (!map.hasLayer(lkl)){map.addLayer(lkl)}
           }
@@ -972,6 +975,7 @@
             if (map.hasLayer(fdl)){map.removeLayer(fdl)}
             if (map.hasLayer(lkl)){map.removeLayer(lkl)}
             if (!map.hasLayer(rel)){map.addLayer(rel)}
+            if (!map.hasLayer(ppl)){map.addLayer(ppl)}
           }
         });
 
