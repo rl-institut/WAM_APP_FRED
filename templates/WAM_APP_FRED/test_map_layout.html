@@ -671,39 +671,9 @@
       ///////////////////////////////////////////////////////////////////////////////////////////////////////
       // res PowerPlants in region boundaries
 
-      // these will apply to geojson object added to the
-      // ppl layer (powerplant layer)
-      let powerplantOptions = {
-        pointToLayer: createCircles,
-        onEachFeature: function(feature, layer) {
-          layer.bindPopup('Loading...');
-          layer.on('click', onPowerPlantDataPointClick);
-        }
-      };
-
-      // Layer containing the clusters of markers
-      var regionPowerPlantgroup = L.layerGroup().addTo(map);
-
       // Layer containing the markers created by user click for powerplant
-      var ppl = new L.geoJSON(null, powerplantOptions);
-      ppl.addTo(map);
-
-      function addPowerPlantsPoints(feature) {
-        // Clear the GeoJSON layer
-        ppl.clearLayers();
-        // Add GeoJSON data in the layer
-        ppl.addData(feature);
-        // Create clusters with the markers
-        var clusters = L.markerClusterGroup();
-        clusters.addLayer(ppl);
-        if (regionPowerPlantgroup.getLayers().length === 0) {
-          regionPowerPlantgroup.addLayer(clusters)
-        } else {
-          regionPowerPlantgroup.clearLayers();
-          regionPowerPlantgroup.addLayer(clusters)
-        }
-
-      }
+      var ppClusters = L.markerClusterGroup();
+      ppClusters.on('click', onPowerPlantDataPointClick);
 
       // request all power plants contained in selected region
       // also include the generation_type option
@@ -725,7 +695,29 @@
             'region_name': region_name,
             'generation_type': generation_type
           },
-          success: addPowerPlantsPoints
+          success: function(features) {
+            if (map.hasLayer(ppClusters)) {
+              map.removeLayer(ppClusters);
+            }
+            for (const feature of features.features) {
+              var m = L.marker(
+                [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
+                myLayerStyle
+              )
+              m.bindPopup('Loading');
+              m.feature = {
+                'id': feature.id
+              };
+
+              ppClusters.addLayer(m)
+            }
+
+
+
+
+            map.addLayer(ppClusters);
+
+          }
 
         }).done(function() {
           //remove spinner when done loading
@@ -985,8 +977,8 @@
             if (map.hasLayer(lkl)) {
               map.removeLayer(lkl)
             }
-            if (map.hasLayer(ppl)) {
-              map.removeLayer(ppl)
+            if (map.hasLayer(ppClusters)) {
+              map.removeLayer(ppClusters)
             }
             if (!map.hasLayer(wdl)) {
               map.addLayer(wdl)
@@ -999,8 +991,8 @@
             if (map.hasLayer(wdl)) {
               map.removeLayer(wdl)
             }
-            if (map.hasLayer(ppl)) {
-              map.removeLayer(ppl)
+            if (map.hasLayer(ppClusters)) {
+              map.removeLayer(ppClusters)
             }
             if (!map.hasLayer(fdl)) {
               map.addLayer(fdl)
@@ -1023,8 +1015,8 @@
             if (!map.hasLayer(rel)) {
               map.addLayer(rel)
             }
-            if (!map.hasLayer(ppl)) {
-              map.addLayer(ppl)
+            if (!map.hasLayer(ppClusters)) {
+              map.addLayer(ppClusters)
             }
           }
         });
