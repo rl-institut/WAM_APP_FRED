@@ -146,35 +146,22 @@
                     <p>Click on the map to load the closest weather data points. You can then click on one of the loaded points to to display the weather data over the selected time period for a given height and variable. The download can take some
                       time, depending on how many data you required. </p>
 
-                    <ul class="accordion" data-accordion>
-                      <li class="accordion-item accordion-item--no-border is-active" data-accordion-item>
+                    <div id="wd-forms">
+                    <form id="wd_timespan">
 
-                        <a href="#" class="accordion-title accordion-title--100">Time Span</a>
-                        <div class="accordion-content" data-tab-content>
-                          <div class="tabs-panel is-active" id="options-energy-system">
-
-                            <form id="wd_timespan">
-
-                              <div>Start date
-                                {{wd_start_date}}
-                              </div>
-                              <div>End date
-                                {{wd_end_date}}
-                              </div>
-                            </form>
-                          </div>
-                      </li>
-                      <li class="accordion-item" data-accordion-item>
-                        <a href="#" class="accordion-title accordion-title--100">Variable</a>
-                        <div class="accordion-content" data-tab-content>
-                          <form>
-                            {{variable}}
-                            {{height}}
-                          </form>
+                       {{variable}}
+                       {{height}}
+                        <div>Start date
+                          {{wd_start_date}}
                         </div>
-                      </li>
-                    </ul>
+                        <div>End date
+                          {{wd_end_date}}
+                        </div>
+
+
+                          </form>
                   </div>
+                    </div>
 
                   <!-- Third panel content -->
                   <div class="tabs-panel" id="panel-feedinlib">
