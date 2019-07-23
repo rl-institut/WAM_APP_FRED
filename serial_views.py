@@ -12,13 +12,17 @@ from geoalchemy2.elements import WKTElement
 from shapely.geometry import shape
 from shapely.wkb import loads as loadswkb
 from dateutil import parser
-
+import saio
 
 from .app_settings import LOCAL_TESTING, fred_config
 
 if not LOCAL_TESTING:
     import WAM_APP_FRED.oep_models as oep_models
-    from WAM_APP_FRED.oep_models import open_fred_classes, open_fred_ts_classes
+    from WAM_APP_FRED.oep_models import open_fred_classes
+
+saio.register_schema("model_draft", sah.get_engine('oep_engine'))
+from saio.model_draft import openfred_timeseries_wind_2016 as openfred_ts_tbl # noqa pylint: disable=unused-import
+
 
 HOUR = '1:00:00'
 HALF_HOUR = '0:30:00'
