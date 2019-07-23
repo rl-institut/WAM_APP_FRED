@@ -282,7 +282,7 @@ def district_feedin_series(request):
             nut = ''
             for record in oep_query:
                 timespan.append(record.time)
-                values.append(record.feedin)
+                values.append(float(record.feedin) * 1e-6)
                 nut = record.nuts
 
             data = dict(
