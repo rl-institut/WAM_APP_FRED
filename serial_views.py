@@ -264,10 +264,18 @@ def district_feedin_series(request):
     data = []
     if request.method == 'POST':
         landkreis_props = {k: request.POST.get(k) for k in ['id', 'gen', 'bez', 'nuts']}
+        technology = str(request.POST.get('technology'))
         lk_id = landkreis_props['nuts']
         if LOCAL_TESTING is False:
-            openfred_ts_tbl = open_fred_ts_classes['OpenFredTimesSeries']
-            oep_query = Serializer.session.query(openfred_ts_tbl)
+            oep_query = Serializer.session.query(openfred_ts_tbl) \
+                .filter(
+                and_(
+                    openfred_ts_tbl.nuts == lk_id,
+                    openfred_ts_tbl.technology == technology
+                )
+            )
+
+            n_records = oep_query.count()
 
             timespan = []
             values = []
@@ -275,9 +283,10 @@ def district_feedin_series(request):
             for record in oep_query:
                 timespan.append(record.time)
                 values.append(record.feedin)
-                nut = record.nut
+                nut = record.nuts
 
             data = dict(
+                n_records=n_records,
                 landkreis_id=lk_id,
                 timespan=timespan,
                 values=values,
@@ -286,6 +295,7 @@ def district_feedin_series(request):
             )
         else:
             data = dict(
+                n_records=6,
                 landkreis_id=lk_id,
                 timespan=[
                     '2003-06-30T23:00:00',

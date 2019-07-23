@@ -882,6 +882,7 @@
         var popup = marker.getPopup();
         var latlng = marker.getLatLng();
         var landkreis_props = marker.feature.properties;
+        landkreis_props.technology = $("#id_fd-technology").val();
         // TODO : this need to be linked to user choice for wd_timespan
         //
         if (marker.feature.properties.timespan) {
