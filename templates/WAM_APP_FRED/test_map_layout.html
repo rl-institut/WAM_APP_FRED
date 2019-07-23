@@ -860,18 +860,29 @@
         var popup = marker.getPopup();
         const name = data.properties.gen
         const lk_id = data.landkreis_id
-        var popupContent = '<h4> ' + name + ' (' + lk_id + ') </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
-        popup.setContent(popupContent)
+        if (data.n_records >0) {
+          var popupContent = '<h4> ' + name + '</h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
+          popup.setContent(popupContent)
 
-        plot_div = document.getElementById('feedin-plot');
-        Plotly.plot(plot_div, [{
-          x: data.timespan,
-          y: data.values
-        }], {
-          margin: {
-            t: 0
-          }
-        });
+          plot_div = document.getElementById('feedin-plot');
+          Plotly.plot(
+            plot_div,
+            [{
+              x: data.timespan,
+              y: data.values
+            }],
+            {
+              margin: {
+                t: 0
+              }
+            }
+          );
+        }
+
+        else{
+          var popupContent = '<h4> ' + name + '</h4></br><div>Your query unfortunately did not match any records from the database</div>';
+          popup.setContent(popupContent)
+        }
       };
 
 
