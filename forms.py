@@ -4,20 +4,20 @@ YEAR_CHOICES = [(y, '{}'.format(y)) for y in range(2002, 2010)]
 MONTH_CHOICES = [(m, '{}'.format(m)) for m in range(1, 13)]
 VARIABLE_CHOICES = [
     (1, 'air_temperature'),
-    (2, 'wind_speed'),
-    (3, 'subsurface_runoff_amount'),
-    (4, 'water_evaporation_amount'),
+    # (2, 'wind_speed'),
+    # (3, 'subsurface_runoff_amount'),
+    # (4, 'water_evaporation_amount'),
     (5, 'air_temperature (2m)'),
-    (6, 'surface_normalized_direct_downwelling_shortwave_flux_in_air'),
+    # (6, 'surface_normalized_direct_downwelling_shortwave_flux_in_air'),
     (7, 'air_pressure'),
-    (8, 'snow_amount'),
+    # (8, 'snow_amount'),
     (9, 'surface_air_pressure'),
-    (10, 'surface_diffuse_downwelling_shortwave_flux_in_air'),
-    (11, 'surface_runoff_amount'),
-    (12, 'precipitation_amount'),
-    (13, 'wind_speed (10m)'),
+    # (10, 'surface_diffuse_downwelling_shortwave_flux_in_air'),
+    # (11, 'surface_runoff_amount'),
+    # (12, 'precipitation_amount'),
+    # (13, 'wind_speed (10m)'),
     (14, 'surface_roughness_length'),
-    (15, 'surface_direct_downwelling_shortwave_flux_in_air')
+    # (15, 'surface_direct_downwelling_shortwave_flux_in_air')
 ]
 
 TECHNOLOGY_CHOICES = [
