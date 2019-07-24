@@ -146,11 +146,14 @@
                     <p>Click on the map to load the closest weather data points. You can then click on one of the loaded points to to display the weather data over the selected time period for a given height and variable. The download can take some
                       time, depending on how many data you required. </p>
 
-                    <div id="wd-forms">
-                    <form id="wd_timespan">
 
-                       {{variable}}
-                       {{height}}
+
+
+                    <div id="wd-forms">
+                      <form id="wd_timespan">
+
+                        {{variable}}
+                        {{height}}
                         <div>Start date
                           {{wd_start_date}}
                         </div>
@@ -159,9 +162,9 @@
                         </div>
 
 
-                          </form>
-                  </div>
+                      </form>
                     </div>
+                  </div>
 
                   <!-- Third panel content -->
                   <div class="tabs-panel" id="panel-feedinlib">
@@ -262,9 +265,6 @@
       return active_panel;
     }
 
-
-
-
     var biomassIcon = L.icon({
       iconUrl: "{% static 'WAM_APP_FRED/img/Pin_biomass_color_v2.svg' %}",
       iconSize: [38, 95], // size of the icon
@@ -349,6 +349,23 @@
     var feedin_location = "{% url 'WAM_APP_FRED:FeedinlibLocation'|add:'.data' %}";
     var feedin_content = "{% url 'WAM_APP_FRED:FeedinlibPopup'|add:'.data' %}";
 
+    var update_heights = "{% url 'WAM_APP_FRED:update_variable_heights' %}";
+
+    //update the available heights depending on the choice of variable
+    $("#id_wd-variable").change(function(event) {
+      const variable_id = event.currentTarget.value; // get the selected variable ID from the HTML input
+      $.ajax({
+        url: update_heights,
+        async: true,
+        data: {
+          'variable_id': variable_id // add the country id to the GET parameters
+        },
+        success: function(data) { // `data` is the return of the `load_heights` view function
+          $("#id_wd-height").html(data); // replace the contents of the height input with the data that came from the server
+        }
+      });
+
+    });
 
     function map_init_basic(map, options) {
       var popup = L.popup();
@@ -838,7 +855,7 @@
         var popup = marker.getPopup();
         const name = data.properties.gen
         const lk_id = data.landkreis_id
-        if (data.n_records >0) {
+        if (data.n_records > 0) {
           var popupContent = '<h4> ' + name + '</h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
           popup.setContent(popupContent)
 
@@ -848,22 +865,23 @@
             [{
               x: data.timespan,
               y: data.values
-            }],
-            {
+            }], {
               margin: {
                 t: 0
               },
               xaxis: {
-                title: {text: 'Time'}
+                title: {
+                  text: 'Time'
+                }
               },
               yaxis: {
-                title: {text: 'MW'}
+                title: {
+                  text: 'MW'
+                }
               }
             }
           );
-        }
-
-        else{
+        } else {
           var popupContent = '<h4> ' + name + '</h4></br><div>Your query unfortunately did not match any records from the database</div>';
           popup.setContent(popupContent)
         }
@@ -1021,17 +1039,18 @@
       function feedinControlChanged(event) {
         marker = fdl.getLayers()[0];
         // if yes, then resimulate a userlick on the marker to update the popup
-        // TODO : if the selections are the same (i.e. if user simply clicked on
-        // the div, don't fire the click (could compare the marker.feature.properties
-        // with the actual values from the forms using theirs id. (need to write the values
-        // of the start and end data as well as technology selection in the properties of
-        // the marker (this could be done in serial_views.py or in createFeedinPopup)
         if (marker) {
           marker.fire('click');
         }
       }
 
       fd_controls = [
+        "id_wd_timespan_start-year",
+        "id_wd_timespan_stop-year",
+        "id_wd_timespan_start-month",
+        "id_wd_timespan_stop-month",
+        "id_wd-variable",
+        "id_wd-height",
         "id_fd-technology"
       ]
 

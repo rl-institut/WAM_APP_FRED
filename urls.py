@@ -29,5 +29,6 @@ urlpatterns = [
     path('PowerPlantRegister.data/', ppr_view, name='PowerPlantRegister.data'),
     path('PowerPlantPopup.data/', ppr_popup_view, name='PowerPlantPopup.data'),
     path('FeedinlibPopup.data/', district_feedin_series, name='FeedinlibPopup.data'),
-    path('FeedinlibLocation.data/', feedin_view, name='FeedinlibLocation.data')
+    path('FeedinlibLocation.data/', feedin_view, name='FeedinlibLocation.data'),
+    path('update-variable-heights/', views.update_heights, name='update_variable_heights')
 ]
