@@ -12,17 +12,17 @@ from geoalchemy2.elements import WKTElement
 from shapely.geometry import shape
 from shapely.wkb import loads as loadswkb
 from dateutil import parser
-import saio
+
+from .saio_table_models import (
+    Timeseries,
+    Powerplants
+)
+
 
 from .app_settings import LOCAL_TESTING, fred_config
 
 if not LOCAL_TESTING:
-    import WAM_APP_FRED.oep_models as oep_models
     from WAM_APP_FRED.oep_models import open_fred_classes
-
-saio.register_schema("model_draft", sah.get_engine('oep_engine'))
-from saio.model_draft import openfred_timeseries_wind_2016 as openfred_ts_tbl # noqa pylint: disable=unused-import
-
 
 HOUR = '1:00:00'
 HALF_HOUR = '0:30:00'
@@ -144,29 +144,26 @@ def ppr_view(request):
     if request.method == 'POST':
         region_name = str(request.POST.get('region_name'))
         generation_type = str(request.POST.get('generation_type'))
-        if LOCAL_TESTING is False:
-            # stores the current region boundary
-            res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
 
         region_nut = Serializer.regions_nuts[region_name]
         if LOCAL_TESTING is False:
             # define the table columns for query
             tbl_cols = Bundle(
                 'powerplant',
-                res_powerplant_tbl.id,
-                res_powerplant_tbl.nuts,  # added
-                res_powerplant_tbl.version,
-                res_powerplant_tbl.generation_type,
-                res_powerplant_tbl.generation_subtype,
-                res_powerplant_tbl.scenario
+                Powerplants.id,
+                Powerplants.nuts,  # added
+                Powerplants.version,
+                Powerplants.generation_type,
+                Powerplants.generation_subtype,
+                Powerplants.scenario
             )
             # create query
             if OEP_ACCESS == 'OEP_DIALECT':
                 # TODO find a way to convert the column rea_geom_new to srid 4326
-                geom = res_powerplant_tbl.geom
+                geom = Powerplants.geom
                 cond_geom = tbl_cols.c.nuts.in_([region_nut])
             elif OEP_ACCESS == 'OEP':
-                geom = res_powerplant_tbl.rea_geom_new
+                geom = Powerplants.rea_geom_new
                 wkb = Serializer.regions_wkbs[region_name]
                 cond_geom = tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb)
 
@@ -267,13 +264,13 @@ def district_feedin_series(request):
         technology = str(request.POST.get('technology'))
         lk_id = landkreis_props['nuts']
         if LOCAL_TESTING is False:
-            oep_query = Serializer.session.query(openfred_ts_tbl) \
+            oep_query = Serializer.session.query(Timeseries) \
                 .filter(
-                and_(
-                    openfred_ts_tbl.nuts == lk_id,
-                    openfred_ts_tbl.technology == technology
+                    and_(
+                        Timeseries.nuts == lk_id,
+                        Timeseries.technology == technology
+                    )
                 )
-            )
 
             n_records = oep_query.count()
 
@@ -327,19 +324,18 @@ def ppr_popup_view(request):
         pp_id = int(request.POST.get('pp_id'))
 
         if LOCAL_TESTING is False:
-            res_powerplant_tbl = oep_models.ego_dp_res_classes['ResPowerPlant']
             tbl_cols_property = Bundle(
                 'powerplant_prop',
-                res_powerplant_tbl.version,
-                res_powerplant_tbl.id,
-                res_powerplant_tbl.electrical_capacity,
-                res_powerplant_tbl.generation_type,
-                res_powerplant_tbl.generation_subtype,
-                res_powerplant_tbl.city,
-                res_powerplant_tbl.postcode,
-                res_powerplant_tbl.voltage_level_var,
-                res_powerplant_tbl.subst_id,
-                res_powerplant_tbl.scenario
+                Powerplants.version,
+                Powerplants.id,
+                Powerplants.electrical_capacity,
+                Powerplants.generation_type,
+                Powerplants.generation_subtype,
+                Powerplants.city,
+                Powerplants.postcode,
+                Powerplants.voltage_level_var,
+                Powerplants.subst_id,
+                Powerplants.scenario
             )
             oep_query = Serializer.session.query(tbl_cols_property) \
                 .filter(
@@ -450,8 +446,6 @@ def wseries_get_single_point(request):
                 )
             )
             features.append(pos)
-
-
     elif request.method == 'GET':
         print(request.GET)
 
@@ -507,9 +501,7 @@ def wseries_fetch_data_single_point(request):
             formatted_data = {}
             timespan_ids = []
             heights = []
-            variable_name = ''
             for record in oep_query:
-                variable_name = record.Series.variable.standard_name
                 timespan_id = record.Series.timespan_id
                 height = record.Series.height
 
