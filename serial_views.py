@@ -434,6 +434,24 @@ def wseries_get_single_point(request):
                 )
             )
             features.append(pos)
+
+            pos = geojson.Feature(
+                geometry=Point((lon + 0.4, lat)),
+                properties=dict(
+                    location_id=2,
+                )
+            )
+            features.append(pos)
+
+            pos = geojson.Feature(
+                geometry=Point((lon - 0.4, lat)),
+                properties=dict(
+                    location_id=3,
+                )
+            )
+            features.append(pos)
+
+
     elif request.method == 'GET':
         print(request.GET)
 
@@ -560,7 +578,7 @@ def wseries_fetch_data_single_point(request):
             pos = geojson.Feature(
                 geometry=Point((lon, lat)),
                 properties=dict(
-                    id=101,
+                    location_id=location_id,
                     heights=["10.0"],
                     data={
                         10.0: {
@@ -571,7 +589,17 @@ def wseries_fetch_data_single_point(request):
                                   '2003-07-01T01:00:00',
                                   '2003-07-01T02:00:00'],
                             'y': [1, 3, 9, 16, 25, 36]
+                        },
+                        80.0: {
+                            'x': ['2003-06-30T23:00:00',
+                                  '2003-07-01T00:00:00',
+                                  '2003-07-01T00:00:00',
+                                  '2003-07-01T01:00:00',
+                                  '2003-07-01T01:00:00',
+                                  '2003-07-01T02:00:00'],
+                            'y': [34, 7, 2, 16, -1, 36]
                         }
+
                     },
                     variable=variable_id,
                     leaflet_id=leaflet_id,
