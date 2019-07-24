@@ -446,8 +446,6 @@ def wseries_get_single_point(request):
                 )
             )
             features.append(pos)
-
-
     elif request.method == 'GET':
         print(request.GET)
 
@@ -503,9 +501,7 @@ def wseries_fetch_data_single_point(request):
             formatted_data = {}
             timespan_ids = []
             heights = []
-            variable_name = ''
             for record in oep_query:
-                variable_name = record.Series.variable.standard_name
                 timespan_id = record.Series.timespan_id
                 height = record.Series.height
 
