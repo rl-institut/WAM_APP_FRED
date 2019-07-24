@@ -184,15 +184,6 @@
                       shows data received from a test data set.
                     </p>
                     <div id="fd-forms">
-                      <form id="fd_timespan">
-
-                        <div>Start date
-                          {{fd_start_date}}
-                        </div>
-                        <div>End date
-                          {{fd_end_date}}
-                        </div>
-                      </form>
 
                       <form id="fd_technology">
                         {{fd_technology}}
@@ -860,18 +851,35 @@
         var popup = marker.getPopup();
         const name = data.properties.gen
         const lk_id = data.landkreis_id
-        var popupContent = '<h4> ' + name + ' (' + lk_id + ') </h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
-        popup.setContent(popupContent)
+        if (data.n_records >0) {
+          var popupContent = '<h4> ' + name + '</h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
+          popup.setContent(popupContent)
 
-        plot_div = document.getElementById('feedin-plot');
-        Plotly.plot(plot_div, [{
-          x: data.timespan,
-          y: data.values
-        }], {
-          margin: {
-            t: 0
-          }
-        });
+          plot_div = document.getElementById('feedin-plot');
+          Plotly.plot(
+            plot_div,
+            [{
+              x: data.timespan,
+              y: data.values
+            }],
+            {
+              margin: {
+                t: 0
+              },
+              xaxis: {
+                title: {text: 'Time'}
+              },
+              yaxis: {
+                title: {text: 'MW'}
+              }
+            }
+          );
+        }
+
+        else{
+          var popupContent = '<h4> ' + name + '</h4></br><div>Your query unfortunately did not match any records from the database</div>';
+          popup.setContent(popupContent)
+        }
       };
 
 
@@ -882,6 +890,7 @@
         var popup = marker.getPopup();
         var latlng = marker.getLatLng();
         var landkreis_props = marker.feature.properties;
+        landkreis_props.technology = $("#id_fd-technology").val();
         // TODO : this need to be linked to user choice for wd_timespan
         //
         if (marker.feature.properties.timespan) {
@@ -1036,10 +1045,6 @@
       }
 
       fd_controls = [
-        "id_fd_timespan_start-year",
-        "id_fd_timespan_start-month",
-        "id_fd_timespan_end-year",
-        "id_fd_timespan_end-month",
         "id_fd-technology"
       ]
 

@@ -21,8 +21,8 @@ VARIABLE_CHOICES = [
 ]
 
 TECHNOLOGY_CHOICES = [
-    (1, 'wind'),
-    (2, 'pv'),
+    ('Wind', 'wind'),
+    ('PV', 'pv'),
 ]
 
 HEIGHTS = [0.0, 10.0, 80.0, 100.0, 120.0, 140.0, 160.0, 200.0, 240.0]

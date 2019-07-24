@@ -12,13 +12,17 @@ from geoalchemy2.elements import WKTElement
 from shapely.geometry import shape
 from shapely.wkb import loads as loadswkb
 from dateutil import parser
-
+import saio
 
 from .app_settings import LOCAL_TESTING, fred_config
 
 if not LOCAL_TESTING:
     import WAM_APP_FRED.oep_models as oep_models
-    from WAM_APP_FRED.oep_models import open_fred_classes, open_fred_ts_classes
+    from WAM_APP_FRED.oep_models import open_fred_classes
+
+saio.register_schema("model_draft", sah.get_engine('oep_engine'))
+from saio.model_draft import openfred_timeseries_wind_2016 as openfred_ts_tbl # noqa pylint: disable=unused-import
+
 
 HOUR = '1:00:00'
 HALF_HOUR = '0:30:00'
@@ -260,20 +264,29 @@ def district_feedin_series(request):
     data = []
     if request.method == 'POST':
         landkreis_props = {k: request.POST.get(k) for k in ['id', 'gen', 'bez', 'nuts']}
+        technology = str(request.POST.get('technology'))
         lk_id = landkreis_props['nuts']
         if LOCAL_TESTING is False:
-            openfred_ts_tbl = open_fred_ts_classes['OpenFredTimesSeries']
-            oep_query = Serializer.session.query(openfred_ts_tbl)
+            oep_query = Serializer.session.query(openfred_ts_tbl) \
+                .filter(
+                and_(
+                    openfred_ts_tbl.nuts == lk_id,
+                    openfred_ts_tbl.technology == technology
+                )
+            )
+
+            n_records = oep_query.count()
 
             timespan = []
             values = []
             nut = ''
             for record in oep_query:
                 timespan.append(record.time)
-                values.append(record.feedin)
-                nut = record.nut
+                values.append(float(record.feedin) * 1e-6)
+                nut = record.nuts
 
             data = dict(
+                n_records=n_records,
                 landkreis_id=lk_id,
                 timespan=timespan,
                 values=values,
@@ -282,6 +295,7 @@ def district_feedin_series(request):
             )
         else:
             data = dict(
+                n_records=6,
                 landkreis_id=lk_id,
                 timespan=[
                     '2003-06-30T23:00:00',
