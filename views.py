@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from WAM_APP_FRED.config.leaflet import LEAFLET_CONFIG
-from .forms import SelectDateTime, SelectVariable, SelectHeight
+from .forms import SelectDateTime, SelectVariable, SelectHeight, SelectTechnology
 # Create your views here.
 
 
@@ -17,18 +17,24 @@ def privacy(request):
 
 
 def webgui_test(request):
-    start_date = SelectDateTime(prefix='wd_timespan_start')
-    end_date = SelectDateTime(prefix='wd_timespan_stop')
+    wd_start_date = SelectDateTime(prefix='wd_timespan_start')
+    wd_end_date = SelectDateTime(prefix='wd_timespan_stop')
     variable = SelectVariable(prefix='wd')
     height = SelectHeight(prefix='wd')
+    fd_start_date = SelectDateTime(prefix='fd_timespan_start')
+    fd_end_date = SelectDateTime(prefix='fd_timespan_end')
+    fd_technology = SelectTechnology(prefix='fd')
     return render(
         request,
         'WAM_APP_FRED/test_map_layout.html',
         context={
             'leaflet_config': LEAFLET_CONFIG,
-            'start_date': start_date,
-            'end_date': end_date,
+            'wd_start_date': wd_start_date,
+            'wd_end_date': wd_end_date,
             'variable': variable,
-            'height': height
+            'height': height,
+            'fd_start_date': fd_start_date,
+            'fd_end_date': fd_end_date,
+            'fd_technology': fd_technology,
         }
     )

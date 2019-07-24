@@ -19,10 +19,11 @@ Here is a template for new release sections
 ## [Unrealeased]
 
 ### Added
-
+- possibility to know which panel is selected
+- feedinlib graph
 ### Changed
+- the click on map will only trigger action for the selected panel
 
-### Removed
 
 
 
