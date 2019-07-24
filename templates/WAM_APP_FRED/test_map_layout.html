@@ -146,34 +146,24 @@
                     <p>Click on the map to load the closest weather data points. You can then click on one of the loaded points to to display the weather data over the selected time period for a given height and variable. The download can take some
                       time, depending on how many data you required. </p>
 
-                    <ul class="accordion" data-accordion>
-                      <li class="accordion-item accordion-item--no-border is-active" data-accordion-item>
 
-                        <a href="#" class="accordion-title accordion-title--100">Time Span</a>
-                        <div class="accordion-content" data-tab-content>
-                          <div class="tabs-panel is-active" id="options-energy-system">
 
-                            <form id="wd_timespan">
 
-                              <div>Start date
-                                {{wd_start_date}}
-                              </div>
-                              <div>End date
-                                {{wd_end_date}}
-                              </div>
-                            </form>
-                          </div>
-                      </li>
-                      <li class="accordion-item" data-accordion-item>
-                        <a href="#" class="accordion-title accordion-title--100">Variable</a>
-                        <div class="accordion-content" data-tab-content>
-                          <form>
-                            {{variable}}
-                            {{height}}
-                          </form>
+                    <div id="wd-forms">
+                      <form id="wd_timespan">
+
+                        {{variable}}
+                        {{height}}
+                        <div>Start date
+                          {{wd_start_date}}
                         </div>
-                      </li>
-                    </ul>
+                        <div>End date
+                          {{wd_end_date}}
+                        </div>
+
+
+                      </form>
+                    </div>
                   </div>
 
                   <!-- Third panel content -->
@@ -275,9 +265,6 @@
       return active_panel;
     }
 
-
-
-
     var biomassIcon = L.icon({
       iconUrl: "{% static 'WAM_APP_FRED/img/Pin_biomass_color_v2.svg' %}",
       iconSize: [38, 95], // size of the icon
@@ -362,6 +349,9 @@
     var feedin_location = "{% url 'WAM_APP_FRED:FeedinlibLocation'|add:'.data' %}";
     var feedin_content = "{% url 'WAM_APP_FRED:FeedinlibPopup'|add:'.data' %}";
 
+    var update_heights = "{% url 'WAM_APP_FRED:update_variable_heights' %}";
+
+
 
     function map_init_basic(map, options) {
       var popup = L.popup();
@@ -383,26 +373,44 @@
         var marker = wdl.getLayer(feature.properties.leaflet_id);
 
         var popup = marker.getPopup();
-        const user_height = $('#id_wd-height').val();
-        console.log(feature.properties.data)
-        const variable = feature.properties.variable
-        var popupContent = '<h4> Variable_id :' + variable +
-          ' Height ' + user_height + ' m' +
-          '</h4></br><div id="tester" style="width:300px;height:250px;"></div>';
-        popup.setContent(popupContent)
+        const user_height = $('select[id=id_wd-height] option:selected').val();
+        const variable = $('select[id=id_wd-variable] option:selected').text();
 
 
-        marker.feature.properties = feature.properties
-        TESTER = document.getElementById('tester');
-        var height = feature.properties.heights[0];
-        Plotly.plot(TESTER, [{
-          x: feature.properties.data[user_height]['x'],
-          y: feature.properties.data[user_height]['y']
-        }], {
-          margin: {
-            t: 0
-          }
-        });
+        var popupContent = '<h4>  Height ' + user_height + ' m</h4></br>';
+        if (feature.properties.data[user_height]) {
+          popupContent = popupContent + '<div id="tester" style="width:300px;height:250px;"></div>';
+
+          popup.setContent(popupContent);
+
+          marker.feature.properties = feature.properties
+          TESTER = document.getElementById('tester');
+          var height = feature.properties.heights[0];
+          Plotly.plot(
+            TESTER,
+            [{
+              x: feature.properties.data[user_height]['x'],
+              y: feature.properties.data[user_height]['y']
+            }], {
+              margin: {
+                t: 0
+              },
+              xaxis: {
+                title: {
+                  text: 'Time'
+                }
+              },
+              yaxis: {
+                title: {
+                  text: variable
+                }
+              }
+            });
+        } else {
+          popupContent = popupContent + 'There is no records for the choosen parameters';
+          popup.setContent(popupContent);
+        }
+
       }
 
       function onWeatherDataPointClick(event) {
@@ -410,7 +418,7 @@
         var leaflet_id = L.stamp(marker);
         var popup = marker.getPopup();
         var latlng = marker.getLatLng();
-        var location_id = marker.feature.properties.id;
+        var location_id = marker.feature.properties.location_id;
         // this need to be linked to user choice
 
         const start_year = $('#id_wd_timespan_start-year').val();
@@ -419,7 +427,7 @@
         const stop_month = $('#id_wd_timespan_stop-month').val();
 
         const variable_id = $('select[id=id_wd-variable] option:selected').val();
-        if (marker.feature.properties.variable) {
+        if (marker.feature.properties.variable == variable_id) {
           // do not fetch the data a second time
           console.log('not fetching data a second time')
           displayWeatherDataPoint(marker.feature)
@@ -427,6 +435,8 @@
           if (map.spin) {
             map.spin(true)
           }
+
+          console.log('fetching data')
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
@@ -851,7 +861,7 @@
         var popup = marker.getPopup();
         const name = data.properties.gen
         const lk_id = data.landkreis_id
-        if (data.n_records >0) {
+        if (data.n_records > 0) {
           var popupContent = '<h4> ' + name + '</h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
           popup.setContent(popupContent)
 
@@ -861,22 +871,23 @@
             [{
               x: data.timespan,
               y: data.values
-            }],
-            {
+            }], {
               margin: {
                 t: 0
               },
               xaxis: {
-                title: {text: 'Time'}
+                title: {
+                  text: 'Time'
+                }
               },
               yaxis: {
-                title: {text: 'MW'}
+                title: {
+                  text: 'MW'
+                }
               }
             }
           );
-        }
-
-        else{
+        } else {
           var popupContent = '<h4> ' + name + '</h4></br><div>Your query unfortunately did not match any records from the database</div>';
           popup.setContent(popupContent)
         }
@@ -1031,15 +1042,40 @@
         });
 
 
+
+      function wdControlChanged(event) {
+        markers = wdl.getLayers();
+        for (const marker of markers) {
+          // if yes, then resimulate a userlick on the marker to update the popup
+          if (marker) {
+            if (marker.isPopupOpen()) {
+              marker.fire('click');
+            }
+          }
+         }
+      }
+
+      wd_controls = [
+        //"id_wd_timespan_start-year",
+        //"id_wd_timespan_stop-year",
+        //"id_wd_timespan_start-month",
+        //"id_wd_timespan_stop-month",
+        //"id_wd-variable",
+        "id_wd-height",
+      ]
+
+      for (const element of wd_controls) {
+        document.getElementById(element).addEventListener(
+          "change",
+          wdControlChanged
+        );
+      }
+
+
       function feedinControlChanged(event) {
         marker = fdl.getLayers()[0];
         // if yes, then resimulate a userlick on the marker to update the popup
-        // TODO : if the selections are the same (i.e. if user simply clicked on
-        // the div, don't fire the click (could compare the marker.feature.properties
-        // with the actual values from the forms using theirs id. (need to write the values
-        // of the start and end data as well as technology selection in the properties of
-        // the marker (this could be done in serial_views.py or in createFeedinPopup)
-        if (marker) {
+        if (marker && marker.isPopupOpen()) {
           marker.fire('click');
         }
       }
@@ -1054,6 +1090,25 @@
           feedinControlChanged
         );
       }
+
+      //update the available heights depending on the choice of variable
+      $("#id_wd-variable").change(function(event) {
+        const variable_id = event.currentTarget.value; // get the selected variable ID from the HTML input
+        $.ajax({
+          url: update_heights,
+          async: true,
+          data: {
+            'variable_id': variable_id // add the country id to the GET parameters
+          },
+          success: function(data) { // `data` is the return of the `load_heights` view function
+            $("#id_wd-height").html(data); // replace the contents of the height input with the data that came from the server
+            wdControlChanged(event);
+          }
+        });
+
+      });
+
+
 
     };
   </script>
