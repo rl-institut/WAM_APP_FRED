@@ -378,7 +378,6 @@
 
 
         var popupContent = '<h4>  Height ' + user_height + ' m</h4></br>';
-
         if (feature.properties.data[user_height]) {
           popupContent = popupContent + '<div id="tester" style="width:300px;height:250px;"></div>';
 
@@ -408,7 +407,7 @@
               }
             });
         } else {
-          popupContent = popupContent + 'There is no records for this height';
+          popupContent = popupContent + 'There is no records for the choosen parameters';
           popup.setContent(popupContent);
         }
 
@@ -419,7 +418,7 @@
         var leaflet_id = L.stamp(marker);
         var popup = marker.getPopup();
         var latlng = marker.getLatLng();
-        var location_id = marker.feature.properties.id;
+        var location_id = marker.feature.properties.location_id;
         // this need to be linked to user choice
 
         const start_year = $('#id_wd_timespan_start-year').val();
@@ -436,6 +435,8 @@
           if (map.spin) {
             map.spin(true)
           }
+
+          console.log('fetching data')
           // here make a call to django and dl the data for that point
           $.ajax({
             type: 'POST',
@@ -1043,13 +1044,15 @@
 
 
       function wdControlChanged(event) {
-        marker = wdl.getLayers()[0];
-        // if yes, then resimulate a userlick on the marker to update the popup
-        if (marker) {
-          if (marker.isPopupOpen()) {
-            marker.fire('click');
+        markers = wdl.getLayers();
+        for (const marker of markers) {
+          // if yes, then resimulate a userlick on the marker to update the popup
+          if (marker) {
+            if (marker.isPopupOpen()) {
+              marker.fire('click');
+            }
           }
-        }
+         }
       }
 
       wd_controls = [

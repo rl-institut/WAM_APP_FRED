@@ -421,7 +421,7 @@ def wseries_get_single_point(request):
                 pos = geojson.Feature(
                     geometry=loadswkb(str(coord), True),
                     properties=dict(
-                        id=i
+                        location_id=i
                     )
                 )
                 features.append(pos)
@@ -430,7 +430,7 @@ def wseries_get_single_point(request):
             pos = geojson.Feature(
                 geometry=Point((lon, lat)),
                 properties=dict(
-                    id=101
+                    location_id=1,
                 )
             )
             features.append(pos)
@@ -548,9 +548,9 @@ def wseries_fetch_data_single_point(request):
             pos = geojson.Feature(
                 geometry=Point((lon, lat)),
                 properties=dict(
-                    id='find_something_unique',
+                    location_id=location_id,
                     heights=[str(h) for h in heights],
-                    variable=variable_name,
+                    variable=variable_id,
                     data=formatted_data,
                     leaflet_id=leaflet_id,
                 )

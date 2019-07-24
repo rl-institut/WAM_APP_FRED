@@ -25,7 +25,7 @@ TECHNOLOGY_CHOICES = [
     ('PV', 'pv'),
 ]
 
-HEIGHTS = [0.0, 10.0, 80.0, 100.0, 120.0, 140.0, 160.0, 200.0, 240.0]
+HEIGHTS = [10.0, 80.0, 100.0, 120.0, 140.0, 160.0, 200.0, 240.0]
 HEIGHT_CHOICES = [(h, '{}'.format(h)) for h in HEIGHTS]
 
 
