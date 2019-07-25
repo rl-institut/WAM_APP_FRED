@@ -1,5 +1,8 @@
+import csv
 from django.shortcuts import render
+from django.http import HttpResponse
 from WAM_APP_FRED.config.leaflet import LEAFLET_CONFIG
+from .models import CsvRow, CsvName
 from .forms import SelectDateTime, SelectVariable, SelectHeight, SelectTechnology
 # Create your views here.
 
@@ -40,6 +43,29 @@ def update_heights(request):
     heights = AVAILABLE_HEIGHTS[variable_id]
     return render(request, 'WAM_APP_FRED/height_dropdown_list_options.html', {'heights': heights})
 
+
+def export_csv(request):
+    if request.method == 'POST':
+        data = {k[0]: request.POST.getlist(k) for k in ['x[]', 'y[]']}
+        fname = request.POST.get('fname')
+        # Create the HttpResponse object with the appropriate CSV header.
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+        CsvName.objects.create(fname=fname)
+        for x, y in zip(data['x'], data['y']):
+            CsvRow.objects.create(time=x, val=y)
+    else:
+
+        response = HttpResponse(content_type='text/csv')
+        fname = CsvName.objects.all()[0].fname
+        CsvName.objects.all().delete()
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(fname)
+        writer = csv.writer(response)
+        writer.writerow(['Time', 'Value'])
+        for el in CsvRow.objects.all():
+            writer.writerow([el.time, el.val])
+        CsvRow.objects.all().delete()
+    return response
 
 def webgui_test(request):
     wd_start_date = SelectDateTime(prefix='wd_timespan_start')

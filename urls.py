@@ -30,5 +30,6 @@ urlpatterns = [
     path('PowerPlantPopup.data/', ppr_popup_view, name='PowerPlantPopup.data'),
     path('FeedinlibPopup.data/', district_feedin_series, name='FeedinlibPopup.data'),
     path('FeedinlibLocation.data/', feedin_view, name='FeedinlibLocation.data'),
-    path('update-variable-heights/', views.update_heights, name='update_variable_heights')
+    path('update-variable-heights/', views.update_heights, name='update_variable_heights'),
+    path('export-csv/', views.export_csv, name='export_csv')
 ]
