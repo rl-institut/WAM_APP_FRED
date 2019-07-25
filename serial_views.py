@@ -14,17 +14,15 @@ from shapely.wkb import loads as loadswkb
 from dateutil import parser
 from pyproj import Proj, transform
 
-from .saio_table_models import (
-    Timeseries,
-    Powerplants
-)
-
 
 from .app_settings import LOCAL_TESTING, fred_config
 
 if not LOCAL_TESTING:
     from WAM_APP_FRED.oep_models import open_fred_classes
-
+    from .saio_table_models import (
+        Timeseries,
+        Powerplants
+    )
 HOUR = '1:00:00'
 HALF_HOUR = '0:30:00'
 QUARTER = '0:15:00'
