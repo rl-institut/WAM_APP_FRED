@@ -67,6 +67,7 @@ def export_csv(request):
         CsvRow.objects.all().delete()
     return response
 
+
 def webgui_test(request):
     wd_start_date = SelectDateTime(prefix='wd_timespan_start')
     wd_end_date = SelectDateTime(prefix='wd_timespan_stop', initial={'month': 2})
