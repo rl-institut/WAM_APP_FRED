@@ -617,12 +617,24 @@
           return GerBoundStyle;
         },
         onEachFeature: function(boundary, layer) {
-          layer.on('mouseover', function() {
+          layer.on('mouseover', function(event) {
+            region = event.sourceTarget;
+            if (region.getTooltip()) {
+              region.openTooltip();
+              //console.log(region);
+            }
+            else {
+              const regionName = region.feature.properties.region
+              var tooltipContent = "<div>"+ regionName +"</div>";
+              region.bindTooltip(tooltipContent).openTooltip();
+            }
             if (this.clicked != true) {
               this.setStyle(highlightStyleMouseOver);
             }
           });
-          layer.on('mouseout', function() {
+          layer.on('mouseout', function(event) {
+            region = event.sourceTarget;
+            region.closeTooltip();
             if (this.clicked != true) {
               this.setStyle(GerBoundStyle);
             }
