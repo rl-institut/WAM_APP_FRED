@@ -158,22 +158,13 @@ def ppr_view(request):
                 Powerplants.scenario
             )
             # create query
-            if OEP_ACCESS == 'OEP_DIALECT':
-                # TODO find a way to convert the column rea_geom_new to srid 4326
-                geom = Powerplants.geom
-                cond_geom = tbl_cols.c.nuts.in_([region_nut])
-            elif OEP_ACCESS == 'OEP':
-                geom = Powerplants.rea_geom_new
-                wkb = Serializer.regions_wkbs[region_name]
-                cond_geom = tbl_cols.c.rea_geom_new.ST_Transform(4326).ST_Within(wkb)
-
             oep_query = Serializer.session.query(
-                geom,
+                Powerplants.rea_geom_4326,
                 tbl_cols
             ) \
                 .filter(
                     and_(
-                        cond_geom,
+                        tbl_cols.c.nuts.in_([region_nut]),
                         tbl_cols.c.version == EGO_DP_VERSION,
                         tbl_cols.c.scenario == EGO_DP_SCENARIO,
                         tbl_cols.c.generation_type == generation_type
@@ -182,14 +173,11 @@ def ppr_view(request):
 
             print('There are ', oep_query.count(), ' powerplants in the data base')
 
-            # TODO find a way not to limit the query
-            for record in oep_query.limit(1000):
-                # TODO
-                # this might need to be translated to 4326!!!
-                region_contains = loadswkb(str(record[0]), True)
+            for record in oep_query:
+                pos = shape(loadswkb(str(record[0]), True))
                 feature = Feature(
                     id=record.powerplant.id,
-                    geometry=region_contains,
+                    geometry=pos,
                     property=dict(
                         region_nut=region_nut,
                         region_name=region_name,
@@ -198,6 +186,7 @@ def ppr_view(request):
                     )
                 )
                 myfeatures.append(feature)
+
         else:
             landkreis_ids = Serializer.regions_to_landkreis[region_nut]
             for lk_id in landkreis_ids:
