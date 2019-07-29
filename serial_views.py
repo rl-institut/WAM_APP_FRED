@@ -12,7 +12,6 @@ from geoalchemy2.elements import WKTElement
 from shapely.geometry import shape
 from shapely.wkb import loads as loadswkb
 from dateutil import parser
-from pyproj import Proj, transform
 
 from .saio_table_models import (
     Timeseries,
@@ -41,9 +40,6 @@ TIME_STEPS = {
 EGO_DP_VERSION = fred_config['WAM_APP_FRED']['EGO_DP_VERSION']
 EGO_DP_SCENARIO = fred_config['WAM_APP_FRED']['SCENARIO']
 OEP_ACCESS = fred_config['WAM_APP_FRED']['OEP_ACCESS']
-
-P3035 = Proj(init='epsg:3035')
-P4326 = Proj(init='epsg:4326')
 
 
 class Serializer(View):
@@ -163,8 +159,7 @@ def ppr_view(request):
             )
             # create query
             oep_query = Serializer.session.query(
-                Powerplants.geom,
-                Powerplants.rea_geom_new,
+                Powerplants.rea_geom_4326,
                 tbl_cols
             ) \
                 .filter(
@@ -178,12 +173,8 @@ def ppr_view(request):
 
             print('There are ', oep_query.count(), ' powerplants in the data base')
 
-            # TODO find a way not to limit the query
-            for record in oep_query.limit(1000):
+            for record in oep_query:
                 pos = shape(loadswkb(str(record[0]), True))
-                # translate from 3035 to 4326
-                # TODO this takes time!!!
-                pos = Point(transform(P3035, P4326, pos.x, pos.y))
                 feature = Feature(
                     id=record.powerplant.id,
                     geometry=pos,
