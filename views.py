@@ -2,7 +2,7 @@ import csv
 from django.shortcuts import render
 from django.http import HttpResponse
 from WAM_APP_FRED.config.leaflet import LEAFLET_CONFIG
-from .models import CsvRow, CsvName
+from .models import CsvRow, CsvParam
 from .forms import SelectDateTime, SelectVariable, SelectHeight, SelectTechnology
 # Create your views here.
 
