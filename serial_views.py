@@ -564,7 +564,7 @@ def wseries_fetch_data_single_point(request):
                     t = datetime.datetime.isoformat(cur_date)
                     timespans.append(t)
                     # for later csv file downloading
-                    CsvRow.objects.create(time=t, val=str(y),  height=str(height))
+                    CsvRow.objects.create(time=t, val=str(y), height=str(height))
                     cur_date = cur_date + dt
                     idx = idx + 1
                 formatted_data[height]['x'] = formatted_data[height]['x'] + timespans

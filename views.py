@@ -42,10 +42,11 @@ def update_heights(request):
     return render(request, 'WAM_APP_FRED/height_dropdown_list_options.html', {'heights': heights})
 
 
-class Echo(object):
+class Echo:
     """An object that implements just the write method of the file-like
     interface.
     """
+    # pylint: disable=no-self-use
     def write(self, value):
         """Write the value by returning it, instead of storing in a buffer."""
         return value
