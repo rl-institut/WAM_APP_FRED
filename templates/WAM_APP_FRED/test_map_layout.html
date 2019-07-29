@@ -396,9 +396,8 @@
                   'X-CSRFToken': '{{ csrf_token }}'
                 },
                 data: {
-                  'fname': variable + '_timeseries_height_' + height + 'm.csv',
-                  'x': feature.properties.data[user_height]['x'],
-                  'y': feature.properties.data[user_height]['y'],
+                  'fname': variable + '_timeseries_height_' + user_height + 'm.csv',
+                  'height': user_height,
                 },
                 async: true,
                 success: function(data) {
@@ -894,6 +893,7 @@
           var popupContent = '<h4> ' + name + '</h4></br>' + export_csv_link + '</br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
           popup.setContent(popupContent)
 
+
           document.getElementById("trig_csv").addEventListener(
             "click",
             function(event) {
@@ -905,8 +905,6 @@
                 },
                 data: {
                   'fname': 'power_timeseries_' + name + '.csv',
-                  'x': data.timespan,
-                  'y': data.values,
                 },
                 async: true,
                 success: function(data) {

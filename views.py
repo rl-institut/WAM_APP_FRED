@@ -1,11 +1,9 @@
 import csv
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from WAM_APP_FRED.config.leaflet import LEAFLET_CONFIG
 from .models import CsvRow, CsvParam
 from .forms import SelectDateTime, SelectVariable, SelectHeight, SelectTechnology
-# Create your views here.
-
 
 AVAILABLE_HEIGHTS = {
     1: [10., 80., 100., 120., 140., 160., 200., 240.],
@@ -44,27 +42,50 @@ def update_heights(request):
     return render(request, 'WAM_APP_FRED/height_dropdown_list_options.html', {'heights': heights})
 
 
+class Echo(object):
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
+
+
 def export_csv(request):
     if request.method == 'POST':
-        data = {k[0]: request.POST.getlist(k) for k in ['x[]', 'y[]']}
         fname = request.POST.get('fname')
+        height = request.POST.get('height')
+        if height is None:
+            height = 'none'
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
-        CsvName.objects.create(fname=fname)
-        for x, y in zip(data['x'], data['y']):
-            CsvRow.objects.create(time=x, val=y)
-    else:
-
-        response = HttpResponse(content_type='text/csv')
-        fname = CsvName.objects.all()[0].fname
-        CsvName.objects.all().delete()
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(fname)
-        writer = csv.writer(response)
-        writer.writerow(['Time', 'Value'])
-        for el in CsvRow.objects.all():
-            writer.writerow([el.time, el.val])
-        CsvRow.objects.all().delete()
+        CsvParam.objects.all().delete()
+        CsvParam.objects.create(fname=fname, height=height)
+    else:
+        # get the filename and the height from a model
+        fname = CsvParam.objects.all()[0].fname
+        height = CsvParam.objects.all()[0].height
+
+        pseudo_buffer = Echo()
+        writer = csv.writer(pseudo_buffer)
+
+        to_write = [['Time', 'Value']]
+        if height == 'none':
+            subset = CsvRow.objects.all()
+            for el in subset:
+                to_write.append([el.time, el.val])
+        else:
+            subset = CsvRow.objects.filter(height__exact=height)
+            for el in subset:
+                to_write.append([el.time, el.val])
+
+        response = StreamingHttpResponse(
+            (writer.writerow(row) for row in to_write),
+            content_type='text/csv'
+        )
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(fname)
+
     return response
 
 
