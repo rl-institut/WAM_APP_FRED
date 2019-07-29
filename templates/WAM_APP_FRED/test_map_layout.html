@@ -660,14 +660,26 @@
           return GerBoundStyle;
         },
         onEachFeature: function(boundary, layer) {
-          layer.on('mouseover', function() {
+          layer.on('mouseover', function(event) {
+            landkreis = event.sourceTarget;
+            if (landkreis.getTooltip()) {
+              landkreis.openTooltip();
+            }
+            else {
+              const landkreisName = landkreis.feature.properties.gen
+              landkreis.bindTooltip("<div>"+ landkreisName +"</div>").openTooltip();
+            }
             if (this.clicked != true) {
               this.setStyle(highlightStyleMouseOver);
+
             }
           });
-          layer.on('mouseout', function() {
+          layer.on('mouseout', function(event) {
+            landkreis = event.sourceTarget;
+            landkreis.closeTooltip();
             if (this.clicked != true) {
               this.setStyle(GerBoundStyle);
+
             }
           });
           // select region and request data
