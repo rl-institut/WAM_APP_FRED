@@ -13,17 +13,16 @@ from shapely.geometry import shape
 from shapely.wkb import loads as loadswkb
 from dateutil import parser
 
-from .saio_table_models import (
-    Timeseries,
-    Powerplants
-)
-
 
 from .app_settings import LOCAL_TESTING, fred_config
+from .models import CsvRow
 
 if not LOCAL_TESTING:
     from WAM_APP_FRED.oep_models import open_fred_classes
-
+    from .saio_table_models import (
+        Timeseries,
+        Powerplants
+    )
 HOUR = '1:00:00'
 HALF_HOUR = '0:30:00'
 QUARTER = '0:15:00'
@@ -252,6 +251,7 @@ def district_feedin_series(request):
         landkreis_props = {k: request.POST.get(k) for k in ['id', 'gen', 'bez', 'nuts']}
         technology = str(request.POST.get('technology'))
         lk_id = landkreis_props['nuts']
+
         if LOCAL_TESTING is False:
             oep_query = Serializer.session.query(Timeseries) \
                 .filter(
@@ -266,9 +266,14 @@ def district_feedin_series(request):
             timespan = []
             values = []
             nut = ''
+            # for later csv file downloading
+            CsvRow.objects.all().delete()
             for record in oep_query:
-                timespan.append(record.time)
-                values.append(float(record.feedin) * 1e-6)
+                t = record.time
+                timespan.append(t)
+                y = float(record.feedin) * 1e-6
+                values.append(y)
+                CsvRow.objects.create(time=t, val=y)
                 nut = record.nuts
 
             data = dict(
@@ -279,6 +284,7 @@ def district_feedin_series(request):
                 nut=nut,
                 properties=landkreis_props
             )
+
         else:
             data = dict(
                 n_records=6,
@@ -295,6 +301,10 @@ def district_feedin_series(request):
                 nut='Wind',
                 properties=landkreis_props
             )
+            # for later csv file downloading
+            CsvRow.objects.all().delete()
+            for x, y in zip(data['timespan'], data['values']):
+                CsvRow.objects.create(time=x, val=y)
 
     elif request.method == 'GET':
         print(request.GET)
@@ -490,6 +500,8 @@ def wseries_fetch_data_single_point(request):
             formatted_data = {}
             timespan_ids = []
             heights = []
+            # for later csv file downloading
+            CsvRow.objects.all().delete()
             for record in oep_query:
                 timespan_id = record.Series.timespan_id
                 height = record.Series.height
@@ -501,6 +513,7 @@ def wseries_fetch_data_single_point(request):
 
                 if height not in heights:
                     heights.append(height)
+
                     # resets the data values for next height index
                     values = []
                     timespans = []
@@ -537,8 +550,12 @@ def wseries_fetch_data_single_point(request):
 
                 idx = 0
                 while cur_date <= end_d - dt:
-                    values.append(temp_values[idx])
-                    timespans.append(datetime.datetime.isoformat(cur_date))
+                    y = temp_values[idx]
+                    values.append(y)
+                    t = datetime.datetime.isoformat(cur_date)
+                    timespans.append(t)
+                    # for later csv file downloading
+                    CsvRow.objects.create(time=t, val=str(y), height=str(height))
                     cur_date = cur_date + dt
                     idx = idx + 1
                 formatted_data[height]['x'] = formatted_data[height]['x'] + timespans
@@ -586,6 +603,14 @@ def wseries_fetch_data_single_point(request):
                     leaflet_id=leaflet_id,
                 )
             )
+
+            # for later csv file downloading
+            CsvRow.objects.all().delete()
+            for k in pos['properties']['data'].keys():
+                x_data = pos['properties']['data'][k]['x']
+                y_data = pos['properties']['data'][k]['y']
+                for x, y in zip(x_data, y_data):
+                    CsvRow.objects.create(time=x, val=str(y), height=str(k))
             features = pos
 
     elif request.method == 'GET':

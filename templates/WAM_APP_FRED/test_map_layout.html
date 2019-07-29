@@ -350,10 +350,12 @@
     var feedin_content = "{% url 'WAM_APP_FRED:FeedinlibPopup'|add:'.data' %}";
 
     var update_heights = "{% url 'WAM_APP_FRED:update_variable_heights' %}";
-
+    var export_csv_url = "{% url 'WAM_APP_FRED:export_csv' %}";
+    var export_csv_link = '<a target="_blank" id="trig_csv">to csv</a><a style="display: none" id="export_csv" target="_blank" href="{% url 'WAM_APP_FRED:export_csv' %}"> csv</a>'
 
 
     function map_init_basic(map, options) {
+
       var popup = L.popup();
 
       let wdataStyle = {
@@ -379,9 +381,35 @@
 
         var popupContent = '<h4>  Height ' + user_height + ' m</h4></br>';
         if (feature.properties.data[user_height]) {
-          popupContent = popupContent + '<div id="tester" style="width:300px;height:250px;"></div>';
+          popupContent = popupContent + export_csv_link + '<div id="tester" style="width:300px;height:250px;"></div>';
+
 
           popup.setContent(popupContent);
+
+          document.getElementById("trig_csv").addEventListener(
+            "click",
+            function(event) {
+              $.ajax({
+                type: 'POST',
+                url: export_csv_url,
+                headers: {
+                  'X-CSRFToken': '{{ csrf_token }}'
+                },
+                data: {
+                  'fname': variable + '_timeseries_height_' + user_height + 'm.csv',
+                  'height': user_height,
+                },
+                async: true,
+                success: function(data) {
+                  const lien = $("#export_csv");
+                  lien.get(0).click();
+
+                }
+              });
+            }
+          );
+
+
 
           marker.feature.properties = feature.properties
           TESTER = document.getElementById('tester');
@@ -862,8 +890,31 @@
         const name = data.properties.gen
         const lk_id = data.landkreis_id
         if (data.n_records > 0) {
-          var popupContent = '<h4> ' + name + '</h4></br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
+          var popupContent = '<h4> ' + name + '</h4></br>' + export_csv_link + '</br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
           popup.setContent(popupContent)
+
+
+          document.getElementById("trig_csv").addEventListener(
+            "click",
+            function(event) {
+              $.ajax({
+                type: 'POST',
+                url: export_csv_url,
+                headers: {
+                  'X-CSRFToken': '{{ csrf_token }}'
+                },
+                data: {
+                  'fname': 'power_timeseries_' + name + '.csv',
+                },
+                async: true,
+                success: function(data) {
+                  const lien = $("#export_csv");
+                  lien.get(0).click();
+
+                }
+              });
+            }
+          );
 
           plot_div = document.getElementById('feedin-plot');
           Plotly.plot(
@@ -1052,7 +1103,7 @@
               marker.fire('click');
             }
           }
-         }
+        }
       }
 
       wd_controls = [
