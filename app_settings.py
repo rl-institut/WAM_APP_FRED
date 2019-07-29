@@ -12,7 +12,7 @@ fred_config = ConfigObj(os.path.join(settings.BASE_DIR, 'WAM_APP_FRED', 'config'
 
 OEP_ACCESS = fred_config['WAM_APP_FRED']['OEP_ACCESS']
 
-LOCAL_TESTING = settings.config['WAM'].as_bool('LOCAL_TESTING')
+LOCAL_TESTING = fred_config['WAM_APP_FRED'].as_bool('LOCAL_TESTING')
 wam_config = settings.config['DATABASES'][OEP_ACCESS]
 
 # ##########################################SQLAlchemy ENGINE#######################################
