@@ -51,7 +51,7 @@ which return value should contain at least `ẀAM_APP_FRED`.
 
 3. The database used in this project is the [OEDB](https://github.com/OpenEnergyPlatform/oeplatform) database which is 
 a external database that is not managed by Django. For this reason we use SQLAlchemy to access the data.
-This is set in the .config/config.cfg file of the WAM core project as follow :
+This is set in the .config/config.cfg file of the WAM core project as follow:
  
  ```
  [DATABASES]
@@ -76,16 +76,41 @@ This is set in the .config/config.cfg file of the WAM core project as follow :
         HOST = oe2.iks.cs.ovgu.de
         PORT = 5432
         NAME = oedb
+    [[OEP_DIALECT]]
+        ENGINE = postgresql+oedialect
+        USER = <username>
+        TOKEN = <password>
+        HOST = openenergy-platform.org
+        PORT = 5432
+        NAME = oep
 ```
  
-Enter your [OEP]((https://openenergy-platform.org/)) credentials instead of <username> and <password>.
+Enter your [OEP]((https://openenergy-platform.org/)) credentials instead of \<username\> and \<password\>.
+
+4. Add LOCAL_TESTING (True|False) parameter in your config. This is also set in the
+.config/config.cfg. Normally, as an external you set this parameter to `False`:
+
+ ```
+ [DATABASES]
+     ...
+    
+ [WAM]
+     ...
+     LOCAL_TESTING=(False|True)
+```
 
 
-4. Run the local Django server from the main directory of the WAM core project 
+5. Run the local Django server from the main directory of the WAM core project.
 
 ```
 python manage.py runserver
 ````
+
+If you have some depencency issues. Manually update your dependencies in your WAM environment (in the WAM_APP_FRED folder):
+
+```
+pip install -r requirements.txt
+```
 
 ## Usage
 
