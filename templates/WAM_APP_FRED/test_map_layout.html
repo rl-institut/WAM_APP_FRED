@@ -265,6 +265,10 @@
       return active_panel;
     }
 
+  function get_selected_powerplant_type() {
+    return $("input[name=generation_type]:checked").val();
+  }
+
     var biomassIcon = L.icon({
       iconUrl: "{% static 'WAM_APP_FRED/img/Pin_biomass_color_v2.svg' %}",
       iconSize: [38, 95], // size of the icon
@@ -747,8 +751,8 @@
       // request all power plants contained in selected region
       // also include the generation_type option
       function loadRegionPowerPlants(region, layer) {
-        region_name = region.feature.properties.region;
-        generation_type = $("input[name=generation_type]:checked").val();
+        var region_name = region.feature.properties.region;
+        var generation_type = get_selected_powerplant_type();
         //set the spinner
         if (map.spin) {
           map.spin(true)
