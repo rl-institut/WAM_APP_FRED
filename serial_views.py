@@ -1,5 +1,6 @@
 # serialize data for all models
 import datetime
+import json
 from django.http import HttpResponse
 from django.views import View
 from sqlalchemy import and_
@@ -110,6 +111,13 @@ class Serializer(View):
         if lk_id not in regions_to_landkreis[region_id]:
             regions_to_landkreis[region_id].append(lk_id)
 
+    # load the powerplant allocation per resion
+    with open(
+            'WAM_APP_FRED/static/WAM_APP_FRED/geodata/bundeslaender_pp_count.json',
+            encoding='UTF-8'
+    ) as g:
+        ger_pp_count = json.load(g)
+
     def ger_boundaries_view(self):
 
         germany_boundaries = Serializer.ger_regions
@@ -121,6 +129,12 @@ class Serializer(View):
         germany_landkreis = Serializer.ger_landkreis
 
         return HttpResponse(dumps(germany_landkreis), content_type="application/json")
+
+    def ger_powerplant_count_view(self):
+
+        germany_powerplants_count = Serializer.ger_pp_count
+
+        return HttpResponse(dumps(germany_powerplants_count), content_type="application/json")
 
     def district_feedin_series_view(self):
         """

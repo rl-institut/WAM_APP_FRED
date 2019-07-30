@@ -342,6 +342,7 @@
 
     var ger_boundaries = "{% url 'WAM_APP_FRED:GerBoundary'|add:'.data' %}";
     var ger_landkreis = "{% url 'WAM_APP_FRED:GerLandkreis'|add:'.data' %}";
+    var ger_pp_count_url = "{% url 'WAM_APP_FRED:GerPowerPlantCount' %}";
 
     var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
     var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
@@ -723,6 +724,18 @@
       //PowePlantRegister StartSection
       ///////////////////////////////////////////////////////////////////////////////////////////////////////
       // res PowerPlants in region boundaries
+
+      var ger_pp_count = null;
+      // fetch Germany powerplant count
+      $.ajax({
+        url: ger_pp_count_url,
+        dataType: 'json',
+        async: true,
+        success: function(pp_count_data) {
+          ger_pp_count = pp_count_data;
+        }
+      });
+
 
       // Layer containing the markers created by user click for powerplant
       var ppClusters = L.markerClusterGroup();
