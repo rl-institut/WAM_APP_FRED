@@ -620,22 +620,31 @@
         onEachFeature: function(boundary, layer) {
           layer.on('mouseover', function(event) {
             region = event.sourceTarget;
+
+            const regionName = region.feature.properties.region;
+            const regionId = region.feature.properties.nuts_1;
+            var tooltipContent = "<div>"+ regionName +"</div></br><ul>";
+
+            pp_count = ger_pp_count[regionId]
+            for (const g_type in pp_count) {
+              var addContent = g_type + ': ' + pp_count[g_type];
+              // set the selected option in bold
+              if (g_type === get_selected_powerplant_type()) {
+                addContent = "<span style='font-weight:bold'>" + addContent + "</span>"
+              }
+
+              tooltipContent = tooltipContent + '<li>' + addContent + '</li>';
+            }
+            tooltipContent = tooltipContent + '</ul>';
+
             if (region.getTooltip()) {
+              region.setTooltipContent(tooltipContent);
               region.openTooltip();
             }
             else {
-              const regionName = region.feature.properties.region;
-              const regionId = region.feature.properties.nuts_1;
-              var tooltipContent = "<div>"+ regionName +"</div></br><ul>";
-
-              pp_count = ger_pp_count[regionId]
-              for (const g_type in pp_count) {
-                tooltipContent = tooltipContent + '<li>' + g_type + ': ' + pp_count[g_type] + '</li>';
-              }
-              tooltipContent = tooltipContent + '</ul>';
-
               region.bindTooltip(tooltipContent).openTooltip();
             }
+
             if (this.clicked != true) {
               this.setStyle(highlightStyleMouseOver);
             }
