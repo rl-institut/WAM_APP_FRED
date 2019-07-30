@@ -627,7 +627,10 @@
 
             pp_count = ger_pp_count[regionId]
             for (const g_type in pp_count) {
-              var addContent = g_type + ': ' + pp_count[g_type];
+              // remove the underscores and capitalize first letter of the type
+              var type_name = g_type.replace(/_/g, ' ');
+              type_name = type_name.charAt(0).toUpperCase() + type_name.slice(1);
+              var addContent = type_name + ': ' + pp_count[g_type];
               // set the selected option in bold
               if (g_type === get_selected_powerplant_type()) {
                 addContent = "<span style='font-weight:bold'>" + addContent + "</span>"
