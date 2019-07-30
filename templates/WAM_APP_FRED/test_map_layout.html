@@ -622,11 +622,18 @@
             region = event.sourceTarget;
             if (region.getTooltip()) {
               region.openTooltip();
-              //console.log(region);
             }
             else {
-              const regionName = region.feature.properties.region
-              var tooltipContent = "<div>"+ regionName +"</div>";
+              const regionName = region.feature.properties.region;
+              const regionId = region.feature.properties.nuts_1;
+              var tooltipContent = "<div>"+ regionName +"</div></br><ul>";
+
+              pp_count = ger_pp_count[regionId]
+              for (const g_type in pp_count) {
+                tooltipContent = tooltipContent + '<li>' + g_type + ': ' + pp_count[g_type] + '</li>';
+              }
+              tooltipContent = tooltipContent + '</ul>';
+
               region.bindTooltip(tooltipContent).openTooltip();
             }
             if (this.clicked != true) {
@@ -695,14 +702,14 @@
 
             }
           });
-          // select region and request data
+          // select landkreis and request data
           layer.on('click', function(event) {
             var active_panel = get_active_panel();
             this.clicked = true;
             this.setStyle(GerBoundZoomLvlStyle);
-            region = event.sourceTarget;
+            landkreis = event.sourceTarget;
             if (active_panel == 'panel-feedinlib') {
-              loadLandkreisFeedin(region, layer);
+              loadLandkreisFeedin(landkreis, layer);
             }
           });
         }
