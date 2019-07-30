@@ -265,6 +265,10 @@
       return active_panel;
     }
 
+  function get_selected_powerplant_type() {
+    return $("input[name=generation_type]:checked").val();
+  }
+
     var biomassIcon = L.icon({
       iconUrl: "{% static 'WAM_APP_FRED/img/Pin_biomass_color_v2.svg' %}",
       iconSize: [38, 95], // size of the icon
@@ -342,6 +346,7 @@
 
     var ger_boundaries = "{% url 'WAM_APP_FRED:GerBoundary'|add:'.data' %}";
     var ger_landkreis = "{% url 'WAM_APP_FRED:GerLandkreis'|add:'.data' %}";
+    var ger_pp_count_url = "{% url 'WAM_APP_FRED:GerPowerPlantCount' %}";
 
     var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
     var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
@@ -356,7 +361,6 @@
 
     function map_init_basic(map, options) {
 
-      var popup = L.popup();
 
       let wdataStyle = {
         opacity: 0.7,
@@ -513,11 +517,8 @@
 
       var wdl = new L.geoJSON(null, wdataOptions);
 
-      var wdl_saved = new L.geoJSON(null, wdataOptions);
-
 
       wdl.addTo(map);
-      wdl_saved.addTo(map);
 
 
       // Move zoom control
@@ -617,12 +618,43 @@
           return GerBoundStyle;
         },
         onEachFeature: function(boundary, layer) {
-          layer.on('mouseover', function() {
+          layer.on('mouseover', function(event) {
+            region = event.sourceTarget;
+
+            const regionName = region.feature.properties.region;
+            const regionId = region.feature.properties.nuts_1;
+            var tooltipContent = "<div>"+ regionName +"</div></br><ul>";
+
+            pp_count = ger_pp_count[regionId]
+            for (const g_type in pp_count) {
+              // remove the underscores and capitalize first letter of the type
+              var type_name = g_type.replace(/_/g, ' ');
+              type_name = type_name.charAt(0).toUpperCase() + type_name.slice(1);
+              var addContent = type_name + ': ' + pp_count[g_type];
+              // set the selected option in bold
+              if (g_type === get_selected_powerplant_type()) {
+                addContent = "<span style='font-weight:bold'>" + addContent + "</span>"
+              }
+
+              tooltipContent = tooltipContent + '<li>' + addContent + '</li>';
+            }
+            tooltipContent = tooltipContent + '</ul>';
+
+            if (region.getTooltip()) {
+              region.setTooltipContent(tooltipContent);
+              region.openTooltip();
+            }
+            else {
+              region.bindTooltip(tooltipContent).openTooltip();
+            }
+
             if (this.clicked != true) {
               this.setStyle(highlightStyleMouseOver);
             }
           });
-          layer.on('mouseout', function() {
+          layer.on('mouseout', function(event) {
+            region = event.sourceTarget;
+            region.closeTooltip();
             if (this.clicked != true) {
               this.setStyle(GerBoundStyle);
             }
@@ -660,24 +692,36 @@
           return GerBoundStyle;
         },
         onEachFeature: function(boundary, layer) {
-          layer.on('mouseover', function() {
+          layer.on('mouseover', function(event) {
+            landkreis = event.sourceTarget;
+            if (landkreis.getTooltip()) {
+              landkreis.openTooltip();
+            }
+            else {
+              const landkreisName = landkreis.feature.properties.gen
+              landkreis.bindTooltip("<div>"+ landkreisName +"</div>").openTooltip();
+            }
             if (this.clicked != true) {
               this.setStyle(highlightStyleMouseOver);
+
             }
           });
-          layer.on('mouseout', function() {
+          layer.on('mouseout', function(event) {
+            landkreis = event.sourceTarget;
+            landkreis.closeTooltip();
             if (this.clicked != true) {
               this.setStyle(GerBoundStyle);
+
             }
           });
-          // select region and request data
+          // select landkreis and request data
           layer.on('click', function(event) {
             var active_panel = get_active_panel();
             this.clicked = true;
             this.setStyle(GerBoundZoomLvlStyle);
-            region = event.sourceTarget;
+            landkreis = event.sourceTarget;
             if (active_panel == 'panel-feedinlib') {
-              loadLandkreisFeedin(region, layer);
+              loadLandkreisFeedin(landkreis, layer);
             }
           });
         }
@@ -700,6 +744,18 @@
       ///////////////////////////////////////////////////////////////////////////////////////////////////////
       // res PowerPlants in region boundaries
 
+      var ger_pp_count = null;
+      // fetch Germany powerplant count
+      $.ajax({
+        url: ger_pp_count_url,
+        dataType: 'json',
+        async: true,
+        success: function(pp_count_data) {
+          ger_pp_count = pp_count_data;
+        }
+      });
+
+
       // Layer containing the markers created by user click for powerplant
       var ppClusters = L.markerClusterGroup();
       ppClusters.on('click', onPowerPlantDataPointClick);
@@ -707,8 +763,8 @@
       // request all power plants contained in selected region
       // also include the generation_type option
       function loadRegionPowerPlants(region, layer) {
-        region_name = region.feature.properties.region;
-        generation_type = $("input[name=generation_type]:checked").val();
+        var region_name = region.feature.properties.region;
+        var generation_type = get_selected_powerplant_type();
         //set the spinner
         if (map.spin) {
           map.spin(true)
