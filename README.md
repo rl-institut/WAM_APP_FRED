@@ -87,18 +87,18 @@ This is set in the .config/config.cfg file of the WAM core project as follow:
  
 Enter your [OEP]((https://openenergy-platform.org/)) credentials instead of \<username\> and \<password\>.
 
-4. Add LOCAL_TESTING (True|False) parameter in your config. This is also set in the
-.config/config.cfg. Normally, as an external you set this parameter to `False`:
+4. Add LOCAL_TESTING (True=1|False=0) parameter in your config. This is set in the
+WAM_APP_FRED/config/fred_app.cfg:
+
 
  ```
- [DATABASES]
-     ...
-    
- [WAM]
-     ...
-     LOCAL_TESTING=(False|True)
+[WAM_APP_FRED]
+    ...
+    LOCAL_TESTING=(1|0)
 ```
 
+When this parameter is set to 0 (False), the query are sent to the database. Otherwise test datasets are used.
+This is useful to test new functionalities.
 
 5. Run the local Django server from the main directory of the WAM core project.
 
