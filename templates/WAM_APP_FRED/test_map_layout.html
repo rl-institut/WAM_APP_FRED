@@ -357,7 +357,6 @@
 
     function map_init_basic(map, options) {
 
-      var popup = L.popup();
 
       let wdataStyle = {
         opacity: 0.7,
@@ -514,11 +513,8 @@
 
       var wdl = new L.geoJSON(null, wdataOptions);
 
-      var wdl_saved = new L.geoJSON(null, wdataOptions);
-
 
       wdl.addTo(map);
-      wdl_saved.addTo(map);
 
 
       // Move zoom control
