@@ -806,6 +806,7 @@
               map.removeLayer(ppClusters);
             }
             for (const feature of features.features) {
+
               var m = L.marker(
                 [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
                 {icon: powerPlantIcons[feature.property.generation_subtype]}
@@ -817,14 +818,8 @@
 
               ppClusters.addLayer(m)
             }
-
-
-
-
             map.addLayer(ppClusters);
-
           }
-
         }).done(function() {
           //remove spinner when done loading
           if (map.spin) {
@@ -845,44 +840,46 @@
 
           var popup = marker.getPopup();
           popup.setContent(content);
+          marker.property = feature.property;
         }
       }
 
       function onPowerPlantDataPointClick(event) {
-        if (map.spin) {
-          map.spin(true)
-        }
+
         var marker = event.sourceTarget;
-        var leaflet_id = L.stamp(marker);
-        var pp_id = marker.feature.id;
-        $.ajax({
-          type: 'POST',
-          url: ppr_content,
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-          },
-          data: {
-            'leaflet_id': leaflet_id,
-            'pp_id': pp_id
-          },
-          success: function(thispopupcontent) {
-            updatePowerplantPopup(thispopupcontent, marker)
-          }
-        }).done(function() {
+
+
+        if (marker.property) {
+          // do not fetch the data a second time
+          console.log('not fetching data a second time')
+          updatePowerplantPopup(marker.feature, marker)
+        }
+        else {
+
           if (map.spin) {
-            map.spin(false)
+            map.spin(true)
           }
-        });
-      }
+          var leaflet_id = L.stamp(marker);
+          var pp_id = marker.feature.id;
 
-      // add icon on to clicked circelmarker
-      function addPowerPlantMarker(feature, latlng) {
-        // ugly function body insert generic or something similar
-        var marker = L.marker(latlng, myLayerStyle)
 
-        if (feature.property.generation_subtype === "solar_roof_mounted") {
-          marker.setIcon({
-            icon: solarRoofIcon
+          $.ajax({
+            type: 'POST',
+            url: ppr_content,
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: {
+              'leaflet_id': leaflet_id,
+              'pp_id': pp_id
+            },
+            success: function(thispopupcontent) {
+              updatePowerplantPopup(thispopupcontent, marker)
+            }
+          }).done(function() {
+            if (map.spin) {
+              map.spin(false)
+            }
           });
         }
       }
