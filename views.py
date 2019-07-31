@@ -1,10 +1,12 @@
+import os
 import csv
 from django.shortcuts import render
 from django.http import HttpResponse, StreamingHttpResponse
+from utils.widgets import InfoButton
+from wam import settings
 from WAM_APP_FRED.config.leaflet import LEAFLET_CONFIG
 from .models import CsvRow, CsvParam
 from .forms import SelectDateTime, SelectVariable, SelectHeight, SelectTechnology
-
 AVAILABLE_HEIGHTS = {
     1: [10., 80., 100., 120., 140., 160., 200., 240.],
     2: [10., 80., 100., 120., 140., 160., 200., 240.],
@@ -98,6 +100,34 @@ def webgui_test(request):
     fd_start_date = SelectDateTime(prefix='fd_timespan_start')
     fd_end_date = SelectDateTime(prefix='fd_timespan_end')
     fd_technology = SelectTechnology(prefix='fd')
+
+    def create_reveal_info_button(fname):
+        """Create reveal window with trigger button with content from markdown file
+        (general app info buttons, e.g. in top navigation bar)
+        """
+        ifname = os.path.join(
+            settings.BASE_DIR,
+            'WAM_APP_FRED',
+            'static',
+            'WAM_APP_FRED',
+            '{}.md'.format(fname)
+        )
+
+
+        text_data = {}
+
+        f = open(ifname, 'r', encoding='utf-8')
+        text = f.read()
+        text_data[fname] = InfoButton(text=text,
+                                     tooltip=text.split("\n")[0][2:],
+                                     is_markdown=True,
+                                     #ionicon_type=data['icon'],
+                                     #ionicon_size='medium',
+                                     info_id='id_info-{}'.format(fname)
+                                     )
+        f.close()
+        return text_data #{'texts': text_data}
+    truc = create_reveal_info_button('welcome')
     return render(
         request,
         'WAM_APP_FRED/test_map_layout.html',
@@ -110,5 +140,6 @@ def webgui_test(request):
             'fd_start_date': fd_start_date,
             'fd_end_date': fd_end_date,
             'fd_technology': fd_technology,
+            'texts': truc,
         }
     )
