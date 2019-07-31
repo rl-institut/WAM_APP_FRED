@@ -808,7 +808,7 @@
             for (const feature of features.features) {
               var m = L.marker(
                 [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
-                myLayerStyle
+                {icon: powerPlantIcons[feature.property.generation_subtype]}
               )
               m.bindPopup('Loading');
               m.feature = {
