@@ -317,6 +317,27 @@
       popupAnchor: [0, -20] // point from which the popup should open relative to the iconAnchor
     });
 
+    const powerPlantIcons = {
+      solar_roof_mounted: solarRoofIcon,
+      solar_ground_mounted: solarGroundIcon,
+      solar: solarGroundIcon,
+      biomass: biomassIcon,
+      biogas: biomassIcon,
+      biogas_dry_fermentation: biomassIcon,
+      biofuel: biomassIcon,
+      wind_offshore: windOffIcon,
+      wind_onshore: windOnIcon,
+      hydro: hydroIcon,
+      geothermal: powerPlantIcon,
+      gas: powerPlantIcon,
+      biogas_from_grid: powerPlantIcon,
+      gas_mine: powerPlantIcon,
+      gas_sewage: powerPlantIcon,
+      gas_landfill: powerPlantIcon,
+      wood: powerPlantIcon,
+      waste_wood: powerPlantIcon,
+    };
+
     var highlightStyle = {
       opacity: 0.7,
       weight: 2,
@@ -785,9 +806,10 @@
               map.removeLayer(ppClusters);
             }
             for (const feature of features.features) {
+
               var m = L.marker(
                 [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
-                myLayerStyle
+                {icon: powerPlantIcons[feature.property.generation_subtype]}
               )
               m.bindPopup('Loading');
               m.feature = {
@@ -796,14 +818,8 @@
 
               ppClusters.addLayer(m)
             }
-
-
-
-
             map.addLayer(ppClusters);
-
           }
-
         }).done(function() {
           //remove spinner when done loading
           if (map.spin) {
@@ -824,116 +840,48 @@
 
           var popup = marker.getPopup();
           popup.setContent(content);
+          marker.property = feature.property;
         }
       }
 
       function onPowerPlantDataPointClick(event) {
-        if (map.spin) {
-          map.spin(true)
-        }
+
         var marker = event.sourceTarget;
-        var leaflet_id = L.stamp(marker);
-        var pp_id = marker.feature.id;
-        $.ajax({
-          type: 'POST',
-          url: ppr_content,
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-          },
-          data: {
-            'leaflet_id': leaflet_id,
-            'pp_id': pp_id
-          },
-          success: function(thispopupcontent) {
-            updatePowerplantPopup(thispopupcontent, marker)
-          }
-        }).done(function() {
+
+
+        if (marker.property) {
+          // do not fetch the data a second time
+          console.log('not fetching data a second time')
+          updatePowerplantPopup(marker.feature, marker)
+        }
+        else {
+
           if (map.spin) {
-            map.spin(false)
+            map.spin(true)
           }
-        });
-      }
+          var leaflet_id = L.stamp(marker);
+          var pp_id = marker.feature.id;
 
-      // add icon on to clicked circelmarker
-      function addPowerPlantMarker(feature, latlng) {
-        // ugly function body insert generic or something similar
-        var marker = L.marker(latlng, myLayerStyle)
 
-        if (feature.property.generation_subtype === "solar_roof_mounted") {
-          marker.setIcon({
-            icon: solarRoofIcon
+          $.ajax({
+            type: 'POST',
+            url: ppr_content,
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: {
+              'leaflet_id': leaflet_id,
+              'pp_id': pp_id
+            },
+            success: function(thispopupcontent) {
+              updatePowerplantPopup(thispopupcontent, marker)
+            }
+          }).done(function() {
+            if (map.spin) {
+              map.spin(false)
+            }
           });
         }
-        if (feature.properties.generation_subtype == "solar_ground_mounted") {
-          marker.setIcon({
-            icon: solarGroundIcon
-          });
-        }
-        if (feature.property.generation_subtype == "solar") {
-          marker.setIcon({
-            icon: solarGroundIcon
-          });
-        }
-        if (feature.properties.generation_subtype == "biomass") {
-          marker.setIcon({
-            icon: biomassIcon
-          });
-        }
-        if (feature.properties.generation_subtype == "biogas") {
-          marker.setIcon({
-            icon: biomassIcon
-          });
-        }
-        if (feature.properties.generation_subtype == "biogas_dry_fermentation") {
-          marker.setIcon({
-            icon: biomassIcon
-          });
-        }
-        if (feature.properties.generation_subtype == "biofuel") {
-          marker.setIcon({
-            icon: biomassIcon
-          });
-        }
-        if (feature.properties.generation_subtype == "wind_offshore") {
-          marker.setIcon({
-            icon: windOffIcon
-          });
-        }
-        if (feature.properties.generation_subtype === "wind_onshore") {
-          marker.setIcon({
-            icon: windOnIcon
-          });
-        }
-        if (feature.properties.generation_subtype == "hydro") {
-          marker.setIcon({
-            icon: hydroIcon
-          });
-        }
-        if (feature.properties.generation_subtype == "geothermal") {
-          // insert icon not availabe -> add when available
-        }
-        if (feature.properties.generation_subtype == "gas") {
-          // insert icon not availabe -> add when available
-        }
-        if (feature.properties.generation_subtype == "biogas_from_grid") {
-          // insert icon not availabe -> add when available
-        }
-        if (feature.properties.generation_subtype == "gas_mine") {
-          // insert icon not availabe -> add when available
-        }
-        if (feature.properties.generation_subtype == "gas_sewage") {
-          // insert icon not availabe -> add when available
-        }
-        if (feature.properties.generation_subtype == "gas_landfill") {
-          // insert icon not availabe -> add when available
-        }
-        if (feature.properties.generation_subtype == "wood") {
-          // insert icon not availabe -> add when available
-        }
-        if (feature.properties.generation_subtype == "waste_wood") {
-          // insert icon not availabe -> add when available
-        }
-        return marker
       }
 
       //PowePlantRegister EndSection
