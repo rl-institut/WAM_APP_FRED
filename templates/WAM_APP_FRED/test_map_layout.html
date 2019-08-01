@@ -76,6 +76,12 @@
               <div class="cell small-3 offcanvas-tabs__wrapper medium-cell-block-y">
                 <ul class="vertical tabs" data-tabs id="offcanvas-tabs">
                   <li class="tabs-title is-active">
+                    <a href="#panel-welcome">
+                      <img src="{% static 'WAM_APP_FRED/img/tab_icons/info.svg' %}">
+                      <h2 class="tabs-title__head">Welcome</h2>
+                    </a>
+                  </li>
+                  <li class="tabs-title">
                     <a href="#panel-energy-system">
                       <img src="{% static 'WAM_APP_FRED/img/tab_icons/weather.svg' %}">
                       <h2 class="tabs-title__head">Weather Data</h2>
@@ -99,6 +105,19 @@
               <div class="cell small-9 medium-cell-block-y tabs-content__wrapper">
                 <div class="tabs-content" data-tabs-content="offcanvas-tabs" id="fred-tabs">
 
+                  <!-- Welcome panel content -->
+                  <div class="tabs-panel is-active" id="panel-welcome">
+                    <h4>Welcome</h4>
+                      <p>This tool can be used to get an example overview of the data used and generated in the project <a href="https://reiner-lemoine-institut.de/open_fred-open-feed-time-series-based-renewable-energy-database/">OpenFRED</a>. OpenFRED stands for open Feed-in time series based on a Renewable Energy Database. The goal was to take weather and powerplant data and calculate the resulting energy feedin over time. It is possible to display and download a subset of the very large datasets. Full data can be accessed via the <a href="https://openenergy-platform.org/">OpenEnergyPlatform</a> (OEP).</p>
+                      <h5> Weather Data </h5>
+                      <p>The weather data were simulated at Helmholtz-Zentrum Geesthacht and cover Germany and its closer surroundings in a dense grid. Every point within the Grid includes 15 weather variables broken down to heights between 0 and 240 meters. Variables are calculated for several years with a resolution of 15 minutes. Access <a href="https://openenergy-platform.org/dataedit/view/model_draft/openfred_series">all weather data</a> on the OEP</p>
+                      <h5> Power Plants </h5>
+                      <p>Power plants shown in the app are taken from the <a href="https://reiner-lemoine-institut.de/open_ego-open-electricity-grid-optimization/">open_eGo project</a>. On the OEP you can download <a href="https://openenergy-platform.org/dataedit/view/supply/ego_dp_res_powerplant">all powerplants</a> used in this app. At the time of these projects, no comprehensive power plant dataset for Germany is available. Recently the German Federal Network Agency has published its internal data called <a href="https://www.marktstammdatenregister.de/MaStR">MaStR</a>. However at the time of this writing the published data are still incomplete. A <a href="https://openenergy-platform.org/dataedit/view/supply/bnetza_eeg_anlagenstammdaten">MaStR dump</a> is available on the OEP as well.</p>
+                      <h5> Feedin Time Series </h5>
+                      <p>Feedin time series were caculated based on the extensive weather data and set of power plants. It is possible to use different dataset like MaStR with the developed <a href="https://github.com/oemof/feedinlib">feedinlib</a>. Currently shown data in this tool is for wind energy in the year 2016 and uses the open_eGo powerplant data.</p> <br>
+
+                  </div>
+
                   <!-- First panel content -->
                   <div class="tabs-panel" id="panel-powerplants">
                     <h4>Power Plant Register</h4>
@@ -108,40 +127,36 @@
                         <legend>Choose one powerplant type
                           <i class="icon ion-information-circled icon--small" title="Informationen zum Inhalt"></i>
                         </legend>
-                        <div>
+                        <div title="Photovoltaic Power Plants (1,558,217 in Germany)">
                           <input type="radio" name="generation_type" value="solar" id="Solar" required checked>
-                          <label for="Solar">Photovoltaic-plant</label>
+                          <label for="Solar">Solar</label>
                         </div>
-                        <div>
+                        <div title="Onshore Wind Turbines (25,157 in Germany)">
                           <input type="radio" name="generation_type" value="wind" id="Wind">
-                          <label for="Wind">Wind-turbines</label>
+                          <label for="Wind">Wind</label>
                         </div>
-                        <div>
+                        <div title="Geothermal Power Plants (30 in Germany)">
                           <input type="radio" name="generation_type" value="geothermal" id="Geothermal">
-                          <label for="Geothermal">Geothermal-plants</label>
+                          <label for="Geothermal">Geothermal</label>
                         </div>
-                        <div>
+                        <div title="Run of the River Water Turbines (7,491 in Germany)">
                           <input type="radio" name="generation_type" value="run_of_river" id="Run_of_river">
-                          <label for="Run_of_river">Hydropower-plant</label>
+                          <label for="Run_of_river">Hydro</label>
                         </div>
-                        <div>
+                        <div title="Natural Gas Power Plants (261 in Germany)">
                           <input type="radio" name="generation_type" value="gas" id="Gas">
-                          <label for="Gas">Gaspower-plant</label>
+                          <label for="Gas">Gas</label>
                         </div>
-                        <div>
-                          <input type="radio" name="generation_type" value="reservoir" id="Reservoir">
-                          <label for="Reservoir">Pumped-storage-powerplant</label>
-                        </div>
-                        <div>
+                        <div title="Biomass Powered Plants (4,382 In Germany)">
                           <input type="radio" name="generation_type" value="biomass" id="Biomass">
-                          <label for="Biomass">Biogas-plant</label>
+                          <label for="Biomass">Biomass</label>
                         </div>
                       </fieldset>
                     </form>
                   </div>
 
                   <!-- Second panel content -->
-                  <div class="tabs-panel is-active" id="panel-energy-system">
+                  <div class="tabs-panel" id="panel-energy-system">
                     <h4>Weather Data</h4>
                     <p>Click on the map to load the closest weather data points. You can then click on one of the loaded points to to display the weather data over the selected time period for a given height and variable. The download can take some
                       time, depending on how many data you required. </p>
