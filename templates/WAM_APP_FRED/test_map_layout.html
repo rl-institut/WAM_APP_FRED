@@ -537,6 +537,8 @@
         onEachFeature: function(feature, layer) {
           layer.on('mouseover', function() {
             this.setStyle(highlightStyleMouseOver);
+            this.bindTooltip("<div >⌛ Load weather data <br> (will take a minute) <div").openTooltip();
+            // alert("lerty")
           });
           layer.on('click', function() {
             this.setStyle(highlightStyle);
