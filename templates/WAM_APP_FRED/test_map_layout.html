@@ -126,7 +126,7 @@
                     <form>
                       <fieldset>
                         <legend>Choose one powerplant type
-                          <i class="icon ion-information-circled icon--small" title="Informationen zum Inhalt"></i>
+                          <i class="icon ion-information-circled icon--small" title="Hover over any power plant type to see its installed number in Germany"></i>
                         </legend>
                         <div title="Photovoltaic Power Plants (1,558,217 in Germany)">
                           <input type="radio" name="generation_type" value="solar" id="Solar" required checked>
@@ -160,7 +160,7 @@
                   <div class="tabs-panel" id="panel-energy-system">
                     <h4>Weather Data</h4>
                     <p>Click on the map to load the closest weather data points. You can then click on one of the loaded points to to display the weather data over the selected time period for a given height and variable. The download can take some
-                      time, depending on how many data you required. </p>
+                      time, depending on how much data you required. </p>
 
 
 
@@ -184,10 +184,11 @@
 
                   <!-- Third panel content -->
                   <div class="tabs-panel" id="panel-feedinlib">
+                    <h4>Feedin-Time Series</h4>
                     <p>
-                      Select a variable and a time span, then click on a region highlighted on the map. The data will be displayed on a graph inside a popup.
+                      Select a technology and click on one of the regions in the map. The energy fed into the electricity grid will be displayed on a graph inside a popup.
                       Currently the plot in the popup window
-                      shows data received from a test data set.
+                      shows calculated data that still need to be revised.
                     </p>
                     <div id="fd-forms">
 
@@ -393,7 +394,7 @@
 
     var update_heights = "{% url 'WAM_APP_FRED:update_variable_heights' %}";
     var export_csv_url = "{% url 'WAM_APP_FRED:export_csv' %}";
-    var export_csv_link = '<a target="_blank" id="trig_csv">to csv</a><a style="display: none" id="export_csv" target="_blank" href="{% url 'WAM_APP_FRED:export_csv' %}"> csv</a>'
+    var export_csv_link = '<a target="_blank" id="trig_csv">save as csv</a><a style="display: none" id="export_csv" target="_blank" href="{% url 'WAM_APP_FRED:export_csv' %}"> csv</a>'
 
 
     function map_init_basic(map, options) {
