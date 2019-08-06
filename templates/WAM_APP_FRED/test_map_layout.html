@@ -394,7 +394,7 @@
 
     var update_heights = "{% url 'WAM_APP_FRED:update_variable_heights' %}";
     var export_csv_url = "{% url 'WAM_APP_FRED:export_csv' %}";
-    var export_csv_link = '<a target="_blank" id="trig_csv">to csv</a><a style="display: none" id="export_csv" target="_blank" href="{% url 'WAM_APP_FRED:export_csv' %}"> csv</a>'
+    var export_csv_link = '<a target="_blank" id="trig_csv">save as csv</a><a style="display: none" id="export_csv" target="_blank" href="{% url 'WAM_APP_FRED:export_csv' %}"> csv</a>'
 
 
     function map_init_basic(map, options) {
