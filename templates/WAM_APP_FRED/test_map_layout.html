@@ -4,477 +4,1189 @@
 
 
 <html class="no-js" lang="en">
-  <head>
+
+<head>
 
 
-    <meta charset="utf-8" />
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>open_FRED</title>
-    <link rel="shortcut icon" type="image/png" href="{% static '/WAM_APP_FRED/img/fav/favicon.ico' %}"/>
-    <link rel="stylesheet" type="text/css" href="{% static 'stemp_abw/img/ionicons-2.0.1/css/ionicons.css' %}">
-    <link rel="stylesheet" href="{% static 'WAM_APP_FRED/foundation/css/app.css' %}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
-    {% leaflet_js %}
-    {% leaflet_css %}
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  </head>
-  <body>
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>open_FRED</title>
+  <link rel="shortcut icon" type="image/png" href="{% static '/WAM_APP_FRED/img/fav/favicon.ico' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'stemp_abw/img/ionicons-2.0.1/css/ionicons.css' %}">
+  <link rel="stylesheet" href="{% static 'WAM_APP_FRED/foundation/css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'WAM_APP_FRED/clusters/css/MarkerCluster.css' %}">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
+  {% leaflet_js %}
+  {% leaflet_css %}
+  <script src="{% static 'WAM_APP_FRED/clusters/js/leaflet.markercluster-src.js' %}"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.Spin/1.1.0/leaflet.spin.js"></script>
+</head>
 
-    <div class="l-bg-color-w u-vh--100">
+<body>
 
-        <!-- TOP NAVIGATION START -->
-        <!-- MAIN NAVIGATION START -->
+  <div class="l-bg-color-w u-vh--100">
 
-        <nav>
-          <div class="title-bar" id="nav-container" data-responsive-toggle="simple-menu" data-hide-for="medium">
-            <button class="menu-icon" type="button" data-toggle></button>
-            <div class="title-bar-title"></div>
-          </div>
+    <!-- TOP NAVIGATION START -->
+    <!-- MAIN NAVIGATION START -->
 
-          <div class="top-bar" id="simple-menu">
-            <div class="top-bar-left show-for-large">
-              <ul class="menu">
-
-              </ul>
-            </div>
-            <div class="top-bar-right">
-              <ul class="dropdown menu" id="nav-list-vertical" data-dropdown-menu>
-                <li>
-                  <a class="anchor-text--light" href="#">Menu</a>
-                  <ul class="menu vertical">
-
-                    <li><a class="anchor-text--light" href="#">Kontakt</a></li>
-                    <li><a class="anchor-text--light" href="#">Impressum</a></li>
-                    <li><a class="anchor-text--light" href="#">Datenschutz</a></li>
-                    <li><a class="anchor-text--light" href="#">Quellen</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </nav>
-
-        <!-- MAIN NAVIGATION END -->    <!-- TOP NAVIGATION END -->
-
-        <div class="off-canvas-wrapper off-canvas-wrapper--left">
-
-          <!-- OFF CANVAS START -->
-          <div class="off-canvas position-left" id="offCanvas" data-off-canvas data-close-on-click="false" data-content-overlay="false" data-transition="overlap" style="color: black; overflow-y: hidden">
-
-            <div class="grid-y medium-grid-frame">
-              <div class="cell medium-auto medium-cell-block-container">
-                <div class="grid-x">
-                  <div class="cell small-3 offcanvas-tabs__wrapper medium-cell-block-y">
-                    <ul class="vertical tabs" data-tabs id="offcanvas-tabs">
-                      <li class="tabs-title is-active">
-                        <a href="#panel-energy-system">
-                          <img src="{% static 'WAM_APP_FRED/img/tab_icons/weather.svg' %}">
-                          <h2 class="tabs-title__head">Weather Data</h2>
-                        </a>
-                      </li>
-                      <li class="tabs-title">
-                        <a href="#panel-scenario">
-                          <img src="{% static 'WAM_APP_FRED/img/tab_icons/powerplants.svg' %}">
-                          <h2 class="tabs-title__head">Power Plant Register</h2>
-                        </a>
-                      </li>
-                      <li class="tabs-title">
-                        <a href="#panel4v">
-                          <img src="{% static 'WAM_APP_FRED/img/tab_icons/feedin.svg' %}">
-                          <h2 class="tabs-title__head">Feedin-Time Series</h2>
-                        </a>
-                      </li>
-                    </ul>
-            
-                  </div>
-                  <div class="cell small-9 medium-cell-block-y tabs-content__wrapper">
-                      <div class="tabs-content" data-tabs-content="offcanvas-tabs">
-    
-                        <!-- First panel content -->
-                        <div class="tabs-panel" id="panel-scenario">
-                          <form>
-                            <fieldset>
-                              <legend>Szenario auswählen 
-                                <i class ="icon ion-information-circled icon--small" title="Informationen zum Inhalt"></i>
-                              </legend>
-                              <div>
-                                <input type="radio" name="scenario" value="statusQuo" id="scenarioStatusQuo" required checked>
-                                <label for="scenarioStatusQuo">Status Quo</label>
-                              </div>
-                              <div>
-                                <input type="radio" name="scenario" value="germany" id="scenarioGermany">
-                                <label for="scenarioGermany">Deutsches Klimaschutzziel</label>
-                              </div>
-                              <div>
-                                <input type="radio" name="scenario" value="100" id="scenario100">
-                                <label for="scenario100">100% EE in der Region</label>
-                              </div>
-                            </fieldset>
-                          </form>
-
-                          <div class="panel__text panel__text--highlighted">
-                            <p id="scenarioPanelText">
-                                <span style="font-weight:700">Status Quo</span><span style="display:inline-block"></span>
-                            </p>
-                          </div>
-                        </div>
-          
-                        <!-- Second panel content -->
-                        <div class="tabs-panel is-active" id="panel-energy-system">
-
-
-
-                          <ul class="accordion" data-accordion>
-                            <li class="accordion-item accordion-item--no-border is-active" data-accordion-item>
-                              <a href="#" class="accordion-title accordion-title--100">Time Span</a>
-                              <div class="accordion-content" data-tab-content >
-                                <div class="tabs-panel is-active" id="panel-energy-system">
-                                  <form id="TimeSpan">
-
-                                    <label for="Start">Start</label>
-                                    <input id="Start">
-                                    <label for="Stop">Stop</label>
-                                    <input id="Stop">
-                                  </form>
-                              </div>
-                            </li>
-                            <li class="accordion-item" data-accordion-item>
-                              <a href="#" class="accordion-title accordion-title--100">Variable</a>
-                              <div class="accordion-content" data-tab-content>
-                                <form id="Variable">
-
-                                  <label>Variable</label>
-                                  <select name="variable">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                  </select>
-                                </form>
-                              </div>
-                            </li>
-                            <li class="accordion-item" data-accordion-item>
-                              <a href="#" class="accordion-title accordion-title--100">Flag</a>
-                              <div class="accordion-content" data-tab-content>
-                                Some Input:
-                                <input type="text">
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
-          
-                        <!-- Third panel content -->
-                        <div class="tabs-panel" id="panel3v">
-
-                        </div>
-          
-                        <!-- Fourth panel content -->
-                        <div class="tabs-panel" id="panel4v">
-                          <p>This will show some graphs soon</p>
-                          <img class="thumbnail" src="{% static 'stemp_abw/img/generic/rectangle-2.jpg' %}">
-                        </div>
-                      </div>
-    
-                  </div>
-                </div>
-              </div>
-            </div>
-    
-            <button class="close-button" aria-label="Close menu" type="button" data-close>
-              <span aria-hidden="true">&times;</span>
-            </button>
-    
-          </div>
-          <!-- OFF CANVAS END -->
-      
-          <!-- CONTENT (MAP + FOOTER) START -->
-          <main class="off-canvas-content" data-off-canvas-content>
-            <div class="map-wrapper">
-              
-              <button type="button" class="button open-offcanvas" data-toggle="offCanvas" title="Parameter">
-                <i class="icon ion-android-options"></i>
-              </button>
-
-              {% leaflet_map "map" callback="window.map_init_basic" settings_overrides=leaflet_config%}
-      
-            </div>
-          </main>
-          <!-- CONTENT (MAP + FOOTER) END -->
-      
-        </div>
-      
-        <footer class="map-footer">
-          <div class="grid-x">
-    
-            <div class="cell medium-4 large-6">
-              <ul class="map-footer__legal">
-                <li>
-                  <a class="anchor-text--dark" href="impressum">Impressum</a>
-                </li>
-                <li>
-                  <a class="anchor-text--dark" href="privacy">Datenschutz</a>
-                </li>
-              </ul>
-            </div>
-    
-            <div class="cell medium-8 large-6">
-              <ul class="map-footer__logo">
-                <li>
-                  <a href="https://www.ovgu.de/" target="_blank" title="Otto von Guericke Universität Magdeburg">
-                    <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/ovgu.svg' %}" alt="Logo OVGU">
-                  </a>
-                </li>
-                <li>
-                  <a href="https://reiner-lemoine-institut.de/" target="_blank" title="Reiner Lemoine Institut">
-                    <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/rli.svg' %}" alt="Logo Reiner Lemoine Institut">
-                  </a>
-                </li>
-                <li>
-                  <a href="https://reiner-lemoine-institut.de/open_fred-open-feed-time-series-based-renewable-energy-database/" target="_blank" title="open_FRED">
-                    <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/open_fred.svg' %}" alt="Logo open_FRED">
-                  </a>
-                </li>
-                <li>
-                  <a href="https://www.bmwi.de/Navigation/DE/Home/home.html" target="_blank" title="Bundesminitserium für Wirtschaft und Energie">
-                    <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/bmwi.svg' %}" alt="Logo BMWI">
-                  </a>
-                </li>
-              </ul>
-            </div>
-    
-          </div>
-        </footer>
-      
+    <nav>
+      <div class="title-bar" id="nav-container" data-responsive-toggle="simple-menu" data-hide-for="medium">
+        <button class="menu-icon" type="button" data-toggle></button>
+        <div class="title-bar-title"></div>
       </div>
 
-    <script src="{% static 'WAM_APP_FRED/foundation/js/app.js' %}"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script type="text/javascript">
+      <div class="top-bar" id="simple-menu">
+        <div class="top-bar-left show-for-large">
+          <ul class="menu">
 
-            var biomassIcon = L.icon({
-                iconUrl: "{% static 'WAM_APP_FRED/img/Pin_biomass_color_v2.svg' %}",
-                iconSize:     [38, 95], // size of the icon
-                iconAnchor:   [19, 72], // point of the icon which will correspond to marker's location
-                popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
-            });
-            
-            var solarRoofIcon = L.icon({
-                iconUrl: "{% static 'WAM_APP_FRED/img/Pin_solarenergy_roof_color_v2.svg' %}",
-                iconSize:     [36, 44], // size of the icon
-                iconAnchor:   [18, 38], // point of the icon which will correspond to marker's location
-                popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
-            });
+          </ul>
+        </div>
+        <div class="top-bar-right">
+          <ul class="dropdown menu" id="nav-list-vertical" data-dropdown-menu>
+            <li>
+              <a class="anchor-text--light" href="#">Menu</a>
+              <ul class="menu vertical">
 
-            var solarGroundIcon = L.icon({
-                iconUrl: "{% static 'WAM_APP_FRED/img/Pin_solarenergy_ground_color_v2.svg' %}",
-                iconSize:     [36, 44], // size of the icon
-                iconAnchor:   [18, 44], // point of the icon which will correspond to marker's location
-                popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
-            });
+                <li><a class="anchor-text--light" href="#">Kontakt</a></li>
+                <li><a class="anchor-text--light" href="#">Impressum</a></li>
+                <li><a class="anchor-text--light" href="#">Datenschutz</a></li>
+                <li><a class="anchor-text--light" href="#">Quellen</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
-            var windOffIcon = L.icon({
-                iconUrl: "{% static 'WAM_APP_FRED/img/Pin_windenergy_offshore_color_v2.svg' %}",
-                iconSize:     [36, 44], // size of the icon
-                iconAnchor:   [18, 44], // point of the icon which will correspond to marker's location
-                popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
-            });
+    <!-- MAIN NAVIGATION END -->
+    <!-- TOP NAVIGATION END -->
 
-            var windOnIcon = L.icon({
-                iconUrl: "{% static 'WAM_APP_FRED/img/Pin_windenergy_onshore_color_v2.svg' %}",
-                iconSize:     [36, 44], // size of the icon
-                iconAnchor:   [18, 44], // point of the icon which will correspond to marker's location
-                popupAnchor:  [0, -20] // point from which the popup should open relative to the iconAnchor
-            });
-      
-            var highlightStyle = {
-                  opacity: 0.7,
-                  weight: 2,
-                  fillOpacity: 0.7,
-                  color: "#0000ff",
-                  fillColor: "#0ba0ff",
-              };
-              var clickedStyle = {
-                  opacity: 0.7,
-                  weight: 2,
-                  fillOpacity: 0.7,
-                  color: "#00ff00",
-                  fillColor: "#00ffff",
-              };
+    <div class="off-canvas-wrapper off-canvas-wrapper--left">
 
-            // define a var which holds a GEOJSON from a URL provided by django
-            var locations_dataurl = "{% url 'WAM_APP_FRED:Locations'|add:'.data' %}";
-            var mouse_click_location = "{% url 'WAM_APP_FRED:MouseClick'|add:'.data' %}";
-            var weather_data_click_location = "{% url 'WAM_APP_FRED:WeatherPointClick'|add:'.data' %}";
+      <!-- OFF CANVAS START -->
+      <div class="off-canvas position-left" id="offCanvas" data-off-canvas data-close-on-click="false" data-content-overlay="false" data-transition="overlap" style="color: black; overflow-y: hidden">
 
+        <div class="grid-y medium-grid-frame">
+          <div class="cell medium-auto medium-cell-block-container">
+            <div class="grid-x">
+              <div class="cell small-3 offcanvas-tabs__wrapper medium-cell-block-y">
+                <ul class="vertical tabs" data-tabs id="offcanvas-tabs">
+                  <li class="tabs-title is-active">
+                    <a href="#panel-welcome">
+                      <img src="{% static 'WAM_APP_FRED/img/tab_icons/info.svg' %}">
+                      <h2 class="tabs-title__head">Welcome</h2>
+                    </a>
+                  </li>
+                  <li class="tabs-title">
+                    <a href="#panel-energy-system">
+                      <img src="{% static 'WAM_APP_FRED/img/tab_icons/weather.svg' %}">
+                      <h2 class="tabs-title__head">Weather Data</h2>
+                    </a>
+                  </li>
+                  <li class="tabs-title">
+                    <a href="#panel-powerplants">
+                      <img src="{% static 'WAM_APP_FRED/img/tab_icons/powerplants.svg' %}">
+                      <h2 class="tabs-title__head">Power Plant Register</h2>
+                    </a>
+                  </li>
+                  <li class="tabs-title">
+                    <a href="#panel-feedinlib">
+                      <img src="{% static 'WAM_APP_FRED/img/tab_icons/feedin.svg' %}">
+                      <h2 class="tabs-title__head">Feedin-Time Series</h2>
+                    </a>
+                  </li>
+                </ul>
 
-            function map_init_basic (map, options) {
-              var popup = L.popup();
+              </div>
+              <div class="cell small-9 medium-cell-block-y tabs-content__wrapper">
+                <div class="tabs-content" data-tabs-content="offcanvas-tabs" id="fred-tabs">
 
-              let wdataStyle = {
-                    opacity: 0.7,
-                    weight: 1,
-                    fillOpacity: 0.7,
-                    color: "#da9700",
-                    fillColor: "#da9700",
-                radius: 5
-              };
-              function createWDataPoint (feature, latlng) {
-                return L.circleMarker(latlng, wdataStyle)
-              };
+                  <!-- Welcome panel content -->
+                  <div class="tabs-panel is-active" id="panel-welcome">
+                    <h4>Welcome</h4>
+                      <p>This tool can be used to get an example overview of the data used and generated in the project <a href="https://reiner-lemoine-institut.de/open_fred-open-feed-time-series-based-renewable-energy-database/">open_FRED</a>. The acronym stands for "open Feed-in time series based on a Renewable Energy Database". The goal of the project was to take weather and powerplant data and calculate the expected energy feedin over time for differen scenarios. It is possible to display and download a subset of the very large datasets. Full data can be accessed via the <a href="https://openenergy-platform.org/">OpenEnergyPlatform</a> (OEP).</p>
+                      <h5> NOTICE: Interfaces to the database are still under development. For that reason queries can take long to finish.</h5> <br>
+                      <h5> Weather Data </h5>
+                      <p>The weather data were simulated at Helmholtz-Zentrum Geesthacht and cover Germany and its closer surroundings in a dense grid. Every point within the Grid includes 15 weather variables broken down to heights between 0 and 240 meters. Variables are calculated for several years with a resolution of 15 minutes. Access <a href="https://openenergy-platform.org/dataedit/view/model_draft/openfred_series">all weather data</a> on the OEP</p>
+                      <h5> Power Plants </h5>
+                      <p>Power plants shown in the app are taken from the <a href="https://reiner-lemoine-institut.de/open_ego-open-electricity-grid-optimization/">open_eGo project</a>. On the OEP you can download <a href="https://openenergy-platform.org/dataedit/view/supply/ego_dp_res_powerplant">all powerplants</a> used in this app. At the time of these projects, no comprehensive power plant dataset for Germany is available. Recently the German Federal Network Agency has published its internal data called <a href="https://www.marktstammdatenregister.de/MaStR">MaStR</a>. However at the time of this writing the published data are still incomplete. A <a href="https://openenergy-platform.org/dataedit/view/supply/bnetza_eeg_anlagenstammdaten">MaStR dump</a> is available on the OEP as well.</p>
+                      <h5> Feedin Time Series </h5>
+                      <p>Feedin time series were caculated based on the extensive weather data and set of power plants. It is possible to use different dataset like MaStR with the developed <a href="https://github.com/oemof/feedinlib">feedinlib</a>. Currently shown data in this tool is for wind energy in the year 2016 and uses the open_eGo powerplant data.</p> <br>
 
-              function displayWeatherDataPoint(feature){
-                  var marker = wdl.getLayer(feature.properties.leaflet_id);
-                  var popup = marker.getPopup();
-                  const variable = feature.properties.variable
-                  var popupContent = '<h4>' + variable +
-                  '</h4></br><div id="tester" style="width:300px;height:250px;"></div>';
-                  popup.setContent(popupContent)
-                  marker.feature.properties = feature.properties
-                  TESTER = document.getElementById('tester');
-                  var height = feature.properties.heights[0];
-                  Plotly.plot( TESTER, [{
-                  x: feature.properties.data[height]['x'],
-                  y: feature.properties.data[height]['y']}], {
-                  margin: { t: 0 } } );
-                  }
+                  </div>
 
-              function onWeatherDataPointClick (event) {
+                  <!-- First panel content -->
+                  <div class="tabs-panel" id="panel-powerplants">
+                    <h4>Power Plant Register</h4>
+                    <p>Select a type of powerplant in this menu. When you click on the map, it will load all powerplants of that type within the selected state. Loading may take a while. Click on another state to load new data.</p>
+                    <form>
+                      <fieldset>
+                        <legend>Choose one powerplant type
+                          <i class="icon ion-information-circled icon--small" title="Hover over any power plant type to see its installed number in Germany"></i>
+                        </legend>
+                        <div title="Photovoltaic Power Plants (1,558,217 in Germany)">
+                          <input type="radio" name="generation_type" value="solar" id="Solar" required checked>
+                          <label for="Solar">Solar</label>
+                        </div>
+                        <div title="Onshore Wind Turbines (25,157 in Germany)">
+                          <input type="radio" name="generation_type" value="wind" id="Wind">
+                          <label for="Wind">Wind</label>
+                        </div>
+                        <div title="Geothermal Power Plants (30 in Germany)">
+                          <input type="radio" name="generation_type" value="geothermal" id="Geothermal">
+                          <label for="Geothermal">Geothermal</label>
+                        </div>
+                        <div title="Run of the River Water Turbines (7,491 in Germany)">
+                          <input type="radio" name="generation_type" value="run_of_river" id="Run_of_river">
+                          <label for="Run_of_river">Hydro</label>
+                        </div>
+                        <div title="Natural Gas Power Plants (261 in Germany)">
+                          <input type="radio" name="generation_type" value="gas" id="Gas">
+                          <label for="Gas">Gas</label>
+                        </div>
+                        <div title="Biomass Powered Plants (4,382 In Germany)">
+                          <input type="radio" name="generation_type" value="biomass" id="Biomass">
+                          <label for="Biomass">Biomass</label>
+                        </div>
+                      </fieldset>
+                    </form>
+                  </div>
 
-                  var marker = event.sourceTarget;
-                  var leaflet_id = L.stamp(marker);
-                  var popup = marker.getPopup();
-                  var latlng = marker.getLatLng();
-                  var location_id = marker.feature.properties.id;
-                  // this need to be linked to user choice
-                  var variable_id = 12;
-
-                  var start_time = '2002-01-31T23:00:00';
-                  var end_time = '2002-03-31T23:00:00';
-
-                  // do not fetch the data a second time
-                  if (marker.feature.properties.variable){
-                  console.log('not fetching data a second time')
-                  displayWeatherDataPoint(marker.feature)
-                  }
-                  else{
-                  // here make a call to django and dl the data for that point
-                  $.ajax({
-                      type: 'POST',
-                      url: weather_data_click_location,
-                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                      data: {
-                      'lat': latlng.lat,
-                      'lon': latlng.lng,
-                      'leaflet_id': leaflet_id,
-                      'location_id': location_id,
-                      'variable_id': variable_id,
-                      'start_time': start_time,
-                      'end_time': end_time
-                      },
-                      success: displayWeatherDataPoint,
-                  });
-                  }
-              }
-
-              let wdataOptions = {
-                pointToLayer: createWDataPoint,
-                onEachFeature: function(feature, layer) {
-                layer.on('mouseover', function () {
-                  this.setStyle(highlightStyle);
-                });
-                layer.on('click', function () {
-                  this.setStyle(highlightStyle);
-                });
-                layer.on('mouseout', function () {
-                  this.setStyle(wdataStyle);
-                });
-                  layer.bindPopup('Loading...');
-
-                  layer.on('click', onWeatherDataPointClick);
-                  }
-              };
-
-              var wdl = new L.geoJSON(null, wdataOptions);
-
-              var wdl_saved = new L.geoJSON(null, wdataOptions);
-
-
-              wdl.addTo(map);
-              wdl_saved.addTo(map);
-
-
-              // Move zoom control
-              map.removeControl(map.zoomControl);
-              L.control.zoom({
-                position: 'topright'
-              }).addTo(map);
-
-              //L.marker([53.4554, 9.6211]).addTo(map); // example marker to quickly show if map loads
-
-              // CIRCLE MARKER --> maybe outsource this section //////////////////////////////////////
-              // create an object with a list of options to style the circle marker
-              // see http://leafletjs.com/reference-1.3.0.html#path for additional options
-              let myLayerStyle = {
-                color: 'Orange',
-                radius: 5
-              };
+                  <!-- Second panel content -->
+                  <div class="tabs-panel" id="panel-energy-system">
+                    <h4>Weather Data</h4>
+                    <p>Click on the map to load the closest weather data points. You can then click on one of the loaded points to to display the weather data over the selected time period for a given height and variable. The download can take some
+                      time, depending on how much data you required. </p>
 
 
 
-              // add all of the GeoJSON data to the empty layer we created
-              function createCircles (feature, latlng) {
-                return L.circleMarker(latlng, myLayerStyle)
-              }
+
+                    <div id="wd-forms">
+                      <form id="wd_timespan">
+
+                        {{variable}}
+                        {{height}}
+                        <div>Start date
+                          {{wd_start_date}}
+                        </div>
+                        <div>End date
+                          {{wd_end_date}}
+                        </div>
 
 
+                      </form>
+                    </div>
+                  </div>
 
-              // create an options object that specifies which function will called on each feature
-              let myLayerOptions = {
-                pointToLayer: createCircles
-              };
-              ///////////////////////////////////////////////////////////////////////////////////////
+                  <!-- Third panel content -->
+                  <div class="tabs-panel" id="panel-feedinlib">
+                    <h4>Feedin-Time Series</h4>
+                    <p>
+                      Select a technology and click on one of the regions in the map. The energy fed into the electricity grid will be displayed on a graph inside a popup.
+                      Currently the plot in the popup window
+                      shows calculated data that still need to be revised.
+                    </p>
+                    <div id="fd-forms">
+
+                      <form id="fd_technology">
+                        {{fd_technology}}
+                      </form>
+                    </div>
+                    <!--<div id="feedin-plot" style="width:300px;height:250px;">
+                    </div>-->
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="close-button" aria-label="Close menu" type="button" data-close>
+          <span aria-hidden="true">&times;</span>
+        </button>
+
+      </div>
+      <!-- OFF CANVAS END -->
+
+      <!-- CONTENT (MAP + FOOTER) START -->
+      <main class="off-canvas-content" data-off-canvas-content>
+        <div class="map-wrapper">
+
+          <button type="button" class="button open-offcanvas" data-toggle="offCanvas" title="Parameter">
+            <i class="icon ion-android-options"></i>
+          </button>
+
+          {% leaflet_map "map" callback="window.map_init_basic" settings_overrides=leaflet_config%}
+
+        </div>
+      </main>
+      <!-- CONTENT (MAP + FOOTER) END -->
+
+    </div>
+
+    <footer class="map-footer">
+      <div class="grid-x">
+
+        <div class="cell medium-4 large-6">
+          <ul class="map-footer__legal">
+            <li>
+              <a class="anchor-text--dark" href="impressum">Impressum</a>
+            </li>
+            <li>
+              <a class="anchor-text--dark" href="privacy">Datenschutz</a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="cell medium-8 large-6">
+          <ul class="map-footer__logo">
+            <li>
+              <a href="https://www.ovgu.de/" target="_blank" title="Otto von Guericke Universität Magdeburg">
+                <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/ovgu.svg' %}" alt="Logo OVGU">
+              </a>
+            </li>
+            <li>
+              <a href="https://reiner-lemoine-institut.de/" target="_blank" title="Reiner Lemoine Institut">
+                <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/rli.svg' %}" alt="Logo Reiner Lemoine Institut">
+              </a>
+            </li>
+            <li>
+              <a href="https://reiner-lemoine-institut.de/open_fred-open-feed-time-series-based-renewable-energy-database/" target="_blank" title="open_FRED">
+                <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/open_fred.svg' %}" alt="Logo open_FRED">
+              </a>
+            </li>
+            <li>
+              <a href="https://www.bmwi.de/Navigation/DE/Home/home.html" target="_blank" title="Bundesminitserium für Wirtschaft und Energie">
+                <img class="map-footer__logo-rli" src="{% static 'WAM_APP_FRED/img/bmwi.svg' %}" alt="Logo BMWI">
+              </a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="{% static 'WAM_APP_FRED/foundation/js/app.js' %}"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    function get_active_panel() {
+      var active_panel = $('#fred-tabs').find('.tabs-panel.is-active').not('*[id*=options-]');
+      active_panel = active_panel.attr('id');
+      return active_panel;
+    }
+
+  function get_selected_powerplant_type() {
+    return $("input[name=generation_type]:checked").val();
+  }
+
+    var biomassIcon = L.icon({
+      iconUrl: "{% static 'WAM_APP_FRED/img/Pin_biomass_color_v2.svg' %}",
+      iconSize: [38, 95], // size of the icon
+      iconAnchor: [19, 72], // point of the icon which will correspond to marker's location
+      popupAnchor: [0, -20] // point from which the popup should open relative to the iconAnchor
+    });
+
+    var solarRoofIcon = L.icon({
+      iconUrl: "{% static 'WAM_APP_FRED/img/Pin_solarenergy_roof_color_v2.svg' %}",
+      iconSize: [36, 44], // size of the icon
+      iconAnchor: [18, 38], // point of the icon which will correspond to marker's location
+      popupAnchor: [0, -20] // point from which the popup should open relative to the iconAnchor
+    });
+
+    var solarGroundIcon = L.icon({
+      iconUrl: "{% static 'WAM_APP_FRED/img/Pin_solarenergy_ground_color_v2.svg' %}",
+      iconSize: [36, 44], // size of the icon
+      iconAnchor: [18, 44], // point of the icon which will correspond to marker's location
+      popupAnchor: [0, -20] // point from which the popup should open relative to the iconAnchor
+    });
+
+    var windOffIcon = L.icon({
+      iconUrl: "{% static 'WAM_APP_FRED/img/Pin_windenergy_offshore_color_v2.svg' %}",
+      iconSize: [36, 44], // size of the icon
+      iconAnchor: [18, 44], // point of the icon which will correspond to marker's location
+      popupAnchor: [0, -20] // point from which the popup should open relative to the iconAnchor
+    });
+
+    var windOnIcon = L.icon({
+      iconUrl: "{% static 'WAM_APP_FRED/img/Pin_windenergy_onshore_color_v2.svg' %}",
+      iconSize: [36, 44], // size of the icon
+      iconAnchor: [18, 44], // point of the icon which will correspond to marker's location
+      popupAnchor: [0, -20] // point from which the popup should open relative to the iconAnchor
+    });
+    var hydroIcon = L.icon({
+      iconUrl: "{% static 'WAM_APP_FRED/img/Pin_hydropower_color_v2.svg' %}",
+      iconSize: [36, 44], // size of the icon
+      iconAnchor: [18, 44], // point of the icon which will correspond to marker's location
+      popupAnchor: [0, -20] // point from which the popup should open relative to the iconAnchor
+    });
+
+    var powerPlantIcon = L.icon({
+      iconUrl: "{% static 'WAM_APP_FRED/img/powerplant.svg' %}",
+      iconSize: [36, 44], // size of the icon
+      iconAnchor: [18, 44], // point of the icon which will correspond to marker's location
+      popupAnchor: [0, -20] // point from which the popup should open relative to the iconAnchor
+    });
+
+    const powerPlantIcons = {
+      solar_roof_mounted: solarRoofIcon,
+      solar_ground_mounted: solarGroundIcon,
+      solar: solarGroundIcon,
+      biomass: biomassIcon,
+      biogas: biomassIcon,
+      biogas_dry_fermentation: biomassIcon,
+      biofuel: biomassIcon,
+      wind_offshore: windOffIcon,
+      wind_onshore: windOnIcon,
+      hydro: hydroIcon,
+      geothermal: powerPlantIcon,
+      gas: powerPlantIcon,
+      biogas_from_grid: powerPlantIcon,
+      gas_mine: powerPlantIcon,
+      gas_sewage: powerPlantIcon,
+      gas_landfill: powerPlantIcon,
+      wood: powerPlantIcon,
+      waste_wood: powerPlantIcon,
+    };
+
+    var highlightStyle = {
+      opacity: 0.7,
+      weight: 2,
+      fillOpacity: 0.7,
+      color: "#0000ff",
+      fillColor: "#0ba0ff",
+    };
+    var highlightStyleMouseOver = {
+      opacity: 0.7,
+      weight: 2,
+      fillOpacity: 0.7,
+      color: "#0000ff",
+      fillColor: "#305EE2",
+    };
+    var clickedStyle = {
+      opacity: 0.7,
+      weight: 2,
+      fillOpacity: 0.7,
+      color: "#00ff00",
+      fillColor: "#00ffff",
+    };
+
+    // define a var which holds a GEOJSON from a URL provided by django
+
+    var mouse_click_location = "{% url 'WAM_APP_FRED:MouseClick'|add:'.data' %}";
+    var weather_data_click_location = "{% url 'WAM_APP_FRED:WeatherPointClick'|add:'.data' %}";
+
+    var ger_boundaries = "{% url 'WAM_APP_FRED:GerBoundary'|add:'.data' %}";
+    var ger_landkreis = "{% url 'WAM_APP_FRED:GerLandkreis'|add:'.data' %}";
+    var ger_pp_count_url = "{% url 'WAM_APP_FRED:GerPowerPlantCount' %}";
+
+    var ppr_location = "{% url 'WAM_APP_FRED:PowerPlantRegister'|add:'.data' %}";
+    var ppr_content = "{% url 'WAM_APP_FRED:PowerPlantPopup'|add:'.data' %}";
+
+    var feedin_location = "{% url 'WAM_APP_FRED:FeedinlibLocation'|add:'.data' %}";
+    var feedin_content = "{% url 'WAM_APP_FRED:FeedinlibPopup'|add:'.data' %}";
+
+    var update_heights = "{% url 'WAM_APP_FRED:update_variable_heights' %}";
+    var export_csv_url = "{% url 'WAM_APP_FRED:export_csv' %}";
+    var export_csv_link = '<a target="_blank" id="trig_csv">save as csv</a><a style="display: none" id="export_csv" target="_blank" href="{% url 'WAM_APP_FRED:export_csv' %}"> csv</a>'
 
 
-              // create a ajax call for locations_dataurl
+    function map_init_basic(map, options) {
+
+
+      let wdataStyle = {
+        opacity: 0.7,
+        weight: 1,
+        fillOpacity: 0.7,
+        color: "#da9700",
+        fillColor: "#da9700",
+        radius: 5
+      };
+
+      function createWDataPoint(feature, latlng) {
+        return L.circleMarker(latlng, wdataStyle)
+      };
+
+      function displayWeatherDataPoint(feature) {
+        var marker = wdl.getLayer(feature.properties.leaflet_id);
+
+        var popup = marker.getPopup();
+        const user_height = $('select[id=id_wd-height] option:selected').val();
+        const variable = $('select[id=id_wd-variable] option:selected').text();
+
+
+        var popupContent = '<h4>  Height ' + user_height + ' m</h4></br>';
+        if (feature.properties.data[user_height]) {
+          popupContent = popupContent + export_csv_link + '<div id="tester" style="width:300px;height:250px;"></div>';
+
+
+          popup.setContent(popupContent);
+
+          document.getElementById("trig_csv").addEventListener(
+            "click",
+            function(event) {
               $.ajax({
-                    url: locations_dataurl,
-                    dataType: 'json',
-                    async: true,
-                    // if the data-source can be accessed, create a GEOJSON layer
-                    success: function(loca){
-                      // create the GeoJSON layer from the myLayerData object
-                      L.geoJSON(loca).addTo(map)
+                type: 'POST',
+                url: export_csv_url,
+                headers: {
+                  'X-CSRFToken': '{{ csrf_token }}'
+                },
+                data: {
+                  'fname': variable + '_timeseries_height_' + user_height + 'm.csv',
+                  'height': user_height,
+                },
+                async: true,
+                success: function(data) {
+                  const lien = $("#export_csv");
+                  lien.get(0).click();
 
-                    }
+                }
               });
+            }
+          );
 
-              // return current location of the mouse-courser
-              // access the original DOM even translate to L.LatLag instance
-              // Rest-full return the value to the server with POST with jQuery
-              map.on('click', onMapClick);
 
-            function addWeatherPoint(data) {
-                // Clear the GeoJSON layer
-                wdl.clearLayers()
-                // Add GeoJSON data in the layer
-                wdl.addData(data)
+
+          marker.feature.properties = feature.properties
+          TESTER = document.getElementById('tester');
+          var height = feature.properties.heights[0];
+          Plotly.plot(
+            TESTER,
+            [{
+              x: feature.properties.data[user_height]['x'],
+              y: feature.properties.data[user_height]['y']
+            }], {
+              margin: {
+                t: 0
+              },
+              xaxis: {
+                title: {
+                  text: 'Time'
+                }
+              },
+              yaxis: {
+                title: {
+                  text: variable
+                }
+              }
+            });
+        } else {
+          popupContent = popupContent + 'There is no records for the choosen parameters';
+          popup.setContent(popupContent);
+        }
+
+      }
+
+      function onWeatherDataPointClick(event) {
+        var marker = event.sourceTarget;
+        var leaflet_id = L.stamp(marker);
+        var popup = marker.getPopup();
+        var latlng = marker.getLatLng();
+        var location_id = marker.feature.properties.location_id;
+        // this need to be linked to user choice
+
+        const start_year = $('#id_wd_timespan_start-year').val();
+        const start_month = $('#id_wd_timespan_stop-month').val();
+        const stop_year = $('#id_wd_timespan_stop-year').val();
+        const stop_month = $('#id_wd_timespan_stop-month').val();
+
+        const variable_id = $('select[id=id_wd-variable] option:selected').val();
+        if (marker.feature.properties.variable == variable_id) {
+          // do not fetch the data a second time
+          console.log('not fetching data a second time')
+          displayWeatherDataPoint(marker.feature)
+        } else {
+          if (map.spin) {
+            map.spin(true)
+          }
+
+          console.log('fetching data')
+          // here make a call to django and dl the data for that point
+          $.ajax({
+            type: 'POST',
+            url: weather_data_click_location,
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: {
+              'lat': latlng.lat,
+              'lon': latlng.lng,
+              'leaflet_id': leaflet_id,
+              'location_id': location_id,
+              'variable_id': variable_id,
+              'start_month': start_month,
+              'start_year': start_year,
+              'end_month': stop_month,
+              'end_year': stop_year
+            },
+            success: displayWeatherDataPoint,
+          }).done(function() {
+            if (map.spin) {
+              map.spin(false)
+            }
+          });
+        }
+      }
+
+      let wdataOptions = {
+        pointToLayer: createWDataPoint,
+        onEachFeature: function(feature, layer) {
+          layer.on('mouseover', function() {
+            this.setStyle(highlightStyleMouseOver);
+            this.bindTooltip("<div >⌛ Load weather data <br> (will take a minute) <div").openTooltip();
+            // alert("lerty")
+          });
+          layer.on('click', function() {
+            this.setStyle(highlightStyle);
+          });
+          layer.on('mouseout', function() {
+            this.setStyle(wdataStyle);
+          });
+          layer.bindPopup('Loading...');
+
+          layer.on('click', onWeatherDataPointClick);
+        }
+      };
+
+
+      var wdl = new L.geoJSON(null, wdataOptions);
+
+
+      wdl.addTo(map);
+
+
+      // Move zoom control
+      map.removeControl(map.zoomControl);
+      L.control.zoom({
+        position: 'topright'
+      }).addTo(map);
+
+      //L.marker([53.4554, 9.6211]).addTo(map); // example marker to quickly show if map loads
+
+      // CIRCLE MARKER --> maybe outsource this section //////////////////////////////////////
+      // create an object with a list of options to style the circle marker
+      // see http://leafletjs.com/reference-1.3.0.html#path for additional options
+      let myLayerStyle = {
+        color: 'Orange',
+        radius: 5,
+        icon: powerPlantIcon
+      };
+
+
+
+      // add all of the GeoJSON data to the empty layer we created
+      function createCircles(feature, latlng) {
+        return L.marker(latlng, myLayerStyle)
+      }
+
+
+
+      // create an options object that specifies which function will called on each feature
+      let myLayerOptions = {
+        pointToLayer: createCircles
+      };
+      ///////////////////////////////////////////////////////////////////////////////////////
+
+      // return current location of the mouse-courser
+      // access the original DOM even translate to L.LatLag instance
+      // Rest-full return the value to the server with POST with jQuery
+      map.on('click', onMapClick);
+
+
+      function addWeatherPoint(data) {
+        // Clear the GeoJSON layer
+        wdl.clearLayers()
+        // Add GeoJSON data in the layer
+        wdl.addData(data)
+      }
+
+      function onMapClick(ev) {
+        var active_panel = get_active_panel();
+        if (active_panel == 'panel-energy-system') {
+          if (map.spin) {
+            map.spin(true)
+          }
+          var latlng = map.mouseEventToLatLng(ev.originalEvent);
+          $.ajax({
+            type: 'POST',
+            url: mouse_click_location,
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: {
+              'lat': latlng.lat,
+              'lon': latlng.lng
+            },
+            success: addWeatherPoint,
+          }).done(function() {
+            if (map.spin) {
+              map.spin(false)
+            }
+          });
+        }
+      };
+
+
+      // This is style setting for german boundary
+      //should be outsourced -> style.css
+      var GerBoundStyle = {
+        opacity: 0.7,
+        weight: 1,
+        fillOpacity: 0.4,
+        color: "#000000",
+        fillColor: "#999999",
+      };
+
+      var GerBoundZoomLvlStyle = {
+        opacity: 0.9,
+        weight: 5,
+        fillOpacity: 0.0,
+        color: "#ffffff",
+        fillColor: "#0BC11C",
+      };
+
+      // these will apply to geojson object added to the
+      // rel layer (region layer)
+      let regionsOptions = {
+        style: function(feature, latlng) {
+          return GerBoundStyle;
+        },
+        onEachFeature: function(boundary, layer) {
+          layer.on('mouseover', function(event) {
+            region = event.sourceTarget;
+
+            const regionName = region.feature.properties.region;
+            const regionId = region.feature.properties.nuts_1;
+            var tooltipContent = "<div>"+ regionName +"</div></br><ul>";
+
+            pp_count = ger_pp_count[regionId]
+            for (const g_type in pp_count) {
+              // remove the underscores and capitalize first letter of the type
+              var type_name = g_type.replace(/_/g, ' ');
+              type_name = type_name.charAt(0).toUpperCase() + type_name.slice(1);
+              var addContent = type_name + ': ' + pp_count[g_type];
+              // set the selected option in bold
+              if (g_type === get_selected_powerplant_type()) {
+                addContent = "<span style='font-weight:bold'>" + addContent + "</span>"
+              }
+
+              tooltipContent = tooltipContent + '<li>' + addContent + '</li>';
+            }
+            tooltipContent = tooltipContent + '</ul>';
+
+            if (region.getTooltip()) {
+              region.setTooltipContent(tooltipContent);
+              region.openTooltip();
+            }
+            else {
+              region.bindTooltip(tooltipContent).openTooltip();
             }
 
-	          function onMapClick(ev) {
-                  var latlng = map.mouseEventToLatLng(ev.originalEvent);
-                  $.ajax({
-                      type: 'POST',
-                      url: mouse_click_location,
-                      headers: {'X-CSRFToken': '{{ csrf_token }}'},
-                      data: {'lat': latlng.lat, 'lon': latlng.lng},
-                      success: addWeatherPoint,
-                  });
-	          };
-            };
+            if (this.clicked != true) {
+              this.setStyle(highlightStyleMouseOver);
+            }
+          });
+          layer.on('mouseout', function(event) {
+            region = event.sourceTarget;
+            region.closeTooltip();
+            if (this.clicked != true) {
+              this.setStyle(GerBoundStyle);
+            }
+          });
+          // select region and request data
+          layer.on('click', function(event) {
+            var active_panel = get_active_panel();
+            this.clicked = true;
+            this.setStyle(GerBoundZoomLvlStyle);
+            region = event.sourceTarget;
+            if (active_panel == 'panel-powerplants') {
+              loadRegionPowerPlants(region, layer);
+            }
+          });
+        }
+      }
+      //Region layer
+      var rel = new L.geoJSON(null, regionsOptions);
 
-    </script>
+      // fetch Germany region geojsons
+      $.ajax({
+        url: ger_boundaries,
+        dataType: 'json',
+        async: true,
+        success: function(region_data) {
+          rel.addData(region_data)
+        }
+      });
 
-  </body>
+
+      // these will apply to geojson object added to the
+      // lkl layer (landkreis layer)
+      let landkreisOptions = {
+        style: function(feature, latlng) {
+          return GerBoundStyle;
+        },
+        onEachFeature: function(boundary, layer) {
+          layer.on('mouseover', function(event) {
+            landkreis = event.sourceTarget;
+            if (landkreis.getTooltip()) {
+              landkreis.openTooltip();
+            }
+            else {
+              const landkreisName = landkreis.feature.properties.gen
+              landkreis.bindTooltip("<div>"+ landkreisName +"</div>").openTooltip();
+            }
+            if (this.clicked != true) {
+              this.setStyle(highlightStyleMouseOver);
+
+            }
+          });
+          layer.on('mouseout', function(event) {
+            landkreis = event.sourceTarget;
+            landkreis.closeTooltip();
+            if (this.clicked != true) {
+              this.setStyle(GerBoundStyle);
+
+            }
+          });
+          // select landkreis and request data
+          layer.on('click', function(event) {
+            var active_panel = get_active_panel();
+            this.clicked = true;
+            this.setStyle(GerBoundZoomLvlStyle);
+            landkreis = event.sourceTarget;
+            if (active_panel == 'panel-feedinlib') {
+              loadLandkreisFeedin(landkreis, layer);
+            }
+          });
+        }
+      }
+      // Landkreis layer
+      var lkl = new L.geoJSON(null, landkreisOptions)
+
+      // fetch Germany landkreis geojsons
+      $.ajax({
+        url: ger_landkreis,
+        dataType: 'json',
+        async: true,
+        success: function(landkreis_data) {
+          lkl.addData(landkreis_data)
+        }
+      });
+
+
+      //PowePlantRegister StartSection
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////
+      // res PowerPlants in region boundaries
+
+      var ger_pp_count = null;
+      // fetch Germany powerplant count
+      $.ajax({
+        url: ger_pp_count_url,
+        dataType: 'json',
+        async: true,
+        success: function(pp_count_data) {
+          ger_pp_count = pp_count_data;
+        }
+      });
+
+
+      // Layer containing the markers created by user click for powerplant
+      var ppClusters = L.markerClusterGroup();
+      ppClusters.on('click', onPowerPlantDataPointClick);
+
+      // request all power plants contained in selected region
+      // also include the generation_type option
+      function loadRegionPowerPlants(region, layer) {
+        var region_name = region.feature.properties.region;
+        var generation_type = get_selected_powerplant_type();
+        //set the spinner
+        if (map.spin) {
+          map.spin(true)
+        }
+        $.ajax({
+          url: ppr_location,
+          type: 'POST',
+          async: true,
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          data: {
+            'region_name': region_name,
+            'generation_type': generation_type
+          },
+          success: function(features) {
+            if (map.hasLayer(ppClusters)) {
+              map.removeLayer(ppClusters);
+            }
+            for (const feature of features.features) {
+
+              var m = L.marker(
+                [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
+                {icon: powerPlantIcons[feature.property.generation_subtype]}
+              )
+              m.bindPopup('Loading');
+              m.feature = {
+                'id': feature.id
+              };
+
+              ppClusters.addLayer(m)
+            }
+            map.addLayer(ppClusters);
+          }
+        }).done(function() {
+          //remove spinner when done loading
+          if (map.spin) {
+            map.spin(false)
+          }
+        });
+      }
+
+      function updatePowerplantPopup(feature, marker) {
+        if (feature.property) {
+          var keys = Object.keys(feature.property);
+          var content = '<table class="selection_detail">';
+
+          for (let i = 1, len = keys.length; i < len; i++) {
+            content = content + '<tr><td align="right"><b>' + keys[i] + '</b>:</td><td>' + feature.property[keys[i]] + '</td></tr>'
+          }
+          content = content + '</table>';
+
+          var popup = marker.getPopup();
+          popup.setContent(content);
+          marker.property = feature.property;
+        }
+      }
+
+      function onPowerPlantDataPointClick(event) {
+
+        var marker = event.sourceTarget;
+
+
+        if (marker.property) {
+          // do not fetch the data a second time
+          console.log('not fetching data a second time')
+          updatePowerplantPopup(marker.feature, marker)
+        }
+        else {
+
+          if (map.spin) {
+            map.spin(true)
+          }
+          var leaflet_id = L.stamp(marker);
+          var pp_id = marker.feature.id;
+
+
+          $.ajax({
+            type: 'POST',
+            url: ppr_content,
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: {
+              'leaflet_id': leaflet_id,
+              'pp_id': pp_id
+            },
+            success: function(thispopupcontent) {
+              updatePowerplantPopup(thispopupcontent, marker)
+            }
+          }).done(function() {
+            if (map.spin) {
+              map.spin(false)
+            }
+          });
+        }
+      }
+
+      //PowePlantRegister EndSection
+      ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      ///// Feedinlib
+      //
+      function updateFeedinPopup(data, marker) {
+        var popup = marker.getPopup();
+        const name = data.properties.gen
+        const lk_id = data.landkreis_id
+        if (data.n_records > 0) {
+          var popupContent = '<h4> ' + name + '</h4></br>' + export_csv_link + '</br><div id="feedin-plot" style="width:300px;height:250px;"></div>';
+          popup.setContent(popupContent)
+
+
+          document.getElementById("trig_csv").addEventListener(
+            "click",
+            function(event) {
+              $.ajax({
+                type: 'POST',
+                url: export_csv_url,
+                headers: {
+                  'X-CSRFToken': '{{ csrf_token }}'
+                },
+                data: {
+                  'fname': 'power_timeseries_' + name + '.csv',
+                },
+                async: true,
+                success: function(data) {
+                  const lien = $("#export_csv");
+                  lien.get(0).click();
+
+                }
+              });
+            }
+          );
+
+          plot_div = document.getElementById('feedin-plot');
+          Plotly.plot(
+            plot_div,
+            [{
+              x: data.timespan,
+              y: data.values
+            }], {
+              margin: {
+                t: 0
+              },
+              xaxis: {
+                title: {
+                  text: 'Time'
+                }
+              },
+              yaxis: {
+                title: {
+                  text: 'MW'
+                }
+              }
+            }
+          );
+        } else {
+          var popupContent = '<h4> ' + name + '</h4></br><div>Your query unfortunately did not match any records from the database</div>';
+          popup.setContent(popupContent)
+        }
+      };
+
+
+
+      function onFeedinPointClick(event) {
+        var marker = event.sourceTarget;
+        var leaflet_id = L.stamp(marker);
+        var popup = marker.getPopup();
+        var latlng = marker.getLatLng();
+        var landkreis_props = marker.feature.properties;
+        landkreis_props.technology = $("#id_fd-technology").val();
+        // TODO : this need to be linked to user choice for wd_timespan
+        //
+        if (marker.feature.properties.timespan) {
+          // do not fetch the data a second time
+          console.log('not fetching data a second time')
+          updateFeedinPopup(marker.feature, marker)
+        } else {
+          if (map.spin) {
+            map.spin(true)
+          }
+          // here make a call to django and dl the data for that point
+          $.ajax({
+            type: 'POST',
+            url: feedin_content,
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            data: landkreis_props,
+            success: function(data) {
+              updateFeedinPopup(data, marker)
+            }
+          }).done(function() {
+            if (map.spin) {
+              map.spin(false)
+            }
+          });
+        }
+      }
+
+      // these will apply to geojson object added to the
+      // fdl layer (feedinlib layer)
+      let feedinOptions = {
+        pointToLayer: createFeedinPopup,
+        onEachFeature: function(feature, layer) {
+          layer.bindPopup('Loading...');
+          layer.on('click', onFeedinPointClick);
+        }
+      };
+
+      // Layer containing the markers created by user click for feedinlib
+      var fdl = new L.geoJSON(null, feedinOptions);
+
+      function addFeedinPoint(feature) {
+        // Clear the GeoJSON layer
+        fdl.clearLayers();
+        // Add GeoJSON data in the layer
+        fdl.addData(feature);
+        // Simulate a click on the marker
+        marker = fdl.getLayers()[0];
+        marker.fire('click');
+      }
+
+
+      function createFeedinPopup(feature, latlng) {
+        return L.circleMarker(latlng, wdataStyle)
+      }
+
+
+      function loadLandkreisFeedin(landkreis, layer) {
+        if (map.spin) {
+          map.spin(true)
+        }
+        landkreis_props = landkreis.feature.properties;
+        $.ajax({
+          url: feedin_location,
+          type: 'POST',
+          async: true,
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          },
+          data: landkreis_props,
+          success: addFeedinPoint
+        }).done(function() {
+          if (map.spin) {
+            map.spin(false)
+          }
+        });
+      };
+
+
+
+      document.getElementById("offcanvas-tabs").addEventListener(
+        "click",
+        function(event) {
+          activePanel = get_active_panel();
+          if (activePanel == 'panel-energy-system') {
+            if (map.hasLayer(rel)) {
+              map.removeLayer(rel)
+            }
+            if (map.hasLayer(fdl)) {
+              map.removeLayer(fdl)
+            }
+            if (map.hasLayer(lkl)) {
+              map.removeLayer(lkl)
+            }
+            if (map.hasLayer(ppClusters)) {
+              map.removeLayer(ppClusters)
+            }
+            if (!map.hasLayer(wdl)) {
+              map.addLayer(wdl)
+            }
+          }
+          if (activePanel == 'panel-feedinlib') {
+            if (map.hasLayer(rel)) {
+              map.removeLayer(rel)
+            }
+            if (map.hasLayer(wdl)) {
+              map.removeLayer(wdl)
+            }
+            if (map.hasLayer(ppClusters)) {
+              map.removeLayer(ppClusters)
+            }
+            if (!map.hasLayer(fdl)) {
+              map.addLayer(fdl)
+            }
+            if (!map.hasLayer(lkl)) {
+              map.addLayer(lkl)
+            }
+          }
+
+          if (activePanel == 'panel-powerplants') {
+            if (map.hasLayer(wdl)) {
+              map.removeLayer(wdl)
+            }
+            if (map.hasLayer(fdl)) {
+              map.removeLayer(fdl)
+            }
+            if (map.hasLayer(lkl)) {
+              map.removeLayer(lkl)
+            }
+            if (!map.hasLayer(rel)) {
+              map.addLayer(rel)
+            }
+            if (!map.hasLayer(ppClusters)) {
+              map.addLayer(ppClusters)
+            }
+          }
+        });
+
+
+
+      function wdControlChanged(event) {
+        markers = wdl.getLayers();
+        for (const marker of markers) {
+          // if yes, then resimulate a userlick on the marker to update the popup
+          if (marker) {
+            if (marker.isPopupOpen()) {
+              marker.fire('click');
+            }
+          }
+        }
+      }
+
+      wd_controls = [
+        //"id_wd_timespan_start-year",
+        //"id_wd_timespan_stop-year",
+        //"id_wd_timespan_start-month",
+        //"id_wd_timespan_stop-month",
+        //"id_wd-variable",
+        "id_wd-height",
+      ]
+
+      for (const element of wd_controls) {
+        document.getElementById(element).addEventListener(
+          "change",
+          wdControlChanged
+        );
+      }
+
+
+      function feedinControlChanged(event) {
+        marker = fdl.getLayers()[0];
+        // if yes, then resimulate a userlick on the marker to update the popup
+        if (marker && marker.isPopupOpen()) {
+          marker.fire('click');
+        }
+      }
+
+      fd_controls = [
+        "id_fd-technology"
+      ]
+
+      for (const element of fd_controls) {
+        document.getElementById(element).addEventListener(
+          "change",
+          feedinControlChanged
+        );
+      }
+
+      //update the available heights depending on the choice of variable
+      $("#id_wd-variable").change(function(event) {
+        const variable_id = event.currentTarget.value; // get the selected variable ID from the HTML input
+        $.ajax({
+          url: update_heights,
+          async: true,
+          data: {
+            'variable_id': variable_id // add the country id to the GET parameters
+          },
+          success: function(data) { // `data` is the return of the `load_heights` view function
+            $("#id_wd-height").html(data); // replace the contents of the height input with the data that came from the server
+            wdControlChanged(event);
+          }
+        });
+
+      });
+
+
+
+    };
+  </script>
+
+</body>
+
 </html>

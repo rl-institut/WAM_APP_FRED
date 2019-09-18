@@ -14,7 +14,8 @@ from sqlalchemy import (
     String as Str,
     Text,
     UniqueConstraint as UC,
-    Table)
+    Table,
+    Numeric)
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -155,11 +156,44 @@ def ppr_mapping(metadata):
         # reflect the existing table with autoload from DB and add values as extend_existing
         Table('ego_dp_res_powerplant', metadata, extend_existing=True, autoload=True)
 
+        # Convert the type Decimal into float for python
+        for column in __table__.columns.values():
+            if isinstance(column.type, Numeric):
+                column.type.asdecimal = False
+
     # Add Table to dict
     classes["ResPowerPlant"] = ResPowerPlantRegister
+    return classes
+
+
+def ts_mapping(metadata):
+    """
+      Returns classes mapped to the OEDB database via SQLAlchemy.
+      The classes are reflected(autoload=True) and stored in a dictionary keyed by
+      class names. The dictionary also contains the special entry `__Base__`,
+      which an SQLAlchemy `declarative_base` instance used as the base class from
+      which all mapped classes inherit.
+      """
+
+    # SQLAlchemy Base
+    Base = declarative_base(metadata=metadata)
+    classes = {"__Base__": Base}
+
+    class OpenFredTimesSeries(Base):
+        __table__ = Table('openfred_timeseries_ch', metadata)
+        # reflect the existing table with autoload from DB and add values as extend_existing
+        Table('openfred_timeseries_ch', metadata, extend_existing=True, autoload=True)
+
+        # Convert the type Decimal into float for python
+        for column in __table__.columns.values():
+            if isinstance(column.type, Numeric):
+                column.type.asdecimal = False
+
+    classes['OpenFredTimesSeries'] = OpenFredTimesSeries
     return classes
 
 
 # contains open_FRED related tables as SQLAlchemy class
 open_fred_classes = mapped_classes(metadata_1)
 ego_dp_res_classes = ppr_mapping(metadata_2)
+open_fred_ts_classes = ts_mapping(metadata_1)

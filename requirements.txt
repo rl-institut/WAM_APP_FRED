@@ -8,3 +8,5 @@ shapely
 geojson
 oedialect
 python-dateutil
+configobj
+git+https://github.com/coroa/saio.git#egg=saio
