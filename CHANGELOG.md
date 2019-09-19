@@ -16,16 +16,25 @@ Here is a template for new release sections
 ### Removed
 -
 ```
-## [Unrealeased]
+
+## [1.0.0] - 2019-09-19
 
 ### Added
 - possibility to know which panel is selected
 - feedinlib graph
+- enabled local
+- attribution to leaflet map
+- possibility to download a CSV file
+- filter option for weather data points (i.e. time span, variable id, height)
+- geojson file with landkreis borders
+- geojson file with rough counts of powerplants (to have an idea of how large it can be)
+- powerplant specific icons
+
 ### Changed
+- serializer view for data points, powerplants and feedinlib improved
 - LOCAL_TESTING is set in `config/fred_app-cfg`
 - the click on map will only trigger action for the selected panel
-
-
+- improved README
 
 
 ## [0.0.1] - 2019-07-09
