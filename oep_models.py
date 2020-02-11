@@ -109,7 +109,6 @@ def mapped_classes(metadata):
         flag_vs = C(ARRAY(Str(37)), nullable=False)
         __mapper_args_ = {"polymorphic_identity": "flags"}
 
-        @property
         def flag(self, key):
             flags = dict(zip(self.flag_ks, self.flag_vs))
             return flags[key]
