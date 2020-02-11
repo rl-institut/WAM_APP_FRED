@@ -518,6 +518,7 @@ def wseries_fetch_data_single_point(request):
             CsvRow.objects.all().delete()
             for record in oep_query:
                 timespan_id = record.Series.timespan_id
+
                 height = record.Series.height
 
                 if timespan_id not in timespan_ids:
