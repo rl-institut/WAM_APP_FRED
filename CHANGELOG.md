@@ -17,6 +17,21 @@ Here is a template for new release sections
 -
 ```
 
+## [v1.0.1] - 2020-02-12
+
+### Added
+- new migration 
+
+### Changed
+- csvrow table now has field "hights"
+- oep_models OEP schemas
+- saio_table_models OEP schemas
+- pylintr ignores oep_models.py 
+
+### Removed
+- unnecessary OEP schemas
+
+
 ## [1.0.0] - 2019-09-19
 
 ### Added

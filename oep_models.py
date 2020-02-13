@@ -28,7 +28,7 @@ from geoalchemy2 import types as geotypes
 
 
 # ##########################################SQLAlchemy setup########################################
-SCHEMA_1 = 'model_draft'
+SCHEMA_1 = 'climate'
 SCHEMA_2 = 'supply'
 engine = sah.get_engine('oep_engine')
 metadata_1 = MetaData(schema=SCHEMA_1, bind=engine)
@@ -196,4 +196,4 @@ def ts_mapping(metadata):
 # contains open_FRED related tables as SQLAlchemy class
 open_fred_classes = mapped_classes(metadata_1)
 ego_dp_res_classes = ppr_mapping(metadata_2)
-open_fred_ts_classes = ts_mapping(metadata_1)
+open_fred_ts_classes = ts_mapping(metadata_2)
