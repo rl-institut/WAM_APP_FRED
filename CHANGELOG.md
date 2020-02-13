@@ -17,7 +17,7 @@ Here is a template for new release sections
 -
 ```
 
-## [1.0.1] - 2020-02-12
+## [v1.0.1] - 2020-02-12
 
 ### Added
 - new migration 
