@@ -16,6 +16,10 @@ Here is a template for new release sections
 ### Removed
 -
 ```
+## [1.0.2] - 2020-11-06
+
+### Fixed
+- fix no longer supporter mapbox tiles
 
 ## [v1.0.1] - 2020-02-12
 

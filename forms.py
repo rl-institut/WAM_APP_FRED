@@ -1,6 +1,6 @@
 from django import forms
 
-YEAR_CHOICES = [(y, '{}'.format(y)) for y in range(2002, 2010)]
+YEAR_CHOICES = [(y, '{}'.format(y)) for y in range(2002, 2020)]
 MONTH_CHOICES = [(m, '{}'.format(m)) for m in range(1, 13)]
 VARIABLE_CHOICES = [
     (1, 'air_temperature'),
